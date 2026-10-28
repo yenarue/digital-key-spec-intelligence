@@ -10,6 +10,14 @@ Prioritize **deployable flow → reliable retrieval → traceable evidence → A
 ## Updated architecture decision (2026-10-29)
 Real CCC Digital Key V3.1.4 and V4.1.0 PDFs **are intended as first-class retrieval sources for a local pilot**. The public Vercel academic demo remains synthetic. Implement shared `CorpusProvider`, `Retriever`, `LLMProvider`, `EvidenceValidator` interfaces so approved local-PDF retrieval via a future stdio MCP adapter and synthetic+OpenRouter Web RAG can share retrieval/evidence logic. Local inference/Ollama is optional, not the planned company workflow. Do not mistake an external vendor's ZDR policy for redistribution rights. Before local ingest check source notices and organization policy; before any external transfer of real text obtain authorization. See [docs/ccc-rag-architecture.md](docs/ccc-rag-architecture.md). Keep `/data/local/` ignored and never bundle or upload real PDFs, parsed text or indices. The PDF parser/local inference are **the next pilot after A–E**, not prohibited permanent non-goals.
 
+## Skills: course deliverable and future MCP workflow
+
+See [docs/skills-plan.md](docs/skills-plan.md). Two repo-local workflows already exist:
+- `.agents/skills/spec-requirement-navigator/SKILL.md`: discover + interpret + cross-reference + exact evidence.
+- `.agents/skills/spec-answer-auditor/SKILL.md`: independently audit citations and logical support.
+
+Maintain their focused YAML metadata and avoid pretending the Skill is the RAG backend or the MCP server. The Skills work on synthetic `data/demo` now without assuming app or MCP implementation; later map retrieval to approved local MCP. Verify activation/non-activation, version constraints, actual source quotes, missing evidence, and adversarial fabricated IDs in Codex. See the academic Skill demonstration as an additional workflow artifact; **A–E Web deployment remains the priority**. Do not mark a Skill as tested unless invoked and checked in an actual agent session.
+
 ## Non-negotiable safety and integrity rules
 1. **Public demo, synthetic data only.** Never commit, scrape, request, copy or transmit CCC specification text without verified rights, OEM/employee documentation, real device logs, internal code, credentials, keys, or identifiable data. Synthetic requirements MUST be clearly labeled fictional and must not be described as CCC mandates.
 2. Keep `OPENROUTER_API_KEY` strictly server-side in Vercel/Next.js Route Handlers. Never use `NEXT_PUBLIC_` prefix for secrets, expose keys in responses, or commit .env files.
