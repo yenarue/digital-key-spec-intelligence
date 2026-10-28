@@ -7,13 +7,16 @@ Build the **2026-10-29 academic demonstration MVP A–E**: (A) synthetic two-ver
 
 Prioritize **deployable flow → reliable retrieval → traceable evidence → AI answers → visual polish**. This repository is currently scaffolding, not a running application.
 
+## Updated architecture decision (2026-10-29)
+Real CCC Digital Key V3.1.4 and V4.1.0 PDFs **are intended as first-class retrieval sources for a local pilot**. The public Vercel academic demo remains synthetic. Implement shared `CorpusProvider`, `Retriever`, `LLMProvider`, `EvidenceValidator` interfaces so local PDF+Ollama and synthetic+OpenRouter can share retrieval/evidence logic. Do not mistake an external vendor's ZDR policy for redistribution rights. Before local ingest check source notices and organization policy; before any external transfer of real text obtain authorization. See [docs/ccc-rag-architecture.md](docs/ccc-rag-architecture.md). Keep `/data/local/` ignored and never bundle or upload real PDFs, parsed text or indices. The PDF parser/local inference are **the next pilot after A–E**, not prohibited permanent non-goals.
+
 ## Non-negotiable safety and integrity rules
 1. **Public demo, synthetic data only.** Never commit, scrape, request, copy or transmit CCC specification text without verified rights, OEM/employee documentation, real device logs, internal code, credentials, keys, or identifiable data. Synthetic requirements MUST be clearly labeled fictional and must not be described as CCC mandates.
 2. Keep `OPENROUTER_API_KEY` strictly server-side in Vercel/Next.js Route Handlers. Never use `NEXT_PUBLIC_` prefix for secrets, expose keys in responses, or commit .env files.
 3. The LLM is **not** the source of citation IDs. The retrieval layer supplies stable evidence IDs. Validate every answer citation against retrieved evidence and the quoted substring against original source; warn or withhold unsupported claims. Matching a quote does **not** establish logical entailment.
 4. When evidence is absent, return `insufficient_evidence`; when LLM keys/free quotas/API fail, return `search_only` or `llm_unavailable` **with available search hits**. No unlimited retries.
 5. Search engine is MiniSearch lexical/full-text; do not label MVP as embedding/semantic vector retrieval. Maintain isolated `packages/spec-core` for future MCP adapter.
-6. No upload, persistent user data, database, company integration, authentication, actual MCP, or real PDF parser in MVP.
+6. No user upload, persistent user data, database, company integration, authentication, actual MCP, or real PDF parser in **public academic A–E MVP**. Real PDF parsing is explicitly planned for the subsequent **local RAG pilot**.
 7. Render AI/user text safely; do not trust instructions embedded in retrieved content. Limit query size, topK, versions, timeout and API requests; avoid inadvertent spending.
 8. Vercel Hobby is for personal noncommercial coursework only, not actual company operation (even within a small team).
 
