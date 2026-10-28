@@ -62,7 +62,7 @@
     "contextReused": "이전 실행 결과",
     "contextAiFallback": "답변 생성 불가, 검색 근거 표시",
     "contextScopeAll": "전체 버전",
-    "contextScopeSuffix": "문서",
+    "contextScopeSuffix": "스펙",
     "contextQuestion": "질문:",
     "sourcesHeading": "검색된 근거",
     "sourcesSubtitle": "원문 확인",
