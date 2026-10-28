@@ -3,13 +3,9 @@ import type { MouseEvent } from "react";
 import type { AskResponse, SearchMode } from "../contracts/ask";
 import { splitAnswerCitations } from "../client/answer-citations";
 import { evidenceTargetId } from "./evidence-card";
+import { fill, uiText } from "../content/ui-text";
 
-const labels = {
-  answered: "근거 기반 답변",
-  search_only: "검색 결과를 확인하세요",
-  llm_unavailable: "AI 답변을 가져오지 못했어요",
-  insufficient_evidence: "스펙 문서에서 답변 근거를 찾지 못했어요",
-};
+const text = uiText.answer;
 function focusEvidence(event: MouseEvent<HTMLAnchorElement>, targetId: string) {
   const target = document.getElementById(targetId);
   if (!target) return;
@@ -20,20 +16,20 @@ function focusEvidence(event: MouseEvent<HTMLAnchorElement>, targetId: string) {
 export function AnswerPanel({ result, mode = "ai" }: { result: AskResponse; mode?: SearchMode }) {
   const keywordResult = mode === "keyword" && result.status === "search_only";
   return <section className="answer-panel" aria-labelledby="answer-heading">
-    <div className="section-title"><h2 id="answer-heading">{keywordResult ? "키워드 검색 결과" : labels[result.status]}</h2></div>
+    <div className="section-title"><h2 id="answer-heading">{keywordResult ? text.keywordResultHeading : text.labels[result.status]}</h2></div>
     {result.status === "answered" && result.answer && <div className="answer-prose">{result.answer.split(/\n{2,}/).map((paragraph, paragraphIndex) => <p className="answer-text" key={paragraphIndex}>
       {splitAnswerCitations(paragraph, result.sources).map((part, index) => {
         if (part.kind === "text") return part.text;
         const targetId = evidenceTargetId(part.source.citationId);
         return <a key={index} className="citation-link" href={`#${targetId}`}
-          aria-label={`근거 ${part.sourceIndex + 1}: ${part.source.version} ${part.source.requirementId}`}
-          onClick={event => focusEvidence(event, targetId)}>근거 {part.sourceIndex + 1}<span aria-hidden="true"> ↗</span></a>;
+          aria-label={fill(text.citationAria, { n: part.sourceIndex + 1, version: part.source.version, requirementId: part.source.requirementId })}
+          onClick={event => focusEvidence(event, targetId)}>{fill(text.citationLabel, { n: part.sourceIndex + 1 })}<span aria-hidden="true"> ↗</span></a>;
       })}
     </p>)}</div>}
-    {result.status === "search_only" && <p className="fallback-copy">{keywordResult ? "AI를 호출하지 않고 검색된 원문 근거를 보여드려요." : "AI 답변 없이 검색된 근거를 보여드려요."}</p>}
-    {result.status === "llm_unavailable" && <p className="fallback-copy">검색된 근거는 아래에서 확인할 수 있어요. 필요하면 다시 질문해주세요.</p>}
-    {result.status === "insufficient_evidence" && <p className="fallback-copy">다른 용어로 질문하거나 문서 버전을 바꿔보세요.</p>}
+    {result.status === "search_only" && <p className="fallback-copy">{keywordResult ? text.searchOnlyKeyword : text.searchOnlyAi}</p>}
+    {result.status === "llm_unavailable" && <p className="fallback-copy">{text.llmUnavailable}</p>}
+    {result.status === "insufficient_evidence" && <p className="fallback-copy">{text.insufficientEvidence}</p>}
     {result.warnings.length > 0 && <ul className="result-warnings">{result.warnings.map((warning, index) => <li key={index}>{warning}</li>)}</ul>}
-    <p className="evidence-caveat">인용과 원문 일치 확인은 답변의 논리적 정확성을 보장하지 않습니다.</p>
+    <p className="evidence-caveat">{text.caveat}</p>
   </section>;
 }

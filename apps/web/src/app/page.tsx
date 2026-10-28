@@ -2,20 +2,20 @@ import { AppHeader } from "../components/app-header";
 import { AskPanel } from "../components/ask-panel";
 import { AppRelease } from "../components/app-release";
 import { SignatureFooter } from "../components/signature-footer";
+import { uiText } from "../content/ui-text";
 
+const { intro } = uiText;
 export default function Home() {
   return <div className="app-shell">
-    <a className="skip-link" href="#main">본문으로 건너뛰기</a>
+    <a className="skip-link" href="#main">{intro.skipLink}</a>
     <AppHeader />
     <main id="main">
-      <div className="page-intro"><h1>디지털 키 스펙, 이제 질문으로 찾아보세요</h1>
-        <p>디지털 키 스펙 문서에서 궁금한 규칙과 예외 사항을 질문해 보세요.</p></div>
+      <div className="page-intro"><h1>{intro.heading}</h1>
+        <p>{intro.subheading}</p></div>
       <details className="about">
-        <summary>이 서비스는 무엇인가요?</summary>
+        <summary>{intro.aboutSummary}</summary>
         <ul>
-          <li>😵‍💫 디지털 키 스펙은 버전마다 조건과 예외가 조금씩 달라서, 사람이 직접 비교하기 번거로워요.</li>
-          <li>🔎 질문하면 선택한 버전의 요구사항을 찾고, 스펙 문서 원문 기반의 근거를 함께 보여줘요.</li>
-          <li>✅ AI는 스펙 문서에서 찾은 내용만 바탕으로 답하고, 인용은 원문과 대조해 확인해요.</li>
+          {intro.aboutItems.map(item => <li key={item}>{item}</li>)}
         </ul>
       </details>
       <AskPanel />

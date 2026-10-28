@@ -1,10 +1,13 @@
 import type { AskRequest, AskResponse } from "../contracts/ask";
+import { uiText } from "../content/ui-text";
+
+const errors = uiText.errors;
 
 export function questionLength(question: string): number { return Array.from(question.trim()).length; }
 export function questionError(question: string): string | null {
   const length = questionLength(question);
-  if (length === 0) return "찾고 싶은 조건이나 예외를 질문해주세요.";
-  if (length > 500) return "질문은 500자 이내로 입력해주세요.";
+  if (length === 0) return errors.questionEmpty;
+  if (length > 500) return errors.questionTooLong;
   return null;
 }
 function isEvidence(value: unknown): boolean {
@@ -35,16 +38,16 @@ export async function askQuestion(request: AskRequest, options: { signal?: Abort
     });
   } catch (caught) {
     if (options.signal?.aborted) throw caught;
-    throw new Error("요청을 완료하지 못했어요. 연결을 확인하고 다시 시도해주세요.");
+    throw new Error(errors.network);
   }
   let body: unknown;
   try { body = await response.json(); }
-  catch { throw new Error("결과를 읽지 못했어요. 잠시 후 다시 시도해주세요."); }
+  catch { throw new Error(errors.unreadable); }
   if (!response.ok) {
     throw new Error(response.status === 400 || response.status === 413
-      ? "질문과 문서 버전을 확인하고 다시 시도해주세요."
-      : "요청을 완료하지 못했어요. 잠시 후 다시 시도해주세요.");
+      ? errors.badRequest
+      : errors.generic);
   }
-  if (!isAskResponse(body)) throw new Error("결과를 읽지 못했어요. 잠시 후 다시 시도해주세요.");
+  if (!isAskResponse(body)) throw new Error(errors.unreadable);
   return body;
 }

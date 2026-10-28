@@ -1,0 +1,102 @@
+{
+  "_안내": "화면에 보이는 문구 모음이에요. 문구만 바꾸세요(키 이름은 바꾸지 마세요). {count}, {n} 같은 {중괄호} 자리는 코드가 값을 채우니 그대로 두세요.",
+  "meta": {
+    "title": "Digital Key Spec Intelligence",
+    "description": "독립 창작한 가상 요구사항에서 버전과 정확한 원문 근거를 확인하는 학술 데모"
+  },
+  "header": {
+    "wordmark": "DKSI",
+    "brandName": "Digital Key Spec Intelligence",
+    "demoTag": "DEMO",
+    "mcpPreview": "Local MCP · Coming soon",
+    "demoTooltipTitle": "Synthetic demo — not an official specification",
+    "demoTooltipParagraphs": [
+      "이 화면의 요구사항은 데모를 위해 새로 지어낸 가상 내용이에요. 실제 CCC 디지털 키 규격과는 관계가 없어요.",
+      "실제 규격 문서는 사용 권한을 확인하지 못한 상태에서 공개 데모에 올릴 수 없어서, 검색·버전 비교·원문 근거 표시가 어떻게 동작하는지만 보여주는 연습용 문서를 직접 만들었어요.",
+      "답변을 실제 규격 해석이나 업무 판단에 사용하지 마세요."
+    ]
+  },
+  "intro": {
+    "skipLink": "본문으로 건너뛰기",
+    "heading": "디지털 키 스펙, 이제 질문으로 찾아보세요",
+    "subheading": "궁금한 규칙과 버전별 예외 상황을 물어보세요. 스펙 원문 근거를 기반으로 답해 드려요.",
+    "aboutSummary": "이 서비스는 무엇인가요?",
+    "aboutItems": [
+      "😵‍💫 디지털 키 스펙은 버전마다 조건과 예외가 조금씩 달라서, 사람이 직접 비교하기 번거로워요.",
+      "🔎 질문하면 선택한 버전의 요구사항을 찾고, 스펙 문서 원문 기반의 근거를 함께 보여줘요.",
+      "✅ AI는 스펙 문서에서 찾은 내용만 바탕으로 답하고, 인용은 원문과 대조해 확인해요."
+    ]
+  },
+  "search": {
+    "modeLegend": "검색 방식",
+    "modeLabels": { "keyword": "키워드 검색", "ai": "AI 검색" },
+    "modeHints": {
+      "keyword": "AI 호출 없이 원문 근거만 찾아요.",
+      "ai": "같은 검색 근거를 바탕으로 AI 답변을 생성해요."
+    },
+    "versionLegend": "문서 버전",
+    "versionAll": "전체",
+    "questionLabel": "질문",
+    "placeholder": "예: V2에서 NFC fallback을 사용할 수 있는 조건은?",
+    "inputHint": "실제 규격이 아닌 데모용 가상 문서(V1·V2)에서만 검색해요 · 최대 500자",
+    "submit": "근거 찾기",
+    "submitPending": "찾는 중…",
+    "examplesLabel": "예시 질문",
+    "examples": [
+      { "label": "위임 공유", "question": "V1과 V2에서 friend device의 재공유 규칙은 어떻게 다른가요?", "scope": "all" },
+      { "label": "NFC 전환 조건", "question": "V2에서 UWB ranging 실패 시 NFC fallback 조건은 무엇인가요?", "scope": "V2" },
+      { "label": "시동 권한", "question": "V2에서 entry-only 권한으로 시동을 걸 수 있나요?", "scope": "V2" },
+      { "label": "BLE 재시도", "question": "BLE 연결이 시간 초과되면 몇 번까지 다시 시도할 수 있나요?", "scope": "all" },
+      { "label": "키 폐기", "question": "키를 폐기하면 그 키에서 파생된 초대도 함께 거부되나요?", "scope": "V2" },
+      { "label": "일시 정지 키", "question": "일시 정지된 친구 키로 NFC 출입을 할 수 있나요?", "scope": "V2" },
+      { "label": "오프라인 동작", "question": "차량이 오프라인일 때 대기 중인 초대 승인은 어떻게 처리되나요?", "scope": "all" },
+      { "label": "진단 로그", "question": "진단 로그에 기기 식별자를 그대로 남겨도 되나요?", "scope": "all" },
+      { "label": "오류 구분", "question": "사용자에게 보여줄 오류 종류는 V1과 V2에서 어떻게 다른가요?", "scope": "all" }
+    ],
+    "statusPendingKeyword": "스펙 문서 속을 열심히 뒤져 보고 있어요 🕵️",
+    "statusPendingAi": "스펙 문서 속을 열심히 뒤져서 AI 답변을 준비하고 있어요 🕵️",
+    "statusDone": "검색이 완료됐어요.",
+    "statusReused": "이전 실행 결과예요.",
+    "statusCount": "근거 {count}개를 찾았어요.",
+    "contextReused": "이전 실행 결과",
+    "contextAiFallback": "답변 생성 불가, 검색 근거 표시",
+    "contextScopeAll": "전체 버전",
+    "contextScopeSuffix": "문서",
+    "contextQuestion": "질문:",
+    "sourcesHeading": "검색된 근거",
+    "sourcesSubtitle": "원문 확인",
+    "firstVisitHeading": "찾고 싶은 조건이 있나요?",
+    "firstVisitLine1": "질문을 입력하거나 예시를 선택해보세요.",
+    "firstVisitLine2": "결과에서 버전과 원문을 함께 확인할 수 있어요."
+  },
+  "answer": {
+    "labels": {
+      "answered": "근거 기반 답변",
+      "search_only": "검색 결과를 확인하세요",
+      "llm_unavailable": "AI 답변을 가져오지 못했어요",
+      "insufficient_evidence": "스펙 문서에서 답변 근거를 찾지 못했어요"
+    },
+    "keywordResultHeading": "키워드 검색 결과",
+    "searchOnlyKeyword": "AI를 호출하지 않고 검색된 원문 근거를 보여드려요.",
+    "searchOnlyAi": "AI 답변 없이 검색된 근거를 보여드려요.",
+    "llmUnavailable": "검색된 근거는 아래에서 확인할 수 있어요. 필요하면 다시 질문해주세요.",
+    "insufficientEvidence": "다른 용어로 질문하거나 문서 버전을 바꿔보세요.",
+    "citationLabel": "근거 {n}",
+    "citationAria": "근거 {n}: {version} {requirementId}",
+    "caveat": "인용과 원문 일치 확인은 답변의 논리적 정확성을 보장하지 않습니다."
+  },
+  "evidence": {
+    "collapse": "원문 접기",
+    "expand": "원문 전체 보기",
+    "documentId": "문서 ID",
+    "citationId": "인용 ID"
+  },
+  "errors": {
+    "questionEmpty": "찾고 싶은 조건이나 예외를 질문해주세요.",
+    "questionTooLong": "질문은 500자 이내로 입력해주세요.",
+    "network": "요청을 완료하지 못했어요. 연결을 확인하고 다시 시도해주세요.",
+    "unreadable": "결과를 읽지 못했어요. 잠시 후 다시 시도해주세요.",
+    "badRequest": "질문과 문서 버전을 확인하고 다시 시도해주세요.",
+    "generic": "요청을 완료하지 못했어요. 잠시 후 다시 시도해주세요."
+  }
+}

@@ -1,6 +1,9 @@
 "use client";
 import { useState } from "react";
 import type { Evidence } from "@dksi/spec-core";
+import { uiText } from "../content/ui-text";
+
+const text = uiText.evidence;
 
 export function evidenceTargetId(citationId: string) { return `source-${citationId.replaceAll(":", "-")}`; }
 export function EvidenceCard({ evidence, index }: { evidence: Evidence; index: number }) {
@@ -14,10 +17,10 @@ export function EvidenceCard({ evidence, index }: { evidence: Evidence; index: n
     <code className="requirement-id">{evidence.requirementId}</code>
     <blockquote lang="en">{evidence.quote}</blockquote>
     <details onToggle={event => setExpanded(event.currentTarget.open)}>
-      <summary>{expanded ? "원문 접기" : "원문 전체 보기"}</summary>
+      <summary>{expanded ? text.collapse : text.expand}</summary>
       <div className="source-full"><p lang="en">{evidence.fullText}</p>
-        <dl><div><dt>문서 ID</dt><dd>{evidence.documentId}</dd></div>
-          <div><dt>인용 ID</dt><dd><code>{evidence.citationId}</code></dd></div></dl>
+        <dl><div><dt>{text.documentId}</dt><dd>{evidence.documentId}</dd></div>
+          <div><dt>{text.citationId}</dt><dd><code>{evidence.citationId}</code></dd></div></dl>
       </div>
     </details>
   </article>;

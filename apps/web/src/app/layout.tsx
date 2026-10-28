@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import localFont from "next/font/local";
 import "./globals.css";
+import { uiText } from "../content/ui-text";
 
 const pretendard = localFont({
   src: "../assets/fonts/PretendardVariable.woff2",
@@ -10,8 +11,8 @@ const pretendard = localFont({
   display: "swap",
 });
 export const metadata: Metadata = {
-  title: "Digital Key Spec Intelligence",
-  description: "독립 창작한 가상 요구사항에서 버전과 정확한 원문 근거를 확인하는 학술 데모",
+  title: uiText.meta.title,
+  description: uiText.meta.description,
 };
 export default function Layout({ children }: { children: ReactNode }) {
   return <html lang="ko" className={pretendard.variable}><body>{children}</body></html>;
