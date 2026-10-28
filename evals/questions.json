@@ -1,9 +1,9 @@
 {
-  "description": "Synthetic only. Expected retrieval examples for implementation tests.",
+  "description": "Fictional Vehicle Digital Access Spec test cases. No actual CCC requirement text or numbering.",
   "cases": [
     {
       "id": "Q1",
-      "question": "세션 만료 시간은 얼마나 돼?",
+      "question": "owner device 등록할 때 어떤 검증이 필요해?",
       "versions": [
         "V1"
       ],
@@ -14,43 +14,76 @@
     },
     {
       "id": "Q2",
-      "question": "maintenance mode에서 세션을 연장할 수 있어?",
+      "question": "V1에서는 friend device가 재공유할 수 있어?",
       "versions": [
-        "V2"
+        "V1"
       ],
       "expectedRequirementIds": [
-        "DEMO-V2-REQ-002"
+        "DEMO-V1-REQ-004"
       ],
-      "type": "condition"
+      "type": "conditional"
     },
     {
       "id": "Q3",
-      "question": "만료 시간을 V1 V2 별로 찾아줘",
-      "versions": [
-        "V1",
-        "V2"
-      ],
-      "expectedRequirementIds": [
-        "DEMO-V1-REQ-001",
-        "DEMO-V2-REQ-001"
-      ],
-      "type": "version-comparison"
-    },
-    {
-      "id": "Q4",
-      "question": "revoked credential도 offline access가 되나?",
+      "question": "V2에서 delegated key sharing 조건은 무엇인가?",
       "versions": [
         "V2"
       ],
       "expectedRequirementIds": [
-        "DEMO-V2-REQ-008",
         "DEMO-V2-REQ-004"
       ],
       "type": "exception"
     },
     {
+      "id": "Q4",
+      "question": "UWB ranging 실패하면 NFC로 fallback 할 수 있나?",
+      "versions": [
+        "V2"
+      ],
+      "expectedRequirementIds": [
+        "DEMO-V2-REQ-010",
+        "DEMO-V2-REQ-011"
+      ],
+      "type": "cross-reference"
+    },
+    {
       "id": "Q5",
-      "question": "우주선 연료 규격은?",
+      "question": "V1 V2에서 BLE retry 조건이 어떻게 바뀌어?",
+      "versions": [
+        "V1",
+        "V2"
+      ],
+      "expectedRequirementIds": [
+        "DEMO-V1-REQ-008",
+        "DEMO-V2-REQ-008"
+      ],
+      "type": "version-comparison"
+    },
+    {
+      "id": "Q6",
+      "question": "revoked key는 차량에 접근할 수 있어?",
+      "versions": [
+        "V2"
+      ],
+      "expectedRequirementIds": [
+        "DEMO-V2-REQ-005"
+      ],
+      "type": "security"
+    },
+    {
+      "id": "Q7",
+      "question": "entry only로 시동을 걸 수 있어?",
+      "versions": [
+        "V2"
+      ],
+      "expectedRequirementIds": [
+        "DEMO-V2-REQ-012"
+      ],
+      "type": "entitlements"
+    },
+    {
+      "id": "Q8",
+      "question": "우주선 추진엔진 사양이 뭐야?",
       "versions": [
         "V1",
         "V2"
@@ -59,15 +92,26 @@
       "type": "insufficient-evidence"
     },
     {
-      "id": "Q6",
-      "question": "연결이 끊기면 어떤 처리해야 해?",
+      "id": "Q9",
+      "question": "NFC 태그로 접근할 수 있나?",
+      "versions": [
+        "V1"
+      ],
+      "expectedRequirementIds": [
+        "DEMO-V1-REQ-011"
+      ],
+      "type": "retrieval"
+    },
+    {
+      "id": "Q10",
+      "question": "로그에 개인정보를 담아도 돼?",
       "versions": [
         "V2"
       ],
       "expectedRequirementIds": [
-        "DEMO-V2-REQ-006"
+        "DEMO-V2-REQ-015"
       ],
-      "type": "fallback-candidate"
+      "type": "privacy"
     }
   ]
 }
