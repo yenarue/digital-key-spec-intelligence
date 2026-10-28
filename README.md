@@ -2,7 +2,7 @@
 
 > **Evidence-first Requirement Assistant** — Find the requirement. Show the evidence. State the uncertainty.
 
-KAIST ITM.690 「인공지능 경영과 법」 2026 가을학기 발표(2026-10-29)를 위한 **합성 데이터 기반 학술 데모** 프로젝트. 실제 디지털키 개발에서 겪는 문서 검색·조건 해석·버전 혼동·근거 부재·지식 파편화 문제를 출발점으로 한다.
+KAIST ITM.690 2026-10-29 발표를 위한 공개 합성 데이터 데모와 **실제 CCC V3.1.4/V4.1.0 PDF를 사용하는 후속 로컬 RAG**를 공통 코어로 연결하는 프로젝트. 구체적 설계: [CCC PDF RAG architecture](docs/ccc-rag-architecture.md). 실제 디지털키 개발에서 겪는 문서 검색·조건 해석·버전 혼동·근거 부재·지식 파편화 문제를 출발점으로 한다.
 
 **상태:** 초기 저장소/설계 문서만 준비됨. **웹앱·RAG·Vercel 배포는 아직 구현되지 않음.**
 
@@ -19,7 +19,7 @@ KAIST ITM.690 「인공지능 경영과 법」 2026 가을학기 발표(2026-10-
 | **E** | Next.js Web MVP를 Vercel에 배포 | 구현 예정 |
 | **F** | 공통 검색 코어를 사용하는 **Local MCP** | 다음 단계 (웹 메뉴만 disabled / Coming soon) |
 
-MVP에서 하지 않는 것: 사용자 파일 업로드, 실제 기업 문서 연결, PDF 파싱, Vector DB/Embedding, 팀 Q&A 저장, 로그인, MCP 서버 구현.
+**이번 발표 A–E:** 합성 데이터 Web RAG와 Vercel 배포. **후속 로컬 실증:** 사용자가 보유한 CCC PDF 두 개를 `data/local/ccc/`에서 로컬 파싱·색인하고 Ollama 로컬 추론으로 답변 생성. 외부 OpenRouter에 실제 스펙 발췌를 보내는 기능은 별도 권한 확인·명시적 허용 이후에만 활성화. MCP는 이후 F 단계.
 
 ## Architecture
 
