@@ -12,3 +12,6 @@ apps/web/.env.local
 .vercel/
 .DS_Store
 *.log
+
+# Operator-provided CCC PDFs and all derived local indices
+/data/local/
