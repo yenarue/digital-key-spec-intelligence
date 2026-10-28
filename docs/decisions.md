@@ -66,3 +66,10 @@
 - UI defaults to keyword and submits mode explicitly. Optional API mode defaults to ai to preserve existing clients. Invalid mode rejects before retrieval. Keyword returns search_only with no warnings and no provider/validator invocation regardless of key/model configuration.
 - Switching modes never submits. Keep only the current normalized question/version/topK's latest response per mode in React memory; label reused results and request snapshot. Input/version changes clear both slots; explicit resubmit always requests again. No persistence, automatic retries or new provider.
 - This supersedes DESIGN's older keep-stale-results-on-input-edit rule for this feature. AI and keyword use identical source ranking; AI only enables generation from the same evidence.
+
+## 2026-10-29 — Web copy pass and planned matched-term display
+- Replaced the top synthetic-demo banner with a `DEMO` tag whose hover/focus tooltip explains why the corpus is fictional (rights to publish real spec text are unverified). The text `Synthetic demo — not an official specification` remains in the tooltip. This deviates from FR-13's "prominent" wording on purpose; the tag is always visible but the full notice is on demand. Tests hover the tag first.
+- Removed the user-facing term "합성 문서" (unclear to non-specialists); use plainer wording such as 데모용 가상 문서 near the input and 스펙 문서 elsewhere. Added a collapsible "이 서비스는 무엇인가요?" intro (`<details>`) instead of a separate about page. Example questions grew from 3 to 9, so FR-15's minimum still holds.
+- Moved Web UI copy to `apps/web/src/content/ui-text.json` so the owner can edit it directly (labels, tooltip, intro, examples, loading/error text). Server `warnings` and the LLM prompt stay in code on purpose.
+- Decided against showing the full keyword list used for search (query tokens plus synonym expansion look noisy and undermine trust). Planned instead FR-20: per-card matched terms with highlighting. Not implemented yet.
+
