@@ -34,6 +34,12 @@ Find the requirement. Show the evidence. State the uncertainty. Long term, build
 
 No user uploads, real CCC parser, login, external scraping, DB, persistence, actual MCP or enterprise document integrations in the **A–E public demo**. Immediately following the demo, implement **local PDF ingestion + version-aware RAG + Ollama grounded answers**, keeping PDFs and derived indices off GitHub/Vercel; external transfer of real text remains disabled pending legal/organizational authorization.
 
+## Course Skill demonstration (separate from Web runtime)
+
+Two repository-local Skill definitions are maintained at `.agents/skills/`: `spec-requirement-navigator` (question → version-aware requirement search/interpretation with exact evidence) and `spec-answer-auditor` (answer → claim/citation verification). Their demonstrations run in Codex using the committed synthetic corpus; **the deployed Vercel application does not execute these Skills**. When local MCP becomes available in Stage F, retain the same workflow and replace the evidence source with the approved MCP tools. Full plan: [docs/skills-plan.md](docs/skills-plan.md).
+
+**Skill acceptance criteria:** relevant questions trigger the Navigator, answer-check requests trigger the Auditor, unrelated requests do not; outputs cite only real demo requirement IDs/quotes, preserve version and qualifiers, and refuse unsupported claims. Record manual Codex validation results. This does not replace the requirement to deploy and demonstrate the Vercel A–E Web app.
+
 ## 4. Functional requirements
 | ID | Priority | Requirement and acceptance |
 | --- | --- | --- |
