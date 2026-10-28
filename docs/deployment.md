@@ -74,7 +74,7 @@ Not yet verified: a grounded `answered` response on Production (free-model timeo
 ### 2026-10-29 — v0.1.1 timeout patch
 
 - Source: `0eb5af2` (fix `617fc2e`), pushed to `main`; Git-triggered Production deployment `dpl_Dap8KZSSqmKSMT1HcDQX2VS1M48H` verified Ready using `vercel inspect`.
-- Model deadline is 60 seconds including response body; Route Handler `maxDuration=90` gives retrieval/validation overhead room. Total generation budget is 2,400 tokens including reasoning; still one free-model call, no automatic retries or paid fallback.
+- Model deadline is 90 seconds including response body; Route Handler `maxDuration=120` gives retrieval/validation overhead room. Total generation budget is 8,000 tokens including reasoning; still one free-model call, no automatic retries or paid fallback.
 - Local verification: unit/integration168/168, browser7/7, lint/build passed. All three UI sample questions returned actual AI answers locally with validated exact citations.
 - Production homepage returned HTTP200, full product title, synthetic notice and `v0.1.1`. Actual POST asking whether V2 entry-only permits starting returned HTTP200 / `answered`, no warnings, V2-only evidence and the correct `DEMO-V2-REQ-012` citation; answer was manually checked against its source.
 - This supersedes the earlier missing Production-answer/version checks. Q5 and the remaining live browser/mobile/console/function-log checks are still pending. Free-model availability and answer quality are not guaranteed by one successful request.
