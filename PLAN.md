@@ -23,7 +23,7 @@
 | `.env.example` | 서버 전용 키 예시와 `openrouter/free` 기본값 준비 | 서버 설정 로딩·무료 모델 제한·Vercel 설정 |
 | `.gitignore` | `.env*`, `.next`, `.vercel`, `/data/local/` 등 제외 | 추적 파일·번들·로그에 대한 실제 검사 |
 | `.agents/skills/` | Navigator/Auditor 정의·README·실제 예시 기록 존재 | 유지; Web 런타임과 연결하지 않음 |
-| 디자인 | `DESIGN.md`의 A안 Clear Desk·Pretendard 확정, `design-preview.html` 비교 시안 준비 | 실제 React UI로 구현; 메뉴 형태는 필요 시 별도 선택 |
+| 디자인 | `DESIGN.md`의 A안 Clear Desk·Pretendard 확정, `docs/design-previews/main-screen-layouts.html` 비교 시안 준비 | 실제 React UI로 구현; 메뉴 형태는 필요 시 별도 선택 |
 | 테스트·배포 | 테스트 소스/러너/설정, CI, 앱 코드, 배포 URL 없음 | 테스트·lint·build 및 live 검증 |
 
 정적 데이터 점검 결과: 실제 `documentId`는 두 버전 모두 `DKSI-SYNTHETIC`, `synthetic: true`다. 버전별 고유 Requirement ID는 16개이며 내부 references의 미해결 대상은 없었다. 같은 순번의 V1/V2 원문 16쌍 모두 다르다. 위임 공유(004), BLE 재시도(008), NFC 조건(010/011) 등 버전 차이와 조건·예외를 이미 포함한다. 평가 10개의 기대 ID는 모두 데이터에 존재한다. 이는 검색 품질이나 답변 정확성 검증 결과가 아니다.
@@ -467,6 +467,7 @@ Evidence before the final60s/2,400-token combination: live app sharing answered 
 - S2 complete: UI Agent changed ask-panel/answer-panel/globals.css/client tests. Default keyword, explicit mode, same-input two-slot memory, reused labels and snapshot context, pending controls and current-input invalidation implemented; 9 examples/user wording/footer preserved.
 - S3/G5: Main added actual runtime/real retriever-provider-validator mode integration and browser regressions. Full npm run test198/198, eval18/18 (17/17 expectedIDs@5), lint/build and E2E9/9 passed. Fixed repeated-Response test fixture consumption (new Response per fake fetch), not runtime behavior. Keyword/ai source equality and zero keyword calls proven; E2E AI states explicitly stubbed, live-model proof recorded separately. Cross-review by API/UI agents found no material defect. Added icon.svg for live favicon404. S4 release/live checks next.
 
+
 ## 14. Follow-up — 카드별 일치 검색어 표시와 하이라이트 (PRD FR-20)
 
 **상태: H0–H4 구현·로컬 검증 완료 (2026-10-29), 미배포.** 키워드 검색 결과만 보면 각 카드가 왜 나왔는지 알기 어렵다. 카드마다 실제로 일치한 검색어를 칩으로 보여주고 원문에서 해당 단어를 강조한다. 전체 확장 검색어 목록은 보여주지 않는다(decisions 2026-10-29). 검색 순위·버전 필터·quote 원문은 바꾸지 않는다.
@@ -508,3 +509,53 @@ interface Evidence { /* 기존 필드 */ matches?: MatchedTerm[] }
 - “디지털키가 뭐야?” → `OVR-001` 카드에 `디지털키` 칩과 동의어로 표시된 `digital` 칩, 원문의 “digital”만 강조.
 - “owner device 등록할 때…”(V1) → `REQ-001` 카드에 `provisioning` 등 동의어 칩이 표시되고, 원문 강조 위치를 잘라낸 문자열이 칩 용어와 대소문자 무시 일치.
 - 강조 전후 카드의 텍스트 내용(`textContent`)이 원문과 동일. V1 전용 결과에 V2 없음. 기존 test/E2E/eval 통과.
+
+## 15. Follow-up — 브라우저 로컬 질문 이력 (PRD FR-21)
+
+**상태: 계획, 미착수.** 사용자가 이전 질문과 결과를 다시 볼 수 있게 한다. 로그인이 없으므로 서버·DB에 저장하지 않고 브라우저 `localStorage`에만 둔다. 전체 사용자 질의 로그 수집(분석·eval 보강)은 서버 영속화와 사내 문구 유입 위험이 있어 이 범위에서 제외한다. UI는 DESIGN §6 “질문 이력” C안(입력창 아래, 기본 접힘, 최근 5건)을 따르고, B안(헤더 버튼 + 드로어)은 사용 후 전환할 대안으로 기록했다. 시안: `docs/design-previews/question-history.html`.
+
+### 저장 형식 (클라이언트 전용)
+
+```ts
+// apps/web 클라이언트 전용. spec-core·API 계약은 바꾸지 않는다.
+interface HistoryEntry {
+  id: string;
+  question: string;
+  mode: "keyword" | "ai";
+  versions: string[];
+  topK: number;
+  submittedAt: string;   // ISO
+  appVersion: string;    // apps/web/package.json
+  response: AskResponse; // status, answer, sources, warnings 그대로
+}
+// key 예: "dksi.history.v1", 최신순 최대 5건
+```
+
+- 같은 question(정규화)+mode+versions는 기존 항목을 지우고 맨 앞에 새로 넣는다. 6번째부터 가장 오래된 항목을 버린다.
+- 읽을 때 기존 클라이언트 응답 guard로 검사하고 잘못된 항목은 버린다. 모든 접근은 try/catch, 저장 불가·용량 초과 시 이력 없이 정상 동작한다.
+- 스냅샷을 열면 해당 모드의 FR-19 메모리 슬롯에 넣고 다른 모드 슬롯은 비운다. 네트워크 요청은 없다. `다시 실행`은 일반 제출과 같다.
+- 이력은 서버·LLM·분석 도구로 보내지 않는다.
+
+### 작업
+
+| ID | 담당 파일 | 내용 / 완료 조건 |
+| --- | --- | --- |
+| Q0 | PRD/PLAN/DESIGN/AGENTS/decisions | 범위·저장 원칙·C안/B안 기록 (이번 세션 완료) |
+| Q1 | `apps/web/src/client/history.ts` + test | 읽기·쓰기·중복 교체·5건 제한·삭제·전체 삭제, 손상 데이터·storage 예외 처리 |
+| Q2 | `apps/web/src/components/` (이력 섹션), `ask-panel.tsx`, `globals.css`, `content/ui-text.json` | 접힘 목록, 행 메타, 스냅샷 복원 배너, `다시 실행`, 앱 버전 불일치 경고 |
+| Q3 | `e2e/**`, `docs/decisions.md` | 새로고침 후 유지, 스냅샷 열 때 요청 0건, 삭제, 모바일 375px 확인. test/lint/build/eval 결과 기록. 배포는 별도 승인 |
+
+사용자에게 보이는 기능 추가이므로 출시 시 Web 버전 Minor를 올린다(docs/versioning.md).
+
+### 보류
+
+- `더 보기`/5건 초과 보관: 사용해보고 결정. 필요하면 B안 전환과 함께 검토한다.
+- 스냅샷에 FR-20 `matches` 포함 여부: 응답을 그대로 저장하므로 자동 포함된다. 별도 처리는 하지 않는다.
+
+### 수용 기준
+
+- 질문 6건 제출 후 새로고침 → 최근 5건만 최신순으로 보이고 기본은 접혀 있다.
+- 이력 행을 열면 `/api/ask` 요청이 발생하지 않고, 폼과 결과가 저장 당시 조건·응답과 같다.
+- 행 삭제·전체 삭제가 즉시 반영되고 새로고침 후에도 유지된다.
+- `localStorage`에 잘못된 JSON을 넣거나 접근을 막아도 페이지와 검색이 정상 동작한다.
+- 기존 test/E2E/eval 통과.

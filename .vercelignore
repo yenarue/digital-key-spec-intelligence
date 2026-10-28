@@ -13,7 +13,7 @@ data/local
 output
 **/test-results
 **/playwright-report
-design-preview.html
+docs/design-previews
 
 # Agent-only local configuration is not part of the Web runtime
 .claude

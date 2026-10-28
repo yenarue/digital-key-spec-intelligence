@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>질문 이력 시안</title>
+<!-- 2026-10-29 결정: C안(입력창 아래, 기본 접힘, 최근 5건) 채택. B안은 써보고 불편하면 넘어갈 대안. A안은 비교 기록. PRD FR-21, DESIGN.md §6 참고. 고정 가상 데이터를 쓴 시안이며 실제 앱 구현이 아님. -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+:root{
+  --canvas:#F7F8FA; --surface:#FFFFFF; --text:#191F28; --text2:#4E5968; --text3:#6B7684;
+  --border:#E2E6EB; --control:#7C899A; --accent:#1765DC; --accent-hover:#1253BA; --accent-soft:#EEF4FF;
+  --notice-bg:#FFF8E8; --notice-text:#715014; --error:#B42318;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;background:#E9ECF0;color:var(--text)}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
+
+/* ---- 시안 조작 바 (앱 화면 아님) ---- */
+.controls{position:sticky;top:0;z-index:50;background:#20262E;color:#fff;padding:12px 16px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;font-size:13px}
+.controls b{font-weight:600;margin-right:4px;color:#AEB7C2}
+.seg{display:inline-flex;border:1px solid #4A5462;border-radius:8px;overflow:hidden}
+.seg button{all:unset;cursor:pointer;padding:6px 12px;color:#D5DBE2}
+.seg button[aria-pressed=true]{background:#fff;color:#191F28;font-weight:600}
+.desc{flex-basis:100%;color:#C9D1DA;font-size:13px;line-height:1.5}
+
+.stage{padding:24px 16px 48px;display:flex;justify-content:center;overflow-x:auto}
+.frame{background:var(--canvas);border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.08);position:relative;overflow:hidden;flex:none}
+.frame.desktop{width:1280px;min-height:860px}
+.frame.mobile{width:390px;min-height:844px}
+
+/* ---- 앱 헤더 ---- */
+.app-header{display:flex;align-items:center;gap:12px;min-height:64px;padding:0 40px;border-bottom:1px solid var(--border);background:var(--surface)}
+.mobile .app-header{padding:0 16px;gap:8px}
+.wordmark{font-weight:800;font-size:18px;letter-spacing:-.02em}
+.brandname{color:var(--text2);font-size:14px}
+.mobile .brandname{display:none}
+.demo-tag{font-size:11px;font-weight:700;padding:2px 6px;border-radius:4px;background:var(--notice-bg);color:var(--notice-text)}
+.spacer{flex:1}
+.mcp{font-size:13px;color:var(--text3);opacity:.55;border:1px solid var(--border);border-radius:8px;padding:6px 10px;background:none}
+.mobile .mcp{font-size:12px;padding:4px 8px}
+.hist-btn{display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:14px;font-weight:600;color:var(--text);background:none;border:1px solid var(--control);border-radius:8px;padding:6px 12px;cursor:pointer}
+.hist-btn .count{font-size:12px;font-weight:600;background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:1px 7px}
+.hist-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.icon-btn{border:1px solid var(--control);background:none;border-radius:8px;width:36px;height:36px;display:inline-grid;place-items:center;cursor:pointer;color:var(--text)}
+
+/* ---- 레이아웃 ---- */
+.body{display:block}
+.body.with-sidebar{display:grid;grid-template-columns:272px 1fr}
+.main{padding:32px 40px 40px;min-width:0}
+.mobile .main{padding:24px 16px 32px}
+h1{font-size:28px;margin:0 0 8px;letter-spacing:-.02em}
+.mobile h1{font-size:22px}
+.sub{color:var(--text2);margin:0 0 24px;font-size:15px}
+
+/* 폼 */
+.form{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px}
+.row{display:flex;flex-wrap:wrap;gap:20px;margin-bottom:14px;font-size:14px}
+.radio-group{display:inline-flex;align-items:center;gap:8px}
+.radio-group .lg{color:var(--text2);font-size:13px}
+.pill{border:1px solid var(--control);border-radius:8px;padding:4px 10px;font-size:13px}
+.pill.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
+.ta{border:1px solid var(--control);border-radius:8px;min-height:96px;padding:12px;font-size:15px;color:var(--text);display:flex;flex-direction:column;justify-content:space-between}
+.ta .ph{color:var(--text3)}
+.ta-foot{display:flex;justify-content:flex-end;align-items:center;gap:12px;font-size:12px;color:var(--text3)}
+.submit{background:var(--accent);color:#fff;border:0;border-radius:8px;padding:8px 16px;font:inherit;font-weight:600;font-size:14px}
+.examples{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;font-size:13px;align-items:center}
+.examples .lg{color:var(--text2)}
+.chip{border:1px solid var(--border);background:var(--surface);border-radius:999px;padding:4px 10px}
+
+/* 이력 목록 공통 */
+.hist-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.hist-head h2{font-size:15px;margin:0}
+.hist-group{font-size:12px;color:var(--text3);margin:14px 0 6px;font-weight:600}
+.hist-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.hist-item{position:relative;border-radius:8px;padding:9px 32px 9px 10px;cursor:pointer;border:1px solid transparent}
+.hist-item:hover{background:#F0F2F5}
+.hist-item.current{background:var(--accent-soft);border-color:#C9DBFA}
+.hist-q{font-size:14px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hist-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;font-size:12px;color:var(--text3);align-items:center}
+.tag{border:1px solid var(--border);border-radius:4px;padding:0 5px;background:var(--surface);color:var(--text2)}
+.tag.ai{border-color:#C9DBFA;color:var(--accent)}
+.tag.none{color:var(--error);border-color:#F2C6C2}
+.del{position:absolute;right:6px;top:8px;border:0;background:none;color:var(--text3);font-size:16px;line-height:1;padding:4px;border-radius:4px;opacity:0;cursor:pointer}
+.hist-item:hover .del,.mobile .del{opacity:1}
+.hist-foot{margin-top:14px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;color:var(--text3);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.link-btn{border:0;background:none;color:var(--text2);text-decoration:underline;font:inherit;font-size:12px;cursor:pointer;padding:0}
+
+/* A: 사이드바 */
+.sidebar{background:var(--surface);border-right:1px solid var(--border);padding:20px 14px;min-height:796px}
+
+/* B: 드로어 */
+.scrim{position:absolute;inset:0;background:rgba(25,31,40,.32);z-index:10}
+.drawer{position:absolute;top:0;bottom:0;background:var(--surface);z-index:11;padding:20px 16px;overflow:auto;box-shadow:0 0 24px rgba(0,0,0,.12)}
+.drawer.right{right:0;width:380px}
+.drawer.left{left:0;width:312px}
+.sheet{position:absolute;left:0;right:0;bottom:0;max-height:72%;background:var(--surface);z-index:11;border-radius:16px 16px 0 0;padding:10px 16px 20px;overflow:auto}
+.grab{width:40px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 12px}
+.close{border:0;background:none;font-size:20px;color:var(--text2);cursor:pointer}
+
+/* C: 인라인 */
+.inline-hist{margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.inline-hist summary{cursor:pointer;font-weight:600;font-size:14px;list-style:none;display:flex;justify-content:space-between;align-items:center}
+.inline-hist summary::-webkit-details-marker{display:none}
+.inline-hist .hist-list{margin-top:8px}
+.inline-row{display:flex;gap:8px;align-items:baseline;padding:8px 6px;border-radius:8px;font-size:14px;cursor:pointer}
+.inline-row:hover{background:#F0F2F5}
+.inline-row .q{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.inline-row .t{font-size:12px;color:var(--text3);white-space:nowrap}
+
+/* 결과 */
+.empty{margin-top:32px;color:var(--text2);font-size:14px;text-align:center;padding:32px 0}
+.snap{margin-top:28px;border:1px solid #C9DBFA;background:var(--accent-soft);border-radius:10px;padding:10px 14px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;font-size:13px;color:var(--text2)}
+.snap strong{color:var(--accent)}
+.snap .grow{flex:1}
+.snap .rerun{border:1px solid var(--accent);color:var(--accent);background:var(--surface);border-radius:8px;padding:5px 10px;font:inherit;font-size:13px;font-weight:600}
+.snap-q{margin:12px 0 0;font-size:14px;color:var(--text2)}
+.snap-q b{color:var(--text)}
+.results{display:grid;grid-template-columns:1.1fr 1fr;gap:32px;margin-top:20px}
+.mobile .results,.with-sidebar .results{grid-template-columns:1fr;gap:20px}
+.with-sidebar.desktop-wide .results{grid-template-columns:1.1fr 1fr}
+.results h3{font-size:16px;margin:0 0 10px}
+.answer{font-size:15px;line-height:1.7}
+.cite{color:var(--accent);text-decoration:underline;font-weight:600}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:12px}
+.card .meta{font-size:12px;color:var(--text2)}
+.card .h{font-weight:600;margin:4px 0}
+.card .quote{font-size:14px;line-height:1.6;margin:8px 0 6px;color:var(--text)}
+.card .more{font-size:13px;color:var(--accent)}
+.caveat{font-size:12px;color:var(--text3);margin-top:16px}
+.warn{margin-top:10px;font-size:12px;color:var(--notice-text);background:var(--notice-bg);border-radius:6px;padding:6px 10px}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<div class="controls">
+  <div><b>시안</b><span class="seg" id="v">
+    <button data-v="C" aria-pressed="true">C. 입력창 아래 목록 (채택)</button>
+    <button data-v="B" aria-pressed="false">B. 헤더 버튼 + 드로어 (대안)</button>
+    <button data-v="A" aria-pressed="false">A. 좌측 사이드바 (기록)</button></span></div>
+  <div><b>화면</b><span class="seg" id="d">
+    <button data-d="desktop" aria-pressed="true">데스크톱</button>
+    <button data-d="mobile" aria-pressed="false">모바일</button></span></div>
+  <div><b>상태</b><span class="seg" id="s">
+    <button data-s="closed" aria-pressed="true">첫 화면 (접힘)</button>
+    <button data-s="list" aria-pressed="false">이력 열람</button>
+    <button data-s="snap" aria-pressed="false">스냅샷 열기 후</button></span></div>
+  <p class="desc" id="desc"></p>
+</div>
+
+<div class="stage"><div class="frame desktop" id="frame"></div></div>
+
+<script>
+const H = [
+  {g:"오늘", q:"V2에서 UWB ranging 실패 시 NFC fallback 조건은 무엇인가요?", mode:"AI", ver:"V2", res:"AI 답변", t:"14:03", cur:true},
+  {g:"오늘", q:"V1과 V2에서 friend device의 재공유 규칙은 어떻게 다른가요?", mode:"키워드", ver:"전체", res:"근거 4개", t:"13:41"},
+  {g:"오늘", q:"차량 원격 시동 요금제 정책", mode:"키워드", ver:"전체", res:"근거 없음", t:"13:20"},
+  {g:"어제", q:"BLE 연결이 시간 초과되면 몇 번까지 다시 시도할 수 있나요?", mode:"AI", ver:"전체", res:"AI 답변", t:"10/28"},
+  {g:"어제", q:"일시 정지된 친구 키로 NFC 출입을 할 수 있나요?", mode:"키워드", ver:"V2", res:"근거 2개", t:"10/28"},
+];
+const state = {v:"C", d:"desktop", s:"closed"};
+const DESC = {
+  A:"[기록] 좌측에 '최근 질문' 열을 항상 보여줘요. 이력을 자주 오가며 비교할 때 편하지만, 본문 폭이 줄어 데스크톱 결과가 한 열로 바뀌어요. 모바일에서는 헤더 ☰ 버튼으로 왼쪽 드로어를 열어요. DESIGN.md §6 '메뉴 확장 원칙'의 측면형에 해당해요.",
+  B:"[대안] C안을 써보고 불편하면 넘어갈 안이에요. 헤더에 '최근 질문 5' 버튼만 추가하고, 누르면 오른쪽 드로어(모바일은 하단 시트)로 열려요. 지금 단일 화면 레이아웃과 두 열 결과를 그대로 유지해요. 상단형에 가까운 가장 작은 변경이에요.",
+  C:"[채택] 입력창 아래 '최근 질문' 목록을 둬요. 기본은 접혀 있고 최근 5건만 보관·표시해요('더 보기'는 보류). 메뉴 구조를 건드리지 않아요. 결과가 길면 목록이 위쪽에 묻힐 수 있어요.",
+};
+
+function metaTags(h){
+  const cls = h.res==="근거 없음"?"none":(h.mode==="AI"?"ai":"");
+  return `<span class="tag ${h.mode==="AI"?"ai":""}">${h.mode}</span><span class="tag">${h.ver}</span><span class="tag ${cls==="none"?"none":""}">${h.res}</span><span>${h.t}</span>`;
+}
+function list(markCurrent){
+  let out="", g=null;
+  H.forEach(h=>{
+    if(h.g!==g){ if(g) out+="</ul>"; out+=`<div class="hist-group">${h.g}</div><ul class="hist-list">`; g=h.g; }
+    out+=`<li class="hist-item ${markCurrent&&h.cur?"current":""}"><div class="hist-q">${h.q}</div><div class="hist-meta">${metaTags(h)}</div><button class="del" aria-label="이 질문 삭제">×</button></li>`;
+  });
+  return out+"</ul>";
+}
+const foot = `<div class="hist-foot"><span>이 브라우저에만 저장돼요 · 최근 5건</span><button class="link-btn">전체 삭제</button></div>`;
+function panel(markCurrent, closeBtn){
+  return `<div class="hist-head"><h2>최근 질문</h2>${closeBtn?'<button class="close" aria-label="닫기">×</button>':""}</div>${list(markCurrent)}${foot}`;
+}
+
+function header(){
+  const mob = state.d==="mobile";
+  let left="", right="";
+  if(state.v==="A" && mob) left=`<button class="icon-btn" aria-label="최근 질문 열기">☰</button>`;
+  if(state.v==="B") right=`<button class="hist-btn ${state.s==="list"?"active":""}">${mob?"🕘":"최근 질문"} <span class="count">${H.length}</span></button>`;
+  return `<header class="app-header">${left}<span class="wordmark">DKSI</span><span class="brandname">Digital Key Spec Intelligence</span><span class="demo-tag">DEMO</span><span class="spacer"></span>${right}<button class="mcp" disabled aria-disabled="true">${mob?"MCP · Soon":"Local MCP · Coming soon"}</button></header>`;
+}
+
+function form(snap){
+  const q = snap? H[0].q : "";
+  return `<h1>디지털 키 스펙, 이제 질문으로 찾아보세요</h1>
+  <p class="sub">궁금한 규칙과 버전별 예외 상황을 물어보세요. 스펙 원문 근거를 기반으로 답해 드려요.</p>
+  <div class="form">
+    <div class="row">
+      <span class="radio-group"><span class="lg">검색 방식</span><span class="pill ${snap?"":"on"}">키워드 검색</span><span class="pill ${snap?"on":""}">AI 검색</span></span>
+      <span class="radio-group"><span class="lg">스펙 버전</span><span class="pill ${snap?"":"on"}">전체</span><span class="pill">V1</span><span class="pill ${snap?"on":""}">V2</span></span>
+    </div>
+    <div class="ta">${q?`<span>${q}</span>`:'<span class="ph">예: V2에서 NFC fallback을 사용할 수 있는 조건은?</span>'}
+      <div class="ta-foot"><span>${q.length}/500</span><button class="submit">근거 찾기</button></div></div>
+    <div class="examples"><span class="lg">예시 질문</span><span class="chip">디지털키란?</span><span class="chip">위임 공유</span><span class="chip">NFC 전환 조건</span></div>
+  </div>`;
+}
+
+function inlineHist(){
+  const rows = H.map(h=>`<li class="inline-row ${state.s==="snap"&&h.cur?"current":""}" style="${state.s==="snap"&&h.cur?"background:var(--accent-soft)":""}"><span class="q">${h.q}</span><span class="hist-meta" style="margin:0">${metaTags(h)}</span></li>`).join("");
+  return `<details class="inline-hist" ${state.s==="list"?"open":""}><summary>최근 질문 <span style="font-weight:400;color:var(--text3);font-size:13px">${H.length}건 ${state.s==="list"?"▴":"▾"}</span></summary><ul class="hist-list">${rows}</ul>${foot}</details>`;
+}
+
+function result(){
+  if(state.s!=="snap") return `<div class="empty">찾고 싶은 조건이 있나요?<br>질문을 입력하거나 예시를 선택해보세요.</div>`;
+  return `<div class="snap"><strong>저장된 결과</strong><span>10월 29일 14:03 · AI 검색 · V2</span><span class="grow"></span><button class="rerun">↻ 다시 실행</button></div>
+  <p class="snap-q">질문: <b>${H[0].q}</b></p>
+  <div class="results">
+    <section><h3>근거 기반 답변</h3>
+      <div class="answer">가상 V2 문서에서는 UWB ranging이 정해진 시간 안에 완료되지 않으면, 차량이 NFC 근거리 인증으로 전환할 수 있다고 정의해요 <a class="cite">근거 1</a>. 단, 사용자가 차량 문 손잡이 가까이에 있어야 하고 키 상태가 활성이어야 해요 <a class="cite">근거 2</a>.</div>
+      <p class="caveat">인용과 원문 일치 확인은 답변의 논리적 정확성을 보장하지 않습니다.</p></section>
+    <section><h3>검색된 근거 · 2개</h3>
+      <div class="card"><div class="meta">V2 · §3.2.2</div><div class="h">Ranging Unavailable</div><div class="mono" style="color:var(--text2)">DEMO-V2-REQ-010</div><p class="quote">If UWB ranging does not complete within the configured window, the vehicle MAY fall back to NFC proximity authentication.</p><span class="more">원문 전체 보기</span></div>
+      <div class="card"><div class="meta">V2 · §3.2.3</div><div class="h">Fallback Preconditions</div><div class="mono" style="color:var(--text2)">DEMO-V2-REQ-011</div><p class="quote">NFC fallback SHALL be permitted only when the key is in the active state.</p><span class="more">원문 전체 보기</span>
+      <div class="warn">⚠ 이전 앱 버전에서 저장된 결과예요. 다시 실행해 최신 원문을 확인하세요. (앱 버전이 다를 때만 표시, 예시)</div></div>
+    </section>
+  </div>`;
+}
+
+function render(){
+  const mob = state.d==="mobile", snap = state.s==="snap";
+  const f = document.getElementById("frame");
+  f.className = "frame "+state.d;
+  let mainInner = form(snap) + (state.v==="C"?inlineHist():"") + result();
+  let html = header();
+  if(state.v==="A" && !mob){
+    html += `<div class="body with-sidebar"><aside class="sidebar">${panel(snap,false)}</aside><main class="main">${mainInner}</main></div>`;
+  } else {
+    html += `<div class="body"><main class="main">${mainInner}</main></div>`;
+  }
+  const open = state.s==="list";
+  if(open && state.v==="A" && mob) html += `<div class="scrim"></div><div class="drawer left">${panel(false,true)}</div>`;
+  if(open && state.v==="B") html += mob ? `<div class="scrim"></div><div class="sheet"><div class="grab"></div>${panel(false,true)}</div>`
+                                          : `<div class="scrim"></div><div class="drawer right">${panel(false,true)}</div>`;
+  f.innerHTML = html;
+  document.getElementById("desc").textContent = DESC[state.v] + ({closed:"  —  '첫 화면': 이력이 있지만 아직 열지 않은 상태예요.", list:"  —  '이력 열람': 목록을 연 상태예요.", snap:"  —  '스냅샷 열기 후': 목록에서 항목을 눌러 저장된 결과를 연 상태예요. API는 다시 호출하지 않고, 폼에는 당시 조건이 채워져요."}[state.s]);
+}
+for (const [id,key] of [["v","v"],["d","d"],["s","s"]]){
+  document.getElementById(id).addEventListener("click",e=>{
+    const b=e.target.closest("button"); if(!b) return;
+    state[key]=b.dataset[key];
+    document.querySelectorAll(`#${id} button`).forEach(x=>x.setAttribute("aria-pressed", x===b));
+    render();
+  });
+}
+render();
+</script>
+</body>
+</html>
