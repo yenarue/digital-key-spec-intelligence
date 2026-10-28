@@ -313,6 +313,8 @@ Vercel 계정 접근/프로젝트 연결/secret 설정 권한이 없다면 필�
 
 ## 11. Out of Scope / Future Work
 
+키워드/AI 검색 전환은 사용자가 요청한 **첫 Vercel 배포·live 검증 이후의 후속 기능**으로 §13에 별도 계획한다. 현재 A–E 배포의 선행조건이 아니며 지금 구현하지 않는다.
+
 이번 A–E에서는 다음을 구현하지 않는다.
 
 - Local stdio MCP(F), 실제 MCP tool/server/endpoint/page 및 가짜 MCP 시연.
@@ -372,3 +374,67 @@ Vercel 계정 접근/프로젝트 연결/secret 설정 권한이 없다면 필�
 - M4 actual model check completed; G3 complete for tested local flows. Vercel CLI remains logged out. M2/M5(deployment prerequisite)/M6/D1–D7 remain pending actual Vercel setup/URL. Latest implementation push will precede the user's first deployment.
 
 - Post-root-env regression: `npm run test`163/163, lint/build, Playwright7/7 passed with the E2E process key explicitly blank (root .env did not override it). Actual key scan across45 production/dev client files found no key in bundles. `.env` is ignored and excluded from commit/deployment. Release display is now `v0.1.0` without the Web prefix.
+
+## 13. Post-Deployment Follow-up — 키워드 / AI 검색 전환
+
+**상태: 계획만 추가 / 미구현 / 현재 배포 우선.** 사용자 요청에 따라 첫 Vercel 배포와 실제 URL 검증(G4, M6/D1–D7)이 끝난 뒤 착수한다. 기존 PRD의 A–E 필수 수용 기준을 대체하거나 이번 배포를 지연시키지 않는다. 구현 시 PRD/DESIGN/결정 기록에 후속 요구사항을 반영한다.
+
+### 목적과 동작 제안
+
+- 질문 폼에 `검색 방식`이라는 레이블의 **`키워드 검색 / AI 검색` 두 선택지**를 추가한다. 버전 선택과 일관된 segmented radio control을 우선 검토한다. 기본 UI 선택은 **키워드 검색**을 제안한다.
+- 키워드 검색은 기존 MiniSearch·한영 용어 확장·문서 버전 필터·동일 topK로 원문 근거만 반환한다. **서버에서 모델 생성 경로를 건너뛰므로 키가 설정돼 있어도 OpenRouter 호출은 0회**여야 한다. 화면에서 답변만 숨기는 방식으로 구현하지 않는다.
+- AI 검색은 동일한 검색 결과를 근거로 한국어 답변을 생성하는 기존 RAG 경로다. 작은 설명으로 “검색된 근거를 바탕으로 AI 답변을 생성합니다”를 제공해 별도의 벡터/의미 검색 엔진으로 오해하지 않게 한다.
+- 모드 전환·질문 편집·문서 버전 변경만으로 API를 호출하지 않는다. 사용자가 `근거 찾기`를 제출할 때만 선택한 모드로 실행한다. 기존 중복 전송 방지·timeout·자동 재시도 없음 정책을 유지한다.
+- 질문과 문서 버전을 보존해 두 방식을 비교한다. 같은 `question + versions + topK`에 대해 모드별 최신 결과 하나씩만 현재 화면의 React 메모리에 보관하는 방식을 사용한다. 이미 받은 결과로 전환할 때는 추가 호출 없이 `이전 실행 결과`임을 표시하고, 해당 모드 결과가 없으면 실행 전 상태를 표시한다. 질문/버전이 달라지면 기존 결과를 새 질문의 결과처럼 보여주지 않는다.
+- 모드별 결과에 제출 당시 질문·버전·요청 모드를 표시한다. AI를 요청했지만 실패한 경우 `AI 검색 · 답변 생성 불가, 검색 근거 표시`로 구분하고, 의도적으로 고른 키워드 검색을 AI 장애처럼 표시하지 않는다. 비교 전용 페이지·자동 재질문·DB·영속 캐시·질문 이력은 추가하지 않는다.
+
+### 후속 API 계약 — 현재 계약은 아직 변경하지 않음
+
+```ts
+// 배포 후 S0에서 확정할 제안. 지금 구현된 AskRequest에는 mode가 없다.
+type SearchMode = "keyword" | "ai";
+type AskRequest = {
+  question: string;
+  versions?: ("V1" | "V2")[];
+  topK?: number;
+  mode?: SearchMode;
+};
+```
+
+UI는 `mode`를 항상 명시한다. **API에서 mode를 생략한 기존 클라이언트는 현재와 동일한 AI 경로**를 유지해 호환성을 보존한다. 빈 값·알 수 없는 문자열·잘못된 타입은 400으로 거부한다. 새 UI의 기본값 keyword와 기존 API의 생략 기본값 ai는 목적이 다르며 테스트로 구분한다. 응답의 네 status와 Evidence 구조는 유지하고, 결과의 요청 모드는 클라이언트가 제출 시 snapshot으로 보관한다.
+
+| 요청/상황 | 응답 | 모델 생성 호출 |
+| --- | --- | --- |
+| keyword + 근거 있음 | `search_only`, answer=null, sources 유지 | **0회**, 키/모델 설정과 무관 |
+| keyword 또는 ai + 근거 없음 | `insufficient_evidence`, answer=null, sources=[] | 0회 |
+| ai 또는 mode 생략 + 근거/키 있음 | 기존 검증 후 `answered` 또는 `llm_unavailable` | 최대 1회 |
+| ai 또는 mode 생략 + 키 없음 | 기존 `search_only` + 근거·정직한 안내 | 0회 |
+
+동일 입력의 sources/순위/버전/quote는 두 모드에서 같아야 한다. 모드는 **생성 여부만 제어**하며 검색 설정을 바꾸지 않는다. 전체 무료 호출 제한이나 동시 사용자 쿼터를 보장하는 기능은 아니지만, 사용자가 명시적으로 키워드 모드를 고른 요청의 AI 호출은 제거한다.
+
+### 후속 작업·의존성·파일 소유권
+
+기존 Core는 변경하지 않는 것을 기본으로 한다. **Main + API/UI Subagent 최대 2개**를 사용하고, 공통 계약 확정 → 두 구현 병렬 → Main 실물 통합 → 다음 릴리스 배포 순으로 진행한다.
+
+| 담당 | 수정 가능 경로 | 의존성 / 완료 조건 |
+| --- | --- | --- |
+| Main | `apps/web/src/contracts/ask.ts`, shared fixture, `src/integration/**`, `e2e/**`, PRD/DESIGN/PLAN/결정·버전 문서, Web manifest/lockfile | S0 계약·기본값 확정, S3 실제 연결·검증, S4 릴리스 |
+| API Agent | `src/server/{request-validation,ask-service}.ts`, 관련 테스트, 필요 시 `app/api/ask/route.test.ts` | S0 후; 키가 있는 keyword 요청에서도 provider spy 0회, 기존 ai/fallback 유지 |
+| UI Agent | `src/components/{ask-panel,answer-panel}.tsx`, `src/client/**`, `src/app/globals.css`와 관련 테스트 | S0 후; 기본 keyword, 명시적 제출, 모드별 최신 결과 비교와 요청 snapshot |
+
+경로는 `apps/web/` 기준이며 Main 계약/fixture/설정 파일은 Subagent가 수정하지 않는다. 공통 파일 변경은 기존 §6 절차를 따른다.
+
+- [ ] **S0 · Main · G4 및 M7 후 / 후속 P1:** 배포 기준 커밋·버전을 기록한 뒤 위 mode 계약·UI 기본 keyword/API 생략 ai·모드별 메모리 결과 범위를 확정하고 PRD/DESIGN/테스트 fixture를 갱신한다. 첫 배포가 미완료이면 시작하지 않는다.
+- [ ] **S1 · API Agent · S0 후 / S2와 병렬:** mode 검증과 서버 생성 분기를 구현한다. keyword는 항상 retriever까지만 실행하고 모델 호출을 건너뛴다. ai의 인용 검증·실패 fallback·1회 상한은 유지한다. 설정된 fake 키/금지 모델에서도 keyword 결과가 정상이고 provider가 호출되지 않는 targeted 테스트를 제출한다.
+- [ ] **S2 · UI Agent · S0 후 / S1과 병렬:** 검색 방식 선택, 요청 mode 전달, 제출 당시 모드 표기, 의도된 keyword와 AI fallback 안내 구분을 구현한다. 전환만으로 호출하지 않고 동일 입력의 모드별 최신 결과를 재사용해 비교한다. 입력 변경·pending·재제출·모바일·keyboard 상태를 검사한다.
+- [ ] **S3 · Main · S1+S2 후 / Integration Gate G5:** 실제 UI→API→코어를 통합하고 아래 수용 기준과 test/eval/lint/build·관련 E2E를 실행한다. 단순 화면 상태가 아니라 서버 provider 호출 횟수를 검사한다. 기존 무근거·버전 격리·인용 거부·AI 장애 회귀가 통과해야 한다.
+- [ ] **S4 · Main · S3/G5 후 / 다음 릴리스:** 호환 기능 추가로 Minor를 증가시킨다. 첫 배포가0.1.0이면 다음 목표는0.2.0이며, 실제 배포 기준이 다르면 그 버전에서 계산한다. 지금 버전을 올리거나 태그를 만들지 않는다. Preview→Production 배포 후 실제 URL에서 두 모드·표시 버전·키워드 무호출을 확인하고 결과를 기록한다.
+
+### 수용 기준과 검증
+
+- 기본 선택은 키워드이며 최초 방문·모드 전환·예시 질문 채우기로 API/AI 호출이 발생하지 않는다. 제출당 요청은 하나다.
+- 서버 단위/통합에서 **키가 설정된 keyword 요청의 `generateGroundedAnswer` 호출 횟수 0**을 검증한다. ai는 근거·설정이 있을 때 최대1회, 무근거는0회다. 잘못된 mode는 검색/모델 실행 전에400이다.
+- 같은 질문·versions·topK의 두 모드가 동일 source IDs/순위/quote를 반환한다. 키워드 모드가 버전 필터를 우회하거나 기존 검색 품질을 바꾸지 않는다.
+- ai 정상 답변·키 없음·429·timeout·위조 인용 보류를 기존 정책대로 유지한다. UI에는 의도한 keyword 결과와 ai 실패를 구분해 표시한다.
+- 브라우저에서는 기본 keyword 제출 payload, ai 선택 제출 payload, 전환만으로 추가 요청 없음, 기존 결과로 돌아가 비교 시 추가 호출 없음, 입력 변경 시 이전 결과 혼동 없음·중복 제출 방지를 검증한다. 모델 UI는 stub으로 검사하고 실제 모델 확인과 구분한다.
+- 배포 후 실제 화면에서도 두 모드와 앱 버전을 확인한다. 요청 수 감소율을 실측하지 않고 수치로 주장하지 않는다. 이번 문서 수정만으로 구현·테스트·릴리스 완료로 표시하지 않는다.
