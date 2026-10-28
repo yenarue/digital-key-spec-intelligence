@@ -8,7 +8,7 @@
 
 ### 현재 실행 결과
 
-로컬 Core/API/UI 구현과 독립 리뷰를 마쳤다. 단위·통합163개, 검색 평가18개, 브라우저7개, lint/typecheck/build를 실제 실행해 통과했다. dev는 http://localhost:3000 에서 계속 실행 중이다. 전체 제품명과 manifest 기반 v0.1.0 표시도 추가했다. 루트 .env 로딩을 연결해 실제 무료 모델의 answered 응답과 원문 인용을 확인했다. Vercel 미로그인으로 M2/M6(live)와 전체 A–E 완료 판정은 남아 있다.
+로컬 Core/API/UI 구현과 독립 리뷰를 마쳤다. 단위·통합168개, 검색 평가18개, 브라우저7개, lint/typecheck/build를 실제 실행해 통과했다. dev는 http://localhost:3000 에서 계속 실행 중이다. 전체 제품명과 manifest 기반 v0.1.0 표시도 추가했다. 루트 .env 로딩을 연결해 실제 무료 모델의 answered 응답과 원문 인용을 확인했다. 병행 세션의 첫 Production 배포 기록이 docs/deployment.md에 추가됐다. 이번 수정의 실제 URL 검증과 전체 A–E 완료 판정은 아직 남아 있다.
 
 ### 착수 시점의 자산과 부족한 부분 (기준 기록)
 
@@ -130,7 +130,7 @@ type ApiError = { error: { code: "invalid_request" | "payload_too_large" | "inte
 
 ### Phase 3 — AI 답변·실패 격리 (PG2-API, P0)
 
-- [x] **R3 · API · G1-local 후:** `src/server/llm/{openrouter,prompt,response-schema}.ts`에 server-only LLMProvider를 구현한다. 무료 모델 allowlist와 기본 `openrouter/free`, 한국어 근거 프롬프트, topK 이하 context, 한 번 호출, 10초 내외 timeout·출력/응답 크기 상한·자동 재시도 없음 정책을 적용한다. 실제 키 없이 fake fetch로 검증한다.
+- [x] **R3 · API · G1-local 후:** `src/server/llm/{openrouter,prompt,response-schema}.ts`에 server-only LLMProvider를 구현한다. 무료 모델 allowlist와 기본 `openrouter/free`, 한국어 근거 프롬프트, topK 이하 context, 한 번 호출, 최대60초 timeout·Route90초 예산·2,400 총 생성 token 및 응답 크기 상한·자동 재시도 없음 정책을 적용한다. 실제 키 없이 fake fetch로 검증한다.
 - [x] **R4 · API · R3 후:** `ask-service.ts`에 모델 JSON/answer 인용 대조와 EvidenceValidator 주입을 연결한다. 정상만 answered; 키 없음 search_only; 429/5xx/network/timeout/malformed/잘못된 인용은 answer=null의 llm_unavailable+동일 sources+warnings. C4가 끝나지 않았으면 명시적 fake로 검사하고 실물 연결 완료라고 하지 않는다.
 - [x] **R5 · API · R4 후:** service/provider/route 테스트에서 성공·실패·무근거 무호출·요청 1회 상한·원문 전송 범위·키 비노출을 검사한다. 출처의 지시문을 실행하지 않는 프롬프트/안전한 응답 정책을 확인한다. 테스트는 네트워크와 실제 모델에 의존하지 않는다.
 - [x] **M3 · Main · C5+R5+U3 후:** 세 writer를 멈추고 실제 Retriever+EvidenceValidator+OpenRouterProvider를 ask-runtime에 조립한다. exports·통합 fixture·상태 UI를 대조하고 test/eval/lint/build를 실행한다. core validator 거부를 service가 답변 보류로 처리하는 통합 검사를 포함한다(G2).
@@ -301,7 +301,7 @@ Vercel 계정 접근/프로젝트 연결/secret 설정 권한이 없다면 필�
 | 병렬 수정·공통 계약 변경 | Main 소유 exports/계약/lockfile, 경로별 writer 1명, Gate 중 정지 및 명시적 소유권 이전 |
 | fake 성공·통합 지연 | 개발 중 fake 허용, G1/G2 실제 조립 강제, API·validator·UI를 함께 확인 |
 | agent 슬롯·중복 도구 작업 | 최대 3 subagent, 재위임 없음, install/build/배포 Main 단독; 효과 낮으면 2개로 축소 |
-| 무료 모델 가용성·쿼터·429 | 키 없는 검색을 먼저 배포; 1회/10초 상한, 출력 제한, 자동 재시도·유료 전환 없음; 성공 확인과 실패 검증을 구분 |
+| 무료 모델 가용성·쿼터·429 | 키 없는 검색을 먼저 배포; 1회/60초 상한, 출력 제한, 자동 재시도·유료 전환 없음; 성공 확인과 실패 검증을 구분 |
 | 공개 endpoint의 반복 호출·비용/쿼터 소진 | 500자/본문/topK/출력 제한, UI 중복 방지, 배포 플랫폼에서 사용 가능한 요청 제한 확인; 저장소/DB 없이 적용. 인스턴스 메모리 제한만으로 전역 rate limit을 보장한다고 주장하지 않으며 필요 시 AI 키를 제거해 검색 전용 유지 |
 | 한국어 lexical recall 부족 | >=5 동의어와 보수적 token/prefix/fuzzy, 기존 10개와 표현 변형 eval; embedding으로 오표기하지 않음 |
 | 일반 용어 적중이 무관한 근거로 연결 | 음성 질문과 최소 적중 조건 점검; 애매하면 보류/한계 표시. 검색 점수를 의미적 확신으로 사용하지 않음 |
@@ -438,3 +438,21 @@ UI는 `mode`를 항상 명시한다. **API에서 mode를 생략한 기존 클라
 - ai 정상 답변·키 없음·429·timeout·위조 인용 보류를 기존 정책대로 유지한다. UI에는 의도한 keyword 결과와 ai 실패를 구분해 표시한다.
 - 브라우저에서는 기본 keyword 제출 payload, ai 선택 제출 payload, 전환만으로 추가 요청 없음, 기존 결과로 돌아가 비교 시 추가 호출 없음, 입력 변경 시 이전 결과 혼동 없음·중복 제출 방지를 검증한다. 모델 UI는 stub으로 검사하고 실제 모델 확인과 구분한다.
 - 배포 후 실제 화면에서도 두 모드와 앱 버전을 확인한다. 요청 수 감소율을 실측하지 않고 수치로 주장하지 않는다. 이번 문서 수정만으로 구현·테스트·릴리스 완료로 표시하지 않는다.
+
+
+## AI timeout investigation — 2026-10-29
+
+이번 수정은 AI 실패 원인 수정이며, §13의 검색 방식 전환은 여전히 배포 후 미구현이다. 수정 소유권은 Main에 두고 provider/test/route/Web README/이 계획 파일로 제한한다.
+
+- [x] **T0 / Main + read-only reviewers:** User-reported UI timeout matched server records at exactly10.0s. Provider default AND clamp were10,000ms; nonstream JSON required the complete body by that point; route budget was15s. Metadata-only instrumentation confirmed the configured free Nemotron model and was removed before completion. No key or source prompts were logged.
+- [x] **T1 / Main / T0:** Wrote a fake-clock regression where a valid response arrives at12s. It failed with the original timeout, proving premature cancellation. Changed provider deadline/default clamp to60,000ms per user request and route maxDuration to90s (Fluid Compute budget), retaining abort/body cancellation,64KiB cap, one call and no retry.
+- [x] **T2 / Main / T0:** Live NFC metadata separately showed finish_reason=length, all1,200 output tokens consumed,1,055 reasoning tokens, incomplete JSON. Increased the shared reasoning+visible-output budget to2,400. Kept strict JSON/citation validation and free-model allowlist; never display truncated responses. No model switch or paid fallback.
+- [x] **T3 / Main / T1+T2:** Provider/service/route/schema targeted tests68/68 passed. Full unit/integration168/168, lint/build passed. Added late-header12s and late-body20s success, capped deadline abort, stalled-body cancellation and model budget < route budget checks.
+- [x] **T4 / Main / T3:** Verify all three UI examples with actual configured free model, original topK5 and version scopes; manually compare successful answers to evidence; record format failures separately from timeouts. Rerun browser regression after final build, then commit/push.
+
+Evidence before the final60s/2,400-token combination: live app sharing answered at11,253ms and start permission answered at13,544ms, both beyond the old10s cutoff; NFC at11,900ms fell back for format/provider failure. A separate same-query diagnostic confirmed token exhaustion rather than timeout. These measurements describe specific trials, not a latency guarantee. Vercel's90s budget requires deployment of the new route and verification against actual project settings/live URL.
+
+- Final actual-app trials at60s/2,400-token budget, original UI questions/scopes/topK5: sharing answered7,416ms, NFC answered9,556ms, start permission answered3,545ms; no retries, all exact citations validated. Manually checked V1 prohibition vs V2 conditional single delegation, NFC permission/tap/suspension conditions and entry-only/start distinction. NFC answer translated passive entry as 수동 진입; attribution/condition checks pass but that domain translation is a remaining interpretation-quality issue, not a semantic guarantee. Future glossary refinement may preserve the English term.
+- Final verification:168/168 unit/integration tests,7/7 browser tests, lint/build passed; independent read-only patch reviewer found no material timeout/resource/free-model-policy defect. Dev remains at localhost:3000. Vercel code now exports90s and must be redeployed/checked on the actual project; no live deployment claim. No keyword/AI mode toggle was implemented.
+
+- Concurrent deployment handoff discovered before release: commits caa4535/67b5276 recorded first Production and Claude entry points. These changes were preserved. Existing first release is0.1.0; timeout fix will be released as0.1.1 per the agreed patch policy. Target live URL is https://digital-key-spec-intelligence.vercel.app; new-budget/version live verification is pending.

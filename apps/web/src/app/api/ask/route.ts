@@ -3,7 +3,8 @@ import { getAskService } from "../../../server/ask-runtime";
 import { RequestValidationError, validateAskRequest } from "../../../server/request-validation";
 
 export const runtime = "nodejs";
-export const maxDuration = 15;
+// Leave time for retrieval, validation and the response after the 60s model budget.
+export const maxDuration = 90;
 
 class PayloadTooLargeError extends Error {}
 

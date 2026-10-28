@@ -18,7 +18,10 @@ export interface OpenRouterOptions {
 }
 export const MODEL_DEFAULT = "openrouter/free";
 export const RESPONSE_MAX_BYTES = 65536;
-export const MAX_OUTPUT_TOKENS = 1200;
+// OpenRouter counts reasoning and visible JSON against this shared limit.
+export const MAX_OUTPUT_TOKENS = 2400;
+// Whole-response budget: free reasoning models need room beyond a ten-second cutoff.
+export const MODEL_TIMEOUT_MS = 60_000;
 
 export function isFreeModel(model: string): boolean {
   return model === MODEL_DEFAULT || /^[a-zA-Z0-9][a-zA-Z0-9._-]*\/[a-zA-Z0-9][a-zA-Z0-9._-]*:free$/.test(model);
@@ -31,7 +34,7 @@ export class OpenRouterProvider implements LLMProvider {
   constructor(private readonly options: OpenRouterOptions) {
     this.model = options.model ?? MODEL_DEFAULT;
     this.fetchImpl = options.fetchImpl ?? fetch;
-    this.timeoutMs = Number.isFinite(options.timeoutMs) ? Math.min(10000, Math.max(1, options.timeoutMs!)) : 10000;
+    this.timeoutMs = Number.isFinite(options.timeoutMs) ? Math.min(MODEL_TIMEOUT_MS, Math.max(1, options.timeoutMs!)) : MODEL_TIMEOUT_MS;
   }
 
   async generateGroundedAnswer(input: Parameters<LLMProvider["generateGroundedAnswer"]>[0]): Promise<GroundedAnswer> {

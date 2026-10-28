@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 import { evidenceFixture } from "../../test-fixtures/ask";
-import { OpenRouterProvider, isFreeModel, LLMProviderError, MAX_OUTPUT_TOKENS, RESPONSE_MAX_BYTES } from "./openrouter";
+import { OpenRouterProvider, isFreeModel, LLMProviderError, MAX_OUTPUT_TOKENS, RESPONSE_MAX_BYTES, MODEL_TIMEOUT_MS } from "./openrouter";
+
+import { maxDuration } from "../../app/api/ask/route";
 
 const candidate = { answer: `가상 NFC 조건입니다. [${evidenceFixture.citationId}]`, citations: [{ citationId: evidenceFixture.citationId, quote: evidenceFixture.quote }] };
 const input = { question: "NFC 조건", evidence: [evidenceFixture], locale: "ko" as const };
@@ -74,6 +76,66 @@ describe("free OpenRouter provider", () => {
     await expect(providerWith(fetchMock, { timeoutMs: 10 }).generateGroundedAnswer(input)).rejects.toMatchObject({ reason: "timeout" });
     expect(cancel).toHaveBeenCalledOnce();
     expect(fetchMock).toHaveBeenCalledOnce();
+  });
+  it("accepts a valid completion after the former ten-second deadline", async () => {
+    vi.useFakeTimers();
+    try {
+      const fetchMock = vi.fn().mockImplementation(() => new Promise<Response>(resolve => {
+        setTimeout(() => resolve(completion()), 12_000);
+      }));
+      const outcome = providerWith(fetchMock).generateGroundedAnswer(input)
+        .then(answer => ({ answer }), error => ({ reason: error.reason }));
+      await vi.advanceTimersByTimeAsync(12_000);
+      expect(await outcome).toEqual({ answer: candidate });
+      expect(fetchMock).toHaveBeenCalledOnce();
+    } finally { vi.useRealTimers(); }
+  });
+  it("accepts a response body that completes after ten seconds", async () => {
+    vi.useFakeTimers();
+    try {
+      const body = new ReadableStream<Uint8Array>({ start(controller) {
+        setTimeout(() => { controller.enqueue(new TextEncoder().encode(JSON.stringify({ choices: [{ finish_reason: "stop", message: { content: JSON.stringify(candidate) } }] }))); controller.close(); }, 20_000);
+      } });
+      const fetchMock = vi.fn().mockResolvedValue(new Response(body));
+      const outcome = providerWith(fetchMock).generateGroundedAnswer(input)
+        .then(answer => ({ answer }), error => ({ reason: error.reason }));
+      await vi.advanceTimersByTimeAsync(20_000);
+      expect(await outcome).toEqual({ answer: candidate });
+      expect(fetchMock).toHaveBeenCalledOnce();
+    } finally { vi.useRealTimers(); }
+  });
+  it("still aborts at the bounded deadline and clamps excessive timeout settings", async () => {
+    vi.useFakeTimers();
+    try {
+      const fetchMock = vi.fn().mockImplementation(() => new Promise(() => undefined));
+      const outcome = providerWith(fetchMock, { timeoutMs: 600_000 }).generateGroundedAnswer(input)
+        .then(() => "unexpected success", error => error.reason);
+      await vi.advanceTimersByTimeAsync(MODEL_TIMEOUT_MS - 1);
+      const init = fetchMock.mock.calls[0][1] as RequestInit;
+      expect(init.signal?.aborted).toBe(false);
+      await vi.advanceTimersByTimeAsync(1);
+      expect(await outcome).toBe("timeout");
+      expect(init.signal?.aborted).toBe(true);
+      expect(fetchMock).toHaveBeenCalledOnce();
+    } finally { vi.useRealTimers(); }
+  });
+  it("cancels a stalled body at the default deadline without retrying", async () => {
+    vi.useFakeTimers();
+    try {
+      const cancel = vi.fn();
+      const body = new ReadableStream<Uint8Array>({ start() {}, cancel });
+      const fetchMock = vi.fn().mockResolvedValue(new Response(body));
+      const outcome = providerWith(fetchMock).generateGroundedAnswer(input)
+        .then(() => "unexpected success", error => error.reason);
+      await vi.advanceTimersByTimeAsync(MODEL_TIMEOUT_MS);
+      expect(await outcome).toBe("timeout");
+      expect(cancel).toHaveBeenCalledOnce();
+      expect(fetchMock).toHaveBeenCalledOnce();
+    } finally { vi.useRealTimers(); }
+  });
+  it("leaves a platform execution cushion beyond the model deadline", () => {
+    expect(MODEL_TIMEOUT_MS).toBeGreaterThan(10_000);
+    expect(MODEL_TIMEOUT_MS).toBeLessThan(maxDuration * 1000);
   });
   it("does not call the API for missing key or no evidence", async () => {
     const fetchMock = vi.fn();
