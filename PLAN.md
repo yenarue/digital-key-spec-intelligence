@@ -8,7 +8,7 @@
 
 ### 현재 실행 결과
 
-로컬 Core/API/UI 구현과 독립 리뷰를 마쳤다. 단위·통합168개, 검색 평가18개, 브라우저7개, lint/typecheck/build를 실제 실행해 통과했다. dev는 http://localhost:3000 에서 계속 실행 중이다. 전체 제품명과 manifest 기반 v0.1.0 표시도 추가했다. 루트 .env 로딩을 연결해 실제 무료 모델의 answered 응답과 원문 인용을 확인했다. 병행 세션의 첫 Production 배포 기록이 docs/deployment.md에 추가됐다. 이번 수정의 실제 URL 검증과 전체 A–E 완료 판정은 아직 남아 있다.
+로컬 Core/API/UI 구현과 독립 리뷰를 마쳤다. 단위·통합168개, 검색 평가18개, 브라우저7개, lint/typecheck/build를 실제 실행해 통과했다. dev는 http://localhost:3000 에서 계속 실행 중이다. 전체 제품명과 manifest 기반 버전 표시도 추가했다. 현재 배포 버전은 v0.1.1이다. 루트 .env 로딩을 연결해 실제 무료 모델의 answered 응답과 원문 인용을 확인했다. 병행 세션의 첫 Production 배포 기록이 docs/deployment.md에 추가됐다. 이번 수정은 실제 URL의 버전과 AI answered 응답까지 확인했다. 전체 G4 브라우저 검증과 A–E 완료 판정은 아직 남아 있다.
 
 ### 착수 시점의 자산과 부족한 부분 (기준 기록)
 
@@ -455,4 +455,4 @@ Evidence before the final60s/2,400-token combination: live app sharing answered 
 - Final actual-app trials at60s/2,400-token budget, original UI questions/scopes/topK5: sharing answered7,416ms, NFC answered9,556ms, start permission answered3,545ms; no retries, all exact citations validated. Manually checked V1 prohibition vs V2 conditional single delegation, NFC permission/tap/suspension conditions and entry-only/start distinction. NFC answer translated passive entry as 수동 진입; attribution/condition checks pass but that domain translation is a remaining interpretation-quality issue, not a semantic guarantee. Future glossary refinement may preserve the English term.
 - Final verification:168/168 unit/integration tests,7/7 browser tests, lint/build passed; independent read-only patch reviewer found no material timeout/resource/free-model-policy defect. Dev remains at localhost:3000. Vercel code now exports90s and must be redeployed/checked on the actual project; no live deployment claim. No keyword/AI mode toggle was implemented.
 
-- Concurrent deployment handoff discovered before release: commits caa4535/67b5276 recorded first Production and Claude entry points. These changes were preserved. Existing first release is0.1.0; timeout fix will be released as0.1.1 per the agreed patch policy. Target live URL is https://digital-key-spec-intelligence.vercel.app; new-budget/version live verification is pending.
+- Concurrent deployment handoff discovered before release: commits caa4535/67b5276 recorded first Production and Claude entry points. These changes were preserved. Released timeout fix as0.1.1 in commits617fc2e/0eb5af2 and pushed main. Production deployment dpl_Dap8KZSSqmKSMT1HcDQX2VS1M48H is Ready at https://digital-key-spec-intelligence.vercel.app; public HTML shows v0.1.1. An actual Production POST for V2 entry-only/start returned HTTP200, answered with no warnings, V2-only evidence, and the correct exact source citation DEMO-V2-REQ-012. This verifies the new release and one live answer; remaining full G4 browser/mobile checks are not implied complete.
