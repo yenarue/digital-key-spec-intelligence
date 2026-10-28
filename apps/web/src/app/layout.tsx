@@ -10,7 +10,7 @@ const pretendard = localFont({
   display: "swap",
 });
 export const metadata: Metadata = {
-  title: "DKSI · Spec Intelligence",
+  title: "Digital Key Spec Intelligence",
   description: "독립 창작한 가상 요구사항에서 버전과 정확한 원문 근거를 확인하는 학술 데모",
 };
 export default function Layout({ children }: { children: ReactNode }) {
