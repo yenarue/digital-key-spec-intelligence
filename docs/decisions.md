@@ -90,6 +90,7 @@
 - Users want to revisit past questions. With no login, store history only in the browser's localStorage; no server DB, no query logging/analytics. Narrowed PRD scope and AGENTS rule 6 from "persistence" to "server-side persistence" accordingly. Collecting all users' queries is out of scope (server persistence, risk of pasted internal text).
 - Opening an entry shows the saved snapshot without a new request; `다시 실행` resubmits explicitly. Snapshots store the Web app version; a mismatch shows a re-run hint instead of checking IDs against the corpus on the client.
 - UI: chose C (collapsible list below the form, collapsed by default, latest 5, no "more" yet). Recorded B (header button + drawer/bottom sheet) as the fallback if C feels awkward in use; A (left sidebar) rejected for now per the deferred-menu principle.
+- Priority raised from P2 to P1 by the user on the same day.
 - Moved design previews into `docs/design-previews/` (`main-screen-layouts.html`, formerly root `design-preview.html`; new `question-history.html`) and excluded the folder from Vercel uploads. Not implemented yet.
 
 ## 2026-10-29 — Fuller AI answers and larger model budget
