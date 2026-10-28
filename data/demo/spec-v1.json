@@ -1,0 +1,118 @@
+{
+  "documentId": "DKSI-DEMO",
+  "title": "Fictional Digital Access Specification (Synthetic Demo)",
+  "version": "V1",
+  "synthetic": true,
+  "disclaimer": "Entirely invented for academic UI testing; not CCC/OEM requirements.",
+  "requirements": [
+    {
+      "requirementId": "DEMO-V1-REQ-001",
+      "sectionId": "3.1.1",
+      "heading": "Session Timeout",
+      "text": "In this fictional demonstration, a session SHALL expire 60 seconds after the final authenticated activity.",
+      "keywords": [
+        "timeout",
+        "expiration",
+        "session",
+        "만료"
+      ],
+      "references": []
+    },
+    {
+      "requirementId": "DEMO-V1-REQ-002",
+      "sectionId": "3.1.2",
+      "heading": "Timeout Exception",
+      "text": "A device MAY extend its active session by 30 seconds when a fictional maintenance mode is enabled.",
+      "keywords": [
+        "exception",
+        "maintenance",
+        "연장"
+      ],
+      "references": [
+        "DEMO-V1-REQ-001"
+      ]
+    },
+    {
+      "requirementId": "DEMO-V1-REQ-003",
+      "sectionId": "3.2.1",
+      "heading": "Authorization Check",
+      "text": "Before granting fictional access, the controller SHALL verify the device authorization token.",
+      "keywords": [
+        "authentication",
+        "authorization",
+        "token",
+        "인증"
+      ],
+      "references": []
+    },
+    {
+      "requirementId": "DEMO-V1-REQ-004",
+      "sectionId": "3.2.2",
+      "heading": "Revoked Device",
+      "text": "A revoked fictional credential SHALL NOT authorize access even when a wireless connection is established.",
+      "keywords": [
+        "revocation",
+        "credential",
+        "access",
+        "폐기"
+      ],
+      "references": [
+        "DEMO-V1-REQ-003"
+      ]
+    },
+    {
+      "requirementId": "DEMO-V1-REQ-005",
+      "sectionId": "4.1.1",
+      "heading": "Proximity Detection",
+      "text": "The fictional controller SHOULD begin proximity evaluation when an authorized device enters the demonstration area.",
+      "keywords": [
+        "proximity",
+        "distance",
+        "접근"
+      ],
+      "references": [
+        "DEMO-V1-REQ-003"
+      ]
+    },
+    {
+      "requirementId": "DEMO-V1-REQ-006",
+      "sectionId": "4.1.2",
+      "heading": "Connection Loss",
+      "text": "When the demonstration radio connection is lost, the fictional application SHALL mark the current session as interrupted.",
+      "keywords": [
+        "disconnect",
+        "radio",
+        "connection",
+        "연결"
+      ],
+      "references": []
+    },
+    {
+      "requirementId": "DEMO-V1-REQ-007",
+      "sectionId": "5.1.1",
+      "heading": "Audit Event",
+      "text": "The fictional application SHALL record a non-identifying event code when an access request is rejected.",
+      "keywords": [
+        "audit",
+        "event",
+        "logging",
+        "기록"
+      ],
+      "references": []
+    },
+    {
+      "requirementId": "DEMO-V1-REQ-008",
+      "sectionId": "5.1.2",
+      "heading": "Offline Mode",
+      "text": "If fictional offline mode is configured, a previously authorized device MAY request local access for up to five minutes.",
+      "keywords": [
+        "offline",
+        "fallback",
+        "오프라인"
+      ],
+      "references": [
+        "DEMO-V1-REQ-003"
+      ]
+    }
+  ]
+}
