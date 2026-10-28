@@ -1,0 +1,73 @@
+{
+  "description": "Synthetic only. Expected retrieval examples for implementation tests.",
+  "cases": [
+    {
+      "id": "Q1",
+      "question": "세션 만료 시간은 얼마나 돼?",
+      "versions": [
+        "V1"
+      ],
+      "expectedRequirementIds": [
+        "DEMO-V1-REQ-001"
+      ],
+      "type": "retrieval"
+    },
+    {
+      "id": "Q2",
+      "question": "maintenance mode에서 세션을 연장할 수 있어?",
+      "versions": [
+        "V2"
+      ],
+      "expectedRequirementIds": [
+        "DEMO-V2-REQ-002"
+      ],
+      "type": "condition"
+    },
+    {
+      "id": "Q3",
+      "question": "만료 시간을 V1 V2 별로 찾아줘",
+      "versions": [
+        "V1",
+        "V2"
+      ],
+      "expectedRequirementIds": [
+        "DEMO-V1-REQ-001",
+        "DEMO-V2-REQ-001"
+      ],
+      "type": "version-comparison"
+    },
+    {
+      "id": "Q4",
+      "question": "revoked credential도 offline access가 되나?",
+      "versions": [
+        "V2"
+      ],
+      "expectedRequirementIds": [
+        "DEMO-V2-REQ-008",
+        "DEMO-V2-REQ-004"
+      ],
+      "type": "exception"
+    },
+    {
+      "id": "Q5",
+      "question": "우주선 연료 규격은?",
+      "versions": [
+        "V1",
+        "V2"
+      ],
+      "expectedRequirementIds": [],
+      "type": "insufficient-evidence"
+    },
+    {
+      "id": "Q6",
+      "question": "연결이 끊기면 어떤 처리해야 해?",
+      "versions": [
+        "V2"
+      ],
+      "expectedRequirementIds": [
+        "DEMO-V2-REQ-006"
+      ],
+      "type": "fallback-candidate"
+    }
+  ]
+}
