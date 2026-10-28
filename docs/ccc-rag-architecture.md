@@ -32,7 +32,7 @@ Primary sources:
 | Runtime | Corpus | Retriever | LLM | Real CCC text leaves PC? |
 | --- | --- | --- | --- | --- |
 | **Vercel demo** | Synthetic JSON | Shared lexical core | OpenRouter free, server-only | No (only synthetic) |
-| **Local Web (preferred real-spec path)** | Local CCC PDFs | Shared core + local parsed index | **Ollama local** | No, assuming no external logs/plugins/routes |
+| **Company-approved Local MCP (planned real-spec path)** | Locally indexed CCC PDFs | Shared core via stdio MCP tools | **Company-approved Codex / Claude / Gemini** | May be sent to approved enterprise model endpoints under applicable contracts |
 | **Local Web (authorized external mode)** | Local CCC PDFs | Same local core | OpenRouter using **only selected retrieval chunks** | **Yes**; only enable after verifying license, employer policy, and provider terms |
 | **Future Local MCP** | Local CCC PDFs | Same shared index | Connected client model | **May** leave PC depending on client/model |
 
@@ -49,8 +49,9 @@ data/local/ccc/*.pdf (V3.1.4, V4.1.0; gitignored)
   -> expand heading/conditions/referenced chunks when needed
   -> evidence IDs: document/version/page/section/content hash
   -> provider abstraction:
-       (a) Ollama API at localhost:11434 -> local grounded answer
+       (a) Local stdio MCP -> company-approved Codex/Claude/Gemini reasoning
        (b) OpenRouter API -> selected chunks only, after authorization
+       (c) Optional Ollama local inference (not required)
   -> claim/evidence validation and traceable answer
 ```
 
@@ -81,11 +82,11 @@ apps/mcp/                                  # future only; menu disabled
 Keep the entire `/data/local/` tree ignored. Never expose real spec via `apps/web/public`, import from client-visible bundles, `next/static`, Vercel assets, test snapshots, screenshots or diagnostic logs.
 
 ## 7. UI policy
-Show **Source: Synthetic Demo / Local CCC PDFs** and **Inference: OpenRouter / Ollama** as *separate* selectors. In public hosted mode, real CCC source is unavailable and synthetic demo is default. In local mode, choose real documents and Ollama; external OpenRouter for real source stays disabled until the operator explicitly configures and verifies permissions. Show exactly what data is leaving the machine. Local MCP remains disabled/Coming Soon.
+Show **Source: Synthetic Demo / Local CCC PDFs** and **Inference: OpenRouter / Ollama** as *separate* selectors. In public hosted mode, real CCC source is unavailable and synthetic demo is default. In the planned company mode, use local real-document retrieval through MCP tools with company-approved AI agents. External personal OpenRouter for real-source excerpts stays disabled unless applicable permission and organizational approval are verified. Show exactly what data is leaving the machine. Local MCP remains disabled/Coming Soon.
 
 ## 8. Implementation and acceptance plan
 **P0 academic A–E:** complete functional Vercel synthetic RAG web demo with citations (existing PRD).  
-**P0 real-spec pilot (next immediately after stable deployment, or earlier if feasible):** local ingestion of two user-supplied CCC PDFs, page/section evidence, common retrieval and local Ollama answer generation; no public publishing.  
+**P0 real-spec pilot (after academic deployment):** local ingestion of the two operator-supplied CCC PDFs with page/section evidence and MCP tool results for company-approved AI agents. No public publishing. Ollama is an optional engineering experiment only.  
 **P1 conditional:** explicit external-provider permission gate + minimal-context sending, with no training/ZDR controls when possible, no logs; only after reviewing rights and organizational approval.  
 **P2:** local MCP adapter, structure-aware + hybrid retrieval, multi-document requirement relation graph, and team knowledge reuse.
 
