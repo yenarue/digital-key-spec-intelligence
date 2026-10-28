@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import v1 from '../../../data/demo/spec-v1.json' with { type: 'json' };
+import webPackage from '../package.json' with { type: 'json' };
 
 test('real API preserves source fields and version, rejects invalid and unsupported requests', async ({ request }) => {
   const response = await request.post('/api/ask', { data: { question: 'NFC 태그로 접근할 수 있나?', versions: ['V1'] } });
@@ -27,6 +28,9 @@ test('real API preserves source fields and version, rejects invalid and unsuppor
 
 test('question to actual search, source expansion and inert MCP', async ({ page }) => {
   await page.goto('/');
+  await expect(page).toHaveTitle('Digital Key Spec Intelligence');
+  await expect(page.getByText('Digital Key Spec Intelligence', {exact:true})).toBeVisible();
+  await expect(page.locator('.app-release')).toHaveText(`Web v${webPackage.version}`);
   await expect(page.getByText('Synthetic demo — not an official specification', {exact:true})).toBeVisible();
   await expect(page.getByRole('button', {name:'Local MCP · Coming soon'})).toBeDisabled();
   await page.getByRole('radio', {name:'V1', exact:true}).check();

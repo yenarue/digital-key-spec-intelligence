@@ -6,3 +6,6 @@
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 
 .citation-link{display:inline-block;min-height:28px;padding:0 3px;margin:0 2px;font-size:14px;font-weight:600;text-decoration:underline;text-underline-offset:3px;white-space:nowrap}.citation-link:hover{background:var(--accent-soft);border-radius:3px}.answer-prose>.answer-text:first-child{margin-top:0}
+
+.app-release{margin:0;padding-top:24px;text-align:center;font-size:13px;line-height:22px;color:var(--muted)}
+.app-release+.signature-footer{margin-top:16px}

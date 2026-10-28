@@ -1,5 +1,6 @@
 import { AppHeader } from "../components/app-header";
 import { AskPanel } from "../components/ask-panel";
+import { AppRelease } from "../components/app-release";
 import { SignatureFooter } from "../components/signature-footer";
 
 export default function Home() {
@@ -15,6 +16,7 @@ export default function Home() {
         <p>가상 V1·V2 문서에서 조건과 예외를 찾아보세요.</p></div>
       <AskPanel />
     </main>
+    <AppRelease />
     <SignatureFooter />
   </div>;
 }

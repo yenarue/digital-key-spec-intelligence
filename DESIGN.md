@@ -32,7 +32,7 @@
 ### A안 — Clear Desk
 
 ```text
-DKSI · Spec Intelligence                 Local MCP · Coming soon
+DKSI · Digital Key Spec Intelligence                 Local MCP · Coming soon
 Synthetic demo — not an official specification
 
 요구사항을 찾고, 근거를 확인하세요
@@ -97,13 +97,14 @@ Requirement ID               [근거 1] [근거 2]
 
 ## 3. A안 화면 구성과 정보 우선순위
 
-1. **제품 헤더:** 텍스트 워드마크 `DKSI`, 보조 이름 `Spec Intelligence`, 비활성 MCP 항목. 현재 단일 화면에는 별도 사이드바나 로그인 메뉴를 추가하지 않는다. 추후 내비게이션 형태는 §6의 메뉴 확장 원칙을 따른다.
+1. **제품 헤더:** 텍스트 워드마크 `DKSI`, 보조 이름 `Digital Key Spec Intelligence`, 비활성 MCP 항목. 현재 단일 화면에는 별도 사이드바나 로그인 메뉴를 추가하지 않는다. 추후 내비게이션 형태는 §6의 메뉴 확장 원칙을 따른다.
 2. **합성 경고:** 정확한 문구 `Synthetic demo — not an official specification`. 한 줄 아래에 “독립 창작한 가상 요구사항입니다. 실제 CCC 규격과 대응하지 않습니다.”를 제공한다. 접거나 닫지 않는다.
 3. **작업 제목:** “요구사항을 찾고, 근거를 확인하세요”. 데스크톱 28px, 모바일 24px. 검색을 밀어낼 만큼 큰 hero를 만들지 않는다.
 4. **질문 폼:** V1/V2/전체 선택 → 명시적 질문 label → textarea → 글자 수·실행 버튼. 기본은 전체, topK=5는 UI에 추가 조작으로 노출하지 않는다.
 5. **세 예시 질문:** 텍스트 버튼으로 제공. 클릭하면 질문·버전을 채우고 입력에 focus한다. API는 `근거 찾기`를 눌렀을 때 호출한다.
 6. **결과:** 제출한 질문과 선택 버전을 짧게 표시한 다음 답변·근거를 표시한다. 결과 범위를 현재 편집 중인 필터와 혼동하지 않게 한다.
-7. **하단 설명:** “인용과 원문 일치 확인은 답변의 논리적 정확성을 보장하지 않습니다.” 실제 콘텐츠를 가리지 않는 일반 문서 흐름으로 둔다.
+7. **앱 버전:** 제작자 서명 footer 바로 위에 `Web v0.1.0` 형태로 작게 표시한다. 버전은 `apps/web/package.json`에서 읽으며 합성 문서 V1/V2와 분리한다. 정책은 [버전 관리](docs/versioning.md)를 따른다. 헤더와 브라우저 title에는 전체 제품명 `Digital Key Spec Intelligence`를 사용한다.
+8. **하단 설명:** “인용과 원문 일치 확인은 답변의 논리적 정확성을 보장하지 않습니다.” 실제 콘텐츠를 가리지 않는 일반 문서 흐름으로 둔다.
 
 사용자에게 필요한 용어는 질문·버전·답변·근거·원문이다. MiniSearch, provider, topK, JSON 검증 같은 구현 용어는 주 작업 흐름에 넣지 않는다. 설정 화면·탭·업로드·문서 관리 UI는 추가하지 않는다.
 
