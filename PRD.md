@@ -20,7 +20,7 @@ Find the requirement. Show the evidence. State the uncertainty. Long term, build
 
 ## 3. Milestones and boundaries
 
-**Updated strategy:** Real CCC V3.1.4/V4.1.0 PDFs are the primary domain-validation corpus for the **local RAG pilot**, rather than an afterthought. The Vercel public demo continues to use synthetic data. See [docs/ccc-rag-architecture.md](docs/ccc-rag-architecture.md) for separate **local Ollama** and **authorized external OpenRouter** processing paths and permission gates.
+**Updated strategy:** Real CCC V3.1.4/V4.1.0 PDFs are the primary domain-validation corpus for the **local RAG pilot**, rather than an afterthought. The Vercel public demo continues to use synthetic data. See [docs/ccc-rag-architecture.md](docs/ccc-rag-architecture.md) for separate **company-approved AI agents via Local MCP** and **academic OpenRouter** processing paths and permission gates.
 
 | Stage | Scope | When |
 | --- | --- | --- |
