@@ -1,5 +1,10 @@
 # Implementation decision log
 
+## 2026-10-29 — Web design direction confirmed
+- User selected A, Clear Desk: light surfaces, restrained blue actions, side-by-side answer/evidence on desktop and a single column on mobile. B/C remain comparison records only.
+- Use Pretendard for Korean/English UI and source prose; retain monospace for requirement/citation IDs. The standalone preview uses a version-pinned CDN; the future Web app will self-host official WOFF2 with its copyright/license notice and system fallback.
+- Defer navigation pattern selection until real additional screens require menus. Keep header and content separate for future expansion; do not add empty navigation, fake routes, or change the A–E scope. Local MCP remains disabled.
+
 ## 2026-10-29 — Initial decisions
 - Name: Digital Key Spec Intelligence (DKSI).
 - Repository starts public and contains synthetic fictional examples only.
