@@ -19,7 +19,20 @@ describe("POST /api/ask", () => {
     expect(response.status).toBe(200);
     expect(response.headers.get("cache-control")).toBe("no-store");
     expect(await response.json()).toEqual(searchOnlyFixture);
-    expect(service).toHaveBeenCalledExactlyOnceWith({ question: "NFC", versions: ["V2"], topK: 5 });
+    expect(service).toHaveBeenCalledExactlyOnceWith({ question: "NFC", versions: ["V2"], topK: 5, mode: "ai" });
+  });
+  it.each(["keyword", "ai"] as const)("forwards explicit %s mode without altering the response contract", async (mode) => {
+    const response = await POST(request({ question: "NFC", mode }));
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual(searchOnlyFixture);
+    expect(service).toHaveBeenCalledExactlyOnceWith({ question: "NFC", versions: ["V1", "V2"], topK: 5, mode });
+  });
+  it.each(["", "semantic", null, 1, false, [], {}])("rejects invalid mode before runtime or service execution %#", async (mode) => {
+    const response = await POST(request({ question: "NFC", mode }));
+    expect(response.status).toBe(400);
+    expect((await response.json()).error.code).toBe("invalid_request");
+    expect(runtimeFactory).not.toHaveBeenCalled();
+    expect(service).not.toHaveBeenCalled();
   });
   it.each([{}, { question: "" }, { question: "NFC", versions: ["V3"] }, { question: "NFC", topK: 9 }])("rejects invalid input before constructing the service %#", async (value) => {
     const response = await POST(request(value));

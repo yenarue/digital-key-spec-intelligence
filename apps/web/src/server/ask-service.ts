@@ -22,6 +22,9 @@ export function createAskService(dependencies: AskDependencies): AskService {
     if (sources.length === 0) {
       return { status: "insufficient_evidence", answer: null, sources: [], warnings: [] };
     }
+    if (request.mode === "keyword") {
+      return { status: "search_only", answer: null, sources, warnings: [] };
+    }
     if (!dependencies.llmProvider || !dependencies.corpus || !dependencies.validator) {
       return {
         status: "search_only", answer: null, sources,

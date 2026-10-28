@@ -34,5 +34,10 @@ export function validateAskRequest(value: unknown): AskRequest {
   if (typeof topK !== "number" || !Number.isInteger(topK) || topK < 1 || topK > 8) {
     throw new RequestValidationError("검색 결과 개수는 1~8 사이의 정수여야 합니다.");
   }
-  return { question, versions, topK };
+  // Preserve the generation behavior of clients created before mode selection.
+  const mode = input.mode === undefined ? "ai" : input.mode;
+  if (mode !== "keyword" && mode !== "ai") {
+    throw new RequestValidationError("검색 방식은 keyword 또는 ai 중에서 선택해주세요.");
+  }
+  return { question, versions, topK, mode };
 }

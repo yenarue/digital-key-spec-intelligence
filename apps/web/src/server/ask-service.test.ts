@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { CorpusProvider, EvidenceValidator, LLMProvider, Retriever } from "@dksi/spec-core";
 import { evidenceFixture } from "../test-fixtures/ask";
 import { createAskService } from "./ask-service";
-import { LLMProviderError } from "./llm/openrouter";
+import { LLMProviderError, OpenRouterProvider } from "./llm/openrouter";
 
 function fakeRetriever(sources = [evidenceFixture]): Retriever {
   return { searchRequirements: vi.fn(() => sources), getRequirement: vi.fn(() => undefined) };
@@ -44,13 +44,51 @@ function completeDependencies() {
 }
 
 describe("grounded generation orchestration", () => {
-  it("retrieves first, calls once and exposes only a valid answer", async () => {
+  it.each([undefined, "ai"] as const)("retrieves first, calls once and validates a grounded answer with mode %s", async (mode) => {
     const deps = completeDependencies();
-    const result = await createAskService(deps)({ question: "NFC 조건", versions: ["V2"], topK: 1 });
+    const result = await createAskService(deps)({ question: "NFC 조건", versions: ["V2"], topK: 1, mode });
     expect(result).toEqual({ status: "answered", answer: candidate.answer, sources: [evidenceFixture], warnings: [] });
     expect(deps.llmProvider.generateGroundedAnswer).toHaveBeenCalledExactlyOnceWith({ question: "NFC 조건", evidence: [evidenceFixture], locale: "ko" });
     expect(deps.validator.validateCitations).toHaveBeenCalledExactlyOnceWith(candidate, [evidenceFixture], corpus);
     expect(vi.mocked(deps.retriever.searchRequirements).mock.invocationCallOrder[0]).toBeLessThan(deps.llmProvider.generateGroundedAnswer.mock.invocationCallOrder[0]);
+  });
+  it("bypasses supplied generation and citation validation for intentional keyword searches", async () => {
+    const deps = completeDependencies();
+    const service = createAskService(deps);
+    const keyword = await service({ question: "NFC 조건", versions: ["V2"], topK: 1, mode: "keyword" });
+    expect(keyword).toEqual({ status: "search_only", answer: null, sources: [evidenceFixture], warnings: [] });
+    expect(deps.retriever.searchRequirements).toHaveBeenCalledExactlyOnceWith("NFC 조건", { versions: ["V2"], topK: 1 });
+    expect(deps.llmProvider.generateGroundedAnswer).not.toHaveBeenCalled();
+    expect(deps.validator.validateCitations).not.toHaveBeenCalled();
+    const ai = await service({ question: "NFC 조건", versions: ["V2"], topK: 1, mode: "ai" });
+    expect(ai.status).toBe("answered");
+    expect(keyword.sources).toEqual(ai.sources);
+    expect(deps.llmProvider.generateGroundedAnswer).toHaveBeenCalledOnce();
+  });
+  it.each(["openrouter/free", "paid/model"])("does not invoke a provider or network in keyword mode even with a key and model %s", async (model) => {
+    const deps = completeDependencies();
+    const fetchImpl = vi.fn<typeof fetch>().mockRejectedValue(new Error("must not call network"));
+    const llmProvider = new OpenRouterProvider({ apiKey: "unit-test-not-a-real-key", model, fetchImpl });
+    const generate = vi.spyOn(llmProvider, "generateGroundedAnswer");
+    const result = await createAskService({ ...deps, llmProvider })({ question: "NFC", mode: "keyword" });
+    expect(result).toEqual({ status: "search_only", answer: null, sources: [evidenceFixture], warnings: [] });
+    expect(generate).not.toHaveBeenCalled();
+    expect(fetchImpl).not.toHaveBeenCalled();
+    expect(deps.validator.validateCitations).not.toHaveBeenCalled();
+  });
+  it.each(["keyword", "ai"] as const)("does not generate or validate without evidence in %s mode", async (mode) => {
+    const deps = completeDependencies();
+    const result = await createAskService({ ...deps, retriever: fakeRetriever([]) })({ question: "우주선 엔진", mode });
+    expect(result).toEqual({ status: "insufficient_evidence", answer: null, sources: [], warnings: [] });
+    expect(deps.llmProvider.generateGroundedAnswer).not.toHaveBeenCalled();
+    expect(deps.validator.validateCitations).not.toHaveBeenCalled();
+  });
+  it("rejects an invalid mode before any retrieval, generation or citation validation", async () => {
+    const deps = completeDependencies();
+    await expect(createAskService(deps)({ question: "NFC", mode: "semantic" } as never)).rejects.toThrow();
+    expect(deps.retriever.searchRequirements).not.toHaveBeenCalled();
+    expect(deps.llmProvider.generateGroundedAnswer).not.toHaveBeenCalled();
+    expect(deps.validator.validateCitations).not.toHaveBeenCalled();
   });
   it("preserves sources and withholds a candidate with invalid citations", async () => {
     const deps = completeDependencies();
