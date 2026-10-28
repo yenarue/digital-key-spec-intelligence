@@ -116,8 +116,8 @@ The repository includes **two actual `SKILL.md` workflows** under `.agents/skill
 
 | Skill | Usage in Codex | What it does |
 | --- | --- | --- |
-| [spec-requirement-navigator](.agents/skills/spec-requirement-navigator/SKILL.md) | `$spec-requirement-navigator` + a fictional V1/V2 requirement question | Find matching clauses, inspect cross-references, interpret conditions, and cite exact source evidence. |
-| [spec-answer-auditor](.agents/skills/spec-answer-auditor/SKILL.md) | `$spec-answer-auditor` + a candidate answer with citations | Validate source IDs, quotes, versions and claim-to-evidence support; mark unsupported inferences. |
+| [spec-requirement-navigator (사용 안내)](.agents/skills/spec-requirement-navigator/README.md) · [SKILL.md](.agents/skills/spec-requirement-navigator/SKILL.md) | `$spec-requirement-navigator` + a fictional V1/V2 requirement question | Find matching clauses, inspect cross-references, interpret conditions, and cite exact source evidence. |
+| [spec-answer-auditor (사용 안내)](.agents/skills/spec-answer-auditor/README.md) · [SKILL.md](.agents/skills/spec-answer-auditor/SKILL.md) | `$spec-answer-auditor` + a candidate answer with citations | Validate source IDs, quotes, versions and claim-to-evidence support; mark unsupported inferences. |
 
 See the [Skill roadmap, demo script and acceptance tests](docs/skills-plan.md). The Skill is an **agent instruction/workflow**, not a running search API. It can inspect committed synthetic JSON in Codex now; it will use **Local MCP tools later** when they actually exist. **Vercel does not run these Skills**; the public RAG Web UI is a separate demo surface. Neither Skill is verified in a live Codex session yet.
 
