@@ -110,6 +110,17 @@ npm run build
 5. 근거가 없거나 LLM이 실패해도 안전한 결과/폴백이 표시된다.
 6. 내비게이션의 **Local MCP — Coming soon**은 dim + disabled 상태다.
 
+## Repository-local Agent Skills (course demonstration)
+
+The repository includes **two actual `SKILL.md` workflows** under `.agents/skills/`:
+
+| Skill | Usage in Codex | What it does |
+| --- | --- | --- |
+| [spec-requirement-navigator](.agents/skills/spec-requirement-navigator/SKILL.md) | `$spec-requirement-navigator` + a fictional V1/V2 requirement question | Find matching clauses, inspect cross-references, interpret conditions, and cite exact source evidence. |
+| [spec-answer-auditor](.agents/skills/spec-answer-auditor/SKILL.md) | `$spec-answer-auditor` + a candidate answer with citations | Validate source IDs, quotes, versions and claim-to-evidence support; mark unsupported inferences. |
+
+See the [Skill roadmap, demo script and acceptance tests](docs/skills-plan.md). The Skill is an **agent instruction/workflow**, not a running search API. It can inspect committed synthetic JSON in Codex now; it will use **Local MCP tools later** when they actually exist. **Vercel does not run these Skills**; the public RAG Web UI is a separate demo surface. Neither Skill is verified in a live Codex session yet.
+
 ## Local MCP vision (not MVP)
 
 팀원이 각자 승인된 로컬 문서를 색인하고, 회사에서 승인한 Codex·Claude·Gemini의 MCP 도구(`search_requirements`, `get_requirement`)로 동일한 검색 코어를 사용하는 구조를 구상한다. **로컬 MCP는 로컬 검색 도구이지 로컬 추론 엔진이 아니다.** 연결된 모델에 도구 출력이 전달될 수 있으므로 사내 승인된 에이전트·계약 및 접근 범위를 준수해야 한다.
