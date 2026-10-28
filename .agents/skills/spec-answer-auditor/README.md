@@ -27,6 +27,8 @@ AI가 정확한 Requirement ID를 붙였다고 해서 해석까지 맞는 것은
 
 ## 사용 예시 ① — Navigator의 답변 검토
 
+[실제 Codex 실행 기록: 질문과 감사 답변](./example.md) — 2026-10-29 같은 대화의 Navigator 답변을 합성 V2 원문과 대조한 사례입니다. 아래는 재실행용 안내입니다.
+
 먼저 [Navigator Skill](../spec-requirement-navigator/README.md)로 합성 V2의 UWB/NFC fallback 조건을 질문한 뒤 **같은 Codex 대화에서** 다음을 입력합니다.
 
 ```text

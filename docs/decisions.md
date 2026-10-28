@@ -21,3 +21,8 @@
 - Future `spec-version-diff`, test case, impact-analysis and knowledge-curation Skills are ideas, not implemented features.
 - Skills can use synthetic JSON immediately in Codex; Local MCP integration is still Stage F. Live Codex triggering and quality are not yet validated.
 - Full proposal and demo script: [docs/skills-plan.md](skills-plan.md).
+
+## 2026-10-29 — Live Skill example records
+- Keep usage instructions in each Skill's README and preserve the actual user question and final answer in a separate `example.md`, linked from that README. Preserve the original answer rather than silently incorporating later audit corrections; only convert local file links to repository-relative links.
+- Recorded one explicit Navigator invocation for synthetic V2 UWB/NFC fallback, followed by one explicit Auditor invocation against that answer in the same Codex conversation. Both used local JSON; no MCP, MiniSearch, or external API was used for retrieval.
+- The audit checked six existing V2 citation IDs and exact quotes, inspected referenced requirements, and distinguished directly supported claims from interpretation of absent automatic-transition guarantees. This is not a separate-agent review or completion of the full regression suite. No A–E scope change.
