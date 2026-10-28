@@ -11,10 +11,14 @@ export interface SpecDocument {
 export interface SourceRequirement extends Requirement {
   citationId: string; documentId: string; documentTitle: string; version: Version;
 }
+/** A query term that matched a hit; ranges are [start, end) offsets into fullText. */
+export interface MatchedTerm {
+  term: string; fields: string[]; viaSynonym: boolean; ranges: [number, number][];
+}
 export interface Evidence {
   citationId: string; documentId: string; documentTitle: string; version: Version;
   sectionId: string; requirementId: string; heading?: string;
-  quote: string; fullText: string; score?: number;
+  quote: string; fullText: string; score?: number; matches?: MatchedTerm[];
 }
 export interface SearchOptions { versions?: Version[]; topK?: number }
 export interface Citation { citationId: string; quote: string }

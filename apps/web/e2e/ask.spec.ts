@@ -54,6 +54,20 @@ test('unsupported question shows honest empty state', async ({ page }) => {
   await expect(page.getByText(/답변 근거를 찾지 못했/)).toBeVisible();
 });
 
+test('evidence cards show matched terms and highlight them without altering the quote', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('radio', {name:'V1', exact:true}).check();
+  await page.getByRole('textbox', {name:'질문', exact:true}).fill('디지털키가 뭐야?');
+  await page.getByRole('button', {name:/^근거 찾기/}).click();
+  const card = page.locator('article.evidence-card').first();
+  await expect(card.getByText('DEMO-V1-OVR-001', {exact:true})).toBeVisible();
+  const terms = card.getByRole('list', {name:'일치한 검색어'});
+  await expect(terms.getByRole('listitem')).toHaveText(['digital동의어', '디지털키']);
+  await expect(card.locator('blockquote mark')).toHaveText(['digital']);
+  const source = v1.requirements.find(item => item.requirementId === 'DEMO-V1-OVR-001')!;
+  await expect(card.locator('blockquote')).toHaveText(source.text);
+});
+
 for (const width of [375,1280]) {
   test(`layout has no horizontal overflow at ${width}px`, async ({ page }) => {
     await page.setViewportSize({width,height:900}); await page.goto('/');

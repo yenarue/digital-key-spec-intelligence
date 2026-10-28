@@ -466,3 +466,45 @@ Evidence before the final60s/2,400-token combination: live app sharing answered 
 - S1 complete: API Agent changed request-validation/ask-service and tests plus route tests. Targeted73/73 passed; keyword with configured fake key and free/forbidden model skips generation/validator/network. Invalid mode rejected before runtime; omitted ai compatible.
 - S2 complete: UI Agent changed ask-panel/answer-panel/globals.css/client tests. Default keyword, explicit mode, same-input two-slot memory, reused labels and snapshot context, pending controls and current-input invalidation implemented; 9 examples/user wording/footer preserved.
 - S3/G5: Main added actual runtime/real retriever-provider-validator mode integration and browser regressions. Full npm run test198/198, eval18/18 (17/17 expectedIDs@5), lint/build and E2E9/9 passed. Fixed repeated-Response test fixture consumption (new Response per fake fetch), not runtime behavior. Keyword/ai source equality and zero keyword calls proven; E2E AI states explicitly stubbed, live-model proof recorded separately. Cross-review by API/UI agents found no material defect. Added icon.svg for live favicon404. S4 release/live checks next.
+
+## 14. Follow-up — 카드별 일치 검색어 표시와 하이라이트 (PRD FR-20)
+
+**상태: H0–H4 구현·로컬 검증 완료 (2026-10-29), 미배포.** 키워드 검색 결과만 보면 각 카드가 왜 나왔는지 알기 어렵다. 카드마다 실제로 일치한 검색어를 칩으로 보여주고 원문에서 해당 단어를 강조한다. 전체 확장 검색어 목록은 보여주지 않는다(decisions 2026-10-29). 검색 순위·버전 필터·quote 원문은 바꾸지 않는다.
+
+### 계약 (호환 추가)
+
+```ts
+// packages/spec-core/src/types.ts — Evidence의 선택 필드
+interface MatchedTerm {
+  term: string;                 // 색인된 원문 용어(정규화된 소문자)
+  fields: string[];             // requirementId | sectionId | heading | keywords | text
+  viaSynonym: boolean;          // 원래 질문만으로는 일치하지 않고 동의어 확장으로만 일치
+  ranges: [number, number][];   // fullText 안의 [start, end) 위치, text에서 일치하지 않으면 []
+}
+interface Evidence { /* 기존 필드 */ matches?: MatchedTerm[] }
+```
+
+- Core가 MiniSearch 결과의 `match`(현재 버림)로 채운다. `viaSynonym`은 동의어 확장 없이 원래 질문으로 한 번 더 검색해, 그 결과에 없는 용어로 판정한다. 순위는 기존 확장 검색 결과를 그대로 쓴다.
+- ranges는 Core가 같은 tokenizer/정규화로 fullText에서 계산한다. UI는 위치만 잘라 `<mark>`로 감싸고 문자열을 재구성하지 않는다. `dangerouslySetInnerHTML` 금지. 잘못된 범위는 무시한다.
+- ID 직접 조회와 `getRequirement`는 matches를 넣지 않는다. LLM 프롬프트는 기존처럼 필요한 필드만 전달해 matches가 모델로 가지 않는다. 인용 검증은 변경 없음.
+
+### 작업
+
+| ID | 담당 파일 | 내용 / 완료 조건 |
+| --- | --- | --- |
+| H0 | PLAN/PRD/DESIGN | 계약·표시 규칙 확정. DESIGN의 “확인되지 않은 하이라이트 금지”를 “서버가 일치를 확인한 단어만 강조”로 구체화 |
+| H1 | `packages/spec-core/src/{types,retriever}.ts` + test | matches 생성. 알려진 질문의 칩 용어·동의어 표시·ranges가 원문과 일치, V1 전용 검색에 V2 없음, quote/fullText 불변 |
+| H2 | `apps/web/src/client/highlight.ts` + test | ranges로 텍스트 분할. 겹침 병합·범위 밖 무시·quote 오프셋 처리 |
+| H3 | `apps/web/src/components/evidence-card.tsx`, `globals.css`, `content/ui-text.json` | 카드에 일치 검색어 칩(동의어 표시 포함)과 quote·전체 원문 하이라이트. 키워드/AI 두 모드 공통 |
+| H4 | `e2e/**`, `docs/decisions.md` | 브라우저에서 칩·`<mark>` 표시와 기존 E2E 회귀 확인. test/lint/build/eval 실행 후 결과 기록. 배포는 별도 승인 |
+
+### 진행 기록
+
+- [x] H0–H3 구현. 탐침 중 지난 커밋의 개요 키워드 `디지털 키`·`digital key`가 `키`/`key`로 쪼개져 무관한 질문(키 폐기·revoked key)에 개요 카드를 올리는 문제를 발견해 `digital`로 정리했다. “디지털 키가 뭐야?”는 `디지털` 동의어와 `디지털키` 앞부분 일치로 계속 찾는다.
+- [x] H4 로컬 검증: `npm run test` 210/210, `npm run eval` 21/21, lint·typecheck·build 통과, E2E 10/10(칩·`<mark>`·quote 원문 동일 확인 추가). 1280/375px 카드 스크린샷 확인. 배포·live 확인은 아직 하지 않았다.
+
+### 수용 기준
+
+- “디지털키가 뭐야?” → `OVR-001` 카드에 `디지털키` 칩과 동의어로 표시된 `digital` 칩, 원문의 “digital”만 강조.
+- “owner device 등록할 때…”(V1) → `REQ-001` 카드에 `provisioning` 등 동의어 칩이 표시되고, 원문 강조 위치를 잘라낸 문자열이 칩 용어와 대소문자 무시 일치.
+- 강조 전후 카드의 텍스트 내용(`textContent`)이 원문과 동일. V1 전용 결과에 V2 없음. 기존 test/E2E/eval 통과.

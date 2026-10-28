@@ -59,6 +59,28 @@ describe("MiniSearchRetriever", () => {
     expect(retriever.searchRequirements("NFC")).toEqual(retriever.searchRequirements("NFC"));
   });
 
+  it("reports per-hit matched terms with synonym flags and verbatim text ranges", () => {
+    const [hit] = retriever.searchRequirements("디지털키가 뭐야?", { versions: ["V1"] });
+    expect(hit.requirementId).toBe("DEMO-V1-OVR-001");
+    expect(hit.fullText).toBe(corpus.getSourceSpan(hit.citationId)!.text);
+    const byTerm = new Map(hit.matches!.map((match) => [match.term, match]));
+    expect(byTerm.get("디지털키")).toMatchObject({ viaSynonym: false, fields: ["keywords"], ranges: [] });
+    expect(byTerm.get("digital")).toMatchObject({ viaSynonym: true });
+    for (const match of hit.matches!) {
+      for (const [start, end] of match.ranges) expect(hit.fullText.slice(start, end).toLowerCase()).toBe(match.term);
+    }
+    expect(byTerm.get("digital")!.ranges.length).toBeGreaterThan(0);
+
+    const [owner] = retriever.searchRequirements("owner device 등록할 때 어떤 검증이 필요해?", { versions: ["V1"] });
+    expect(owner.matches!.find((match) => match.term === "owner")).toMatchObject({ viaSynonym: false });
+    expect(owner.matches!.some((match) => match.viaSynonym && match.term.startsWith("enrollment"))).toBe(true);
+  });
+
+  it("omits matched terms for direct ID lookups", () => {
+    expect(retriever.searchRequirements("DEMO-V2-REQ-010")[0].matches).toBeUndefined();
+    expect(retriever.getRequirement("SRC:DKSI-SYNTHETIC:V2:DEMO-V2-REQ-010")?.matches).toBeUndefined();
+  });
+
   it("rejects invalid limits, versions and overlong queries at the core boundary", () => {
     for (const topK of [0, 9, 1.5, NaN]) expect(() => retriever.searchRequirements("NFC", { topK })).toThrow();
     expect(() => retriever.searchRequirements("NFC", { versions: [] })).toThrow();

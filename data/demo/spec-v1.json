@@ -287,11 +287,10 @@
       "heading": "Purpose and Scope",
       "text": "In this fictional specification, a digital key is a credential stored on a mobile device, such as a smartphone, that lets an authorized user unlock, lock, or start a vehicle without a physical key. This document is an independently authored educational demo, not an official specification.",
       "keywords": [
-        "digital key",
+        "digital",
         "overview",
         "purpose",
         "디지털키",
-        "디지털 키",
         "개요",
         "정의",
         "스마트폰"

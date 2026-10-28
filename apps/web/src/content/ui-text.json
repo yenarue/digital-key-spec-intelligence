@@ -92,7 +92,9 @@
     "collapse": "원문 접기",
     "expand": "원문 전체 보기",
     "documentId": "문서 ID",
-    "citationId": "인용 ID"
+    "citationId": "인용 ID",
+    "matchedTerms": "일치한 검색어",
+    "synonymTag": "동의어"
   },
   "errors": {
     "questionEmpty": "찾고 싶은 조건이나 예외를 질문해주세요.",

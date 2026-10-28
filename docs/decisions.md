@@ -80,3 +80,8 @@
 - New IDs use `OVR` so existing `REQ` IDs and citations are stable. Overview entries are appended to the requirements array because tests reference requirements by array position.
 - Added synonym groups: 디지털키/디지털/digital/dk, 기능/feature(s), 용어/개요/overview/terms/definition, 변경/차이/비교/changes/differences. Added eval cases Q11–Q13 and a first example question.
 - Known trade-off: Q1–Q10 keep their expected requirement at rank 1, but overview entries (mostly `OVR-002`, a broad summary) now appear at ranks 2–5 for some detailed questions and may be sent to the LLM as extra evidence.
+
+## 2026-10-29 — Matched-term chips and highlights (FR-20)
+- `Evidence.matches` is optional and additive: `{term, fields, viaSynonym, ranges}`. Core fills it from MiniSearch `match`; `viaSynonym` comes from a second search with the unexpanded question, so ranking is untouched. Ranges are computed in Core with the same tokenizer, so the UI only slices text and never rebuilds it.
+- Direct ID lookups and `getRequirement` carry no matches. The LLM prompt still sends a fixed field list, so matches never reach the model. The client response guard does not require matches; the card ignores malformed terms/ranges.
+- Removed overview keywords `디지털 키` and `digital key` (replaced by `digital`): MiniSearch splits keyword phrases, so `키`/`key` pulled overview cards into unrelated questions.
