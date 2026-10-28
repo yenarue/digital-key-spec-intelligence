@@ -95,14 +95,14 @@ export function AskPanel() {
       <div className="examples"><span>{text.examplesLabel}</span>{examples.map(example => <button type="button" key={example.label} disabled={pending}
         onClick={() => { updateInput(example.question, example.scope); input.current?.focus(); }}>{example.label}<span aria-hidden="true"> ↗</span></button>)}</div>
     </form>
-    <p className="search-status" role="status" aria-live="polite">{pending ? (mode === "keyword" ? text.statusPendingKeyword : text.statusPendingAi) : result ? `${reused ? text.statusReused : text.statusDone} ${fill(text.statusCount, { count: result.sources.length })}` : ""}</p>
+    <p className="search-status" role="status" aria-live="polite">{pending ? (mode === "keyword" ? text.statusPendingKeyword : text.statusPendingAi) : result ? `${reused ? text.statusReused : text.statusDone} ${fill(submitted?.mode === "keyword" ? text.statusCountKeyword : text.statusCount, { count: result.sources.length })}` : ""}</p>
     {pending && <div className="loading-skeleton" aria-hidden="true"><div /><div /><div /></div>}
     {!pending && result && <div className="result-block">
       <div className="result-context"><span>{reused && <><span className="cached-result">{text.contextReused}</span> · </>}{submitted && modeLabels[submitted.mode]}{submitted?.mode === "ai" && (result.status === "llm_unavailable" || result.status === "search_only") ? ` · ${text.contextAiFallback}` : ""} · {submitted?.scope === "all" ? text.contextScopeAll : submitted?.scope} {text.contextScopeSuffix}</span>
         <span>{text.contextQuestion} {submitted?.question}</span></div>
       <div className={`results-grid${result.sources.length ? "" : " no-sources"}`}>
         <AnswerPanel result={result} mode={submitted?.mode} />
-        {result.sources.length > 0 && <section className="sources-panel" aria-labelledby="sources-heading"><div className="section-title"><h2 id="sources-heading">{text.sourcesHeading} <span className="source-count">{result.sources.length}</span></h2><span>{text.sourcesSubtitle}</span></div>
+        {result.sources.length > 0 && <section className="sources-panel" aria-labelledby="sources-heading"><div className="section-title"><h2 id="sources-heading">{submitted?.mode === "keyword" ? text.sourcesHeadingKeyword : text.sourcesHeading}<span className="source-count">{result.sources.length}</span></h2><span>{text.sourcesSubtitle}</span></div>
           {result.sources.map((source, index) => <EvidenceCard key={source.citationId} evidence={source} index={index} />)}</section>}
       </div>
     </div>}
