@@ -73,3 +73,10 @@
 - Moved Web UI copy to `apps/web/src/content/ui-text.json` so the owner can edit it directly (labels, tooltip, intro, examples, loading/error text). Server `warnings` and the LLM prompt stay in code on purpose.
 - Decided against showing the full keyword list used for search (query tokens plus synonym expansion look noisy and undermine trust). Planned instead FR-20: per-card matched terms with highlighting. Not implemented yet.
 
+
+## 2026-10-29 — Fictional overview sections for basic questions
+- Basic questions such as "디지털키가 뭐야?" returned no evidence because the corpus held only detailed rules (2.1.1+). Added fictional section 1 to both versions: `OVR-001` Purpose and Scope, `OVR-002` Feature Summary, `OVR-003` Terms, plus V2-only `DEMO-V2-OVR-004` Changes from V1. Text is independently written and summarizes only the demo requirements; no CCC text.
+- Did not let the LLM answer from general knowledge when evidence is missing; grounding rules stay unchanged.
+- New IDs use `OVR` so existing `REQ` IDs and citations are stable. Overview entries are appended to the requirements array because tests reference requirements by array position.
+- Added synonym groups: 디지털키/디지털/digital/dk, 기능/feature(s), 용어/개요/overview/terms/definition, 변경/차이/비교/changes/differences. Added eval cases Q11–Q13 and a first example question.
+- Known trade-off: Q1–Q10 keep their expected requirement at rank 1, but overview entries (mostly `OVR-002`, a broad summary) now appear at ranks 2–5 for some detailed questions and may be sent to the LLM as extra evidence.

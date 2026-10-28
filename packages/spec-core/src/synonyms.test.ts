@@ -6,6 +6,7 @@ describe("static Korean-English term expansion", () => {
     ["등록할 때", "provisioning"], ["공유", "sharing"], ["재공유할 수", "delegation"],
     ["폐기된 키", "revocation"], ["권한이", "entitlement"], ["재시도를", "retry"],
     ["태그로", "tap"], ["개인정보를", "privacy"],
+    ["디지털키가", "digital"], ["DK는", "digital"], ["기능이", "features"],
   ])("maps %s to %s", (question, term) => {
     expect(expandQuery(question)).toContain(term);
   });

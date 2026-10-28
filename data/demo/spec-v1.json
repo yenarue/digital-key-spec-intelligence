@@ -280,6 +280,61 @@
         "DEMO-V1-REQ-005",
         "DEMO-V1-REQ-010"
       ]
+    },
+    {
+      "requirementId": "DEMO-V1-OVR-001",
+      "sectionId": "1.1",
+      "heading": "Purpose and Scope",
+      "text": "In this fictional specification, a digital key is a credential stored on a mobile device, such as a smartphone, that lets an authorized user unlock, lock, or start a vehicle without a physical key. This document is an independently authored educational demo, not an official specification.",
+      "keywords": [
+        "digital key",
+        "overview",
+        "purpose",
+        "디지털키",
+        "디지털 키",
+        "개요",
+        "정의",
+        "스마트폰"
+      ],
+      "references": []
+    },
+    {
+      "requirementId": "DEMO-V1-OVR-002",
+      "sectionId": "1.2",
+      "heading": "Feature Summary",
+      "text": "This fictional digital key covers owner device provisioning (2.1), friend key sharing and delegation (2.2), revocation and suspension (2.3), BLE discovery, UWB passive entry and NFC tap-to-access (3.x), operation entitlements and time limits (4.1), offline operation (4.2), and privacy-preserving logging and error reporting (5.x).",
+      "keywords": [
+        "features",
+        "capabilities",
+        "기능",
+        "주요 기능",
+        "목록"
+      ],
+      "references": [
+        "DEMO-V1-REQ-001",
+        "DEMO-V1-REQ-003",
+        "DEMO-V1-REQ-005",
+        "DEMO-V1-REQ-007",
+        "DEMO-V1-REQ-009",
+        "DEMO-V1-REQ-011",
+        "DEMO-V1-REQ-012",
+        "DEMO-V1-REQ-014",
+        "DEMO-V1-REQ-015"
+      ]
+    },
+    {
+      "requirementId": "DEMO-V1-OVR-003",
+      "sectionId": "1.3",
+      "heading": "Terms",
+      "text": "In this fictional document, an owner device is the first device provisioned for a vehicle; a friend device receives a shared key from the owner; a credential is the key data a device presents; an entitlement is an allowed operation such as entry or start; passive entry unlocks the vehicle when an authorized device is verified nearby without a user action.",
+      "keywords": [
+        "terms",
+        "glossary",
+        "definition",
+        "용어",
+        "정의"
+      ],
+      "references": []
     }
   ]
 }

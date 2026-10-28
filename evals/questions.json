@@ -112,6 +112,41 @@
         "DEMO-V2-REQ-015"
       ],
       "type": "privacy"
+    },
+    {
+      "id": "Q11",
+      "question": "디지털키가 뭐야?",
+      "versions": [
+        "V1",
+        "V2"
+      ],
+      "expectedRequirementIds": [
+        "DEMO-V1-OVR-001",
+        "DEMO-V2-OVR-001"
+      ],
+      "type": "overview"
+    },
+    {
+      "id": "Q12",
+      "question": "DK에는 어떤 기능이 있어?",
+      "versions": [
+        "V2"
+      ],
+      "expectedRequirementIds": [
+        "DEMO-V2-OVR-002"
+      ],
+      "type": "overview"
+    },
+    {
+      "id": "Q13",
+      "question": "V2에서 V1과 비교해 변경된 점은?",
+      "versions": [
+        "V2"
+      ],
+      "expectedRequirementIds": [
+        "DEMO-V2-OVR-004"
+      ],
+      "type": "overview"
     }
   ]
 }

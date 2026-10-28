@@ -7,8 +7,8 @@ describe("SyntheticCorpusProvider", () => {
   it("loads two fictional versions with stable composite IDs and exact text", () => {
     const corpus = new SyntheticCorpusProvider([v1, v2]);
     expect(corpus.listDocuments()).toHaveLength(2);
-    expect(corpus.getChunks()).toHaveLength(32);
-    expect(new Set(corpus.getChunks().map((source) => source.citationId)).size).toBe(32);
+    expect(corpus.getChunks()).toHaveLength(39);
+    expect(new Set(corpus.getChunks().map((source) => source.citationId)).size).toBe(39);
     expect(corpus.getSourceSpan("SRC:DKSI-SYNTHETIC:V1:DEMO-V1-REQ-001")?.text).toBe(v1.requirements[0].text);
     expect(corpus.getChunks("missing")).toEqual([]);
     expect(corpus.getSourceSpan("SRC:DKSI-SYNTHETIC:V1:MADE-UP")).toBeUndefined();

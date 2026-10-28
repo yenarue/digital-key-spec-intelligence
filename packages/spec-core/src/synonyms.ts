@@ -14,6 +14,10 @@ export const SYNONYM_GROUPS: readonly (readonly string[])[] = [
   ["일시정지", "중단", "suspension", "suspended"],
   ["오프라인", "offline"],
   ["시동", "start"],
+  ["디지털키", "디지털", "digital", "dk"],
+  ["기능", "feature", "features"],
+  ["용어", "개요", "overview", "terms", "definition"],
+  ["변경", "차이", "비교", "changes", "differences"],
 ];
 
 function matchesAlias(token: string, alias: string): boolean {
