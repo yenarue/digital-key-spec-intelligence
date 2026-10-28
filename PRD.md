@@ -3,7 +3,7 @@
 **Product:** Digital Key Spec Intelligence (DKSI)  
 **Tagline:** Evidence-first Requirement Assistant  
 **Release:** v0.1 academic Web MVP (2026-10-29 class presentation)  
-**Status:** Specification agreed; implementation not yet done.
+**Status:** A–E Web MVP implemented and deployed; v0.2.0 search-mode follow-up in progress. Actual verification records: docs/deployment.md and PLAN.md.
 
 ## 1. Problem and users
 Digital Key mobile developers repeatedly search large versioned specifications and OEM/internal requirements. Each developer currently supplies documents to their preferred AI assistant independently. Common problems:
@@ -60,6 +60,8 @@ Two repository-local Skill definitions are maintained at `.agents/skills/`: `spe
 | FR-15 | P1 | Three example question actions. |
 | FR-16 | P1 | Responsive screen, accessible form/buttons and cards. |
 | FR-17 | P1 | Meaningful loading, rate-limit, and fallback labels; prevent duplicate sends. |
+| FR-18 | P1 follow-up | User-selectable keyword/AI modes. UI defaults to keyword and explicitly submits mode; keyword uses the identical lexical retrieval but never invokes the LLM, even with a key. Omitted API mode preserves legacy AI behavior; invalid modes return400. |
+| FR-19 | P1 follow-up | Switching modes does not submit. Keep at most one latest result per mode for the current question/version/topK in React memory, label reused results and submitted scope/mode, and clear results when question/version changes. No persistence or automatic retries. |
 
 ## 5. UX flows
 **Default:** select V1/V2/all → enter question → see retrieved sources + grounded answer if AI is available → expand source to confirm verbatim evidence.
@@ -69,6 +71,8 @@ Two repository-local Skill definitions are maintained at `.agents/skills/`: `spe
 **No LLM:** show search hits with an honest banner that free-model AI answer is unavailable.
 
 **Future feature:** dimmed `Local MCP / Coming soon` in navigation is visible but not interactive.
+
+**Post-deployment follow-up:** choose `키워드 검색` (default; evidence only, no model call) or `AI 검색` (same retrieved evidence plus grounded answer), then explicitly submit. Switching between existing results for the same input uses memory without another request. AI failure retains evidence and is labeled separately from intentional keyword search.
 
 ## 6. Architecture and source model
 - `apps/web`: Next.js App Router (TypeScript) and Tailwind CSS. `POST /api/ask` uses Node.js runtime and keeps secrets server-side.
@@ -99,9 +103,9 @@ MVP search uses lexical full-text retrieval, not vector/semantic embeddings. Ind
 ## 7. API and RAG behavior
 **POST** `/api/ask`:
 ```json
-{"question":"세션 만료 조건은?", "versions":["V1"], "topK":5}
+{"question":"세션 만료 조건은?", "versions":["V1"], "topK":5, "mode":"keyword"}
 ```
-Return:
+`mode?: "keyword" | "ai"`; omission defaults to `ai` for compatibility. Keyword with evidence returns `search_only`, `answer:null`, the same sources and empty warnings without invoking generation or citation validation. Neither mode calls a model without evidence. Unknown/empty/null/non-string modes are rejected before retrieval. The response shape remains unchanged. The following is an example successful **AI-mode** response:
 ```json
 {
   "status":"answered",

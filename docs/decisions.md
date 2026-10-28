@@ -59,3 +59,10 @@
 - Actual local server API trial: a V2 entry-only query with topK1 returned answered in2508ms and cited exactly REQ012; manual check confirmed the explicit prohibition. Two other bounded trials were withheld for citation validation/timeout. Keep free-router failure fallback and no automatic retry; one real success is not a reliability guarantee.
 - Removed the visible Web prefix: show v0.1.0 above the signature footer. Root dotenv support is a local configuration improvement, not an upload of env files.
 - After root-env support, 163 tests/lint/build and 7 E2E passed; explicitly blank test environment key stays blank. Actual credential scan across 45 client bundle files passed without printing its value.
+
+
+## 2026-10-29 — Explicit keyword/AI search modes (v0.2.0 follow-up)
+- After first Production and core live QA, implement user-approved FR-18/19 as a compatible feature release. Main owns shared contract and integration; two agents exclusively own API and UI files. Keep MiniSearch/Core and the response statuses/evidence unchanged.
+- UI defaults to keyword and submits mode explicitly. Optional API mode defaults to ai to preserve existing clients. Invalid mode rejects before retrieval. Keyword returns search_only with no warnings and no provider/validator invocation regardless of key/model configuration.
+- Switching modes never submits. Keep only the current normalized question/version/topK's latest response per mode in React memory; label reused results and request snapshot. Input/version changes clear both slots; explicit resubmit always requests again. No persistence, automatic retries or new provider.
+- This supersedes DESIGN's older keep-stale-results-on-input-edit rule for this feature. AI and keyword use identical source ranking; AI only enables generation from the same evidence.

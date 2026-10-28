@@ -377,7 +377,7 @@ Vercel 계정 접근/프로젝트 연결/secret 설정 권한이 없다면 필�
 
 ## 13. Post-Deployment Follow-up — 키워드 / AI 검색 전환
 
-**상태: 계획만 추가 / 미구현 / 현재 배포 우선.** 사용자 요청에 따라 첫 Vercel 배포와 실제 URL 검증(G4, M6/D1–D7)이 끝난 뒤 착수한다. 기존 PRD의 A–E 필수 수용 기준을 대체하거나 이번 배포를 지연시키지 않는다. 구현 시 PRD/DESIGN/결정 기록에 후속 요구사항을 반영한다.
+**상태: v0.1.1 첫 배포 및 핵심 live 검증 후 구현 진행 중.** 사용자 후속 승인에 따라 키워드/AI 검색 전환을 구현한다. 기존 PRD의 A–E 필수 수용 기준을 대체하거나 이번 배포를 지연시키지 않는다. 구현 시 PRD/DESIGN/결정 기록에 후속 요구사항을 반영한다.
 
 ### 목적과 동작 제안
 
@@ -388,10 +388,10 @@ Vercel 계정 접근/프로젝트 연결/secret 설정 권한이 없다면 필�
 - 질문과 문서 버전을 보존해 두 방식을 비교한다. 같은 `question + versions + topK`에 대해 모드별 최신 결과 하나씩만 현재 화면의 React 메모리에 보관하는 방식을 사용한다. 이미 받은 결과로 전환할 때는 추가 호출 없이 `이전 실행 결과`임을 표시하고, 해당 모드 결과가 없으면 실행 전 상태를 표시한다. 질문/버전이 달라지면 기존 결과를 새 질문의 결과처럼 보여주지 않는다.
 - 모드별 결과에 제출 당시 질문·버전·요청 모드를 표시한다. AI를 요청했지만 실패한 경우 `AI 검색 · 답변 생성 불가, 검색 근거 표시`로 구분하고, 의도적으로 고른 키워드 검색을 AI 장애처럼 표시하지 않는다. 비교 전용 페이지·자동 재질문·DB·영속 캐시·질문 이력은 추가하지 않는다.
 
-### 후속 API 계약 — 현재 계약은 아직 변경하지 않음
+### 후속 API 계약 — S0 확정
 
 ```ts
-// 배포 후 S0에서 확정할 제안. 지금 구현된 AskRequest에는 mode가 없다.
+// S0 확정: 선택적 mode를 추가하며 생략은 기존 AI 동작을 보존한다.
 type SearchMode = "keyword" | "ai";
 type AskRequest = {
   question: string;
@@ -424,7 +424,7 @@ UI는 `mode`를 항상 명시한다. **API에서 mode를 생략한 기존 클라
 
 경로는 `apps/web/` 기준이며 Main 계약/fixture/설정 파일은 Subagent가 수정하지 않는다. 공통 파일 변경은 기존 §6 절차를 따른다.
 
-- [ ] **S0 · Main · G4 및 M7 후 / 후속 P1:** 배포 기준 커밋·버전을 기록한 뒤 위 mode 계약·UI 기본 keyword/API 생략 ai·모드별 메모리 결과 범위를 확정하고 PRD/DESIGN/테스트 fixture를 갱신한다. 첫 배포가 미완료이면 시작하지 않는다.
+- [x] **S0 · Main · G4 및 M7 후 / 후속 P1:** 배포 기준 커밋·버전을 기록한 뒤 위 mode 계약·UI 기본 keyword/API 생략 ai·모드별 메모리 결과 범위를 확정하고 PRD/DESIGN/테스트 fixture를 갱신한다. 첫 배포가 미완료이면 시작하지 않는다.
 - [ ] **S1 · API Agent · S0 후 / S2와 병렬:** mode 검증과 서버 생성 분기를 구현한다. keyword는 항상 retriever까지만 실행하고 모델 호출을 건너뛴다. ai의 인용 검증·실패 fallback·1회 상한은 유지한다. 설정된 fake 키/금지 모델에서도 keyword 결과가 정상이고 provider가 호출되지 않는 targeted 테스트를 제출한다.
 - [ ] **S2 · UI Agent · S0 후 / S1과 병렬:** 검색 방식 선택, 요청 mode 전달, 제출 당시 모드 표기, 의도된 keyword와 AI fallback 안내 구분을 구현한다. 전환만으로 호출하지 않고 동일 입력의 모드별 최신 결과를 재사용해 비교한다. 입력 변경·pending·재제출·모바일·keyboard 상태를 검사한다.
 - [ ] **S3 · Main · S1+S2 후 / Integration Gate G5:** 실제 UI→API→코어를 통합하고 아래 수용 기준과 test/eval/lint/build·관련 E2E를 실행한다. 단순 화면 상태가 아니라 서버 provider 호출 횟수를 검사한다. 기존 무근거·버전 격리·인용 거부·AI 장애 회귀가 통과해야 한다.
@@ -456,3 +456,9 @@ Evidence before the final60s/2,400-token combination: live app sharing answered 
 - Final verification:168/168 unit/integration tests,7/7 browser tests, lint/build passed; independent read-only patch reviewer found no material timeout/resource/free-model-policy defect. Dev remains at localhost:3000. Vercel code now exports90s and must be redeployed/checked on the actual project; no live deployment claim. No keyword/AI mode toggle was implemented.
 
 - Concurrent deployment handoff discovered before release: commits caa4535/67b5276 recorded first Production and Claude entry points. These changes were preserved. Released timeout fix as0.1.1 in commits617fc2e/0eb5af2 and pushed main. Production deployment dpl_Dap8KZSSqmKSMT1HcDQX2VS1M48H is Ready at https://digital-key-spec-intelligence.vercel.app; public HTML shows v0.1.1. An actual Production POST for V2 entry-only/start returned HTTP200, answered with no warnings, V2-only evidence, and the correct exact source citation DEMO-V2-REQ-012. This verifies the new release and one live answer; remaining full G4 browser/mobile checks are not implied complete.
+
+
+## Search modes implementation log — 2026-10-29
+
+- S0: baseline first Production v0.1.1, latest shared revision fb83427 (other session copy edits preserved). Main added SearchMode and optional AskRequest.mode, PRD FR-18/19 and DESIGN interaction rules. UI default keyword, omitted API mode ai, response unchanged; no Core changes. API/UI exclusive owners follow §13; Main owns contracts/integration/E2E/docs/release. Baseline npm run test168/168 passed.
+- Read-only live reviewer: v0.1.1 desktop1280/mobile375 no overflow, inert MCP, actual Q5 answered with V1/V2 REQ008 ranks1/2, correct once vs two retries/backoff, citation focus and full-text expansion verified. Recent Vercel error-level function logs empty. Remaining cosmetic favicon404 will be fixed in follow-up. These are actual live checks, separate from stubbed E2E.
