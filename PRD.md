@@ -19,6 +19,9 @@ Primary user: technical mobile Digital Key engineer. **The public demo must not 
 Find the requirement. Show the evidence. State the uncertainty. Long term, build a reusable team specification intelligence core, with Web and local MCP as separate adapters. In the academic MVP, prove **retrieval and citation traceability** using a small fictional corpus, not enterprise-grade specification interpretation or true cross-document intelligence.
 
 ## 3. Milestones and boundaries
+
+**Updated strategy:** Real CCC V3.1.4/V4.1.0 PDFs are the primary domain-validation corpus for the **local RAG pilot**, rather than an afterthought. The Vercel public demo continues to use synthetic data. See [docs/ccc-rag-architecture.md](docs/ccc-rag-architecture.md) for separate **local Ollama** and **authorized external OpenRouter** processing paths and permission gates.
+
 | Stage | Scope | When |
 | --- | --- | --- |
 | A | Versioned fictional spec data V1/V2 | MVP |
@@ -29,7 +32,7 @@ Find the requirement. Show the evidence. State the uncertainty. Long term, build
 | F | Local stdio MCP using shared core | Later; disabled UI preview only |
 | Future | PDF parsing, semantic+hybrid search, cross-spec relationships, ACL, team knowledge | Not MVP |
 
-No user uploads, no real PDF parser, no login, no external scraping, no DB, no persistence, no actual MCP or enterprise document integrations in this release.
+No user uploads, real CCC parser, login, external scraping, DB, persistence, actual MCP or enterprise document integrations in the **A–E public demo**. Immediately following the demo, implement **local PDF ingestion + version-aware RAG + Ollama grounded answers**, keeping PDFs and derived indices off GitHub/Vercel; external transfer of real text remains disabled pending legal/organizational authorization.
 
 ## 4. Functional requirements
 | ID | Priority | Requirement and acceptance |
