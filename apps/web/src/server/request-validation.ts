@@ -10,7 +10,7 @@ export class RequestValidationError extends Error {
 
 export function validateAskRequest(value: unknown): AskRequest {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
-    throw new RequestValidationError("질문과 문서 버전을 올바른 형식으로 입력해주세요.");
+    throw new RequestValidationError("질문과 스펙 버전을 올바른 형식으로 입력해주세요.");
   }
   const input = value as Record<string, unknown>;
   if (typeof input.question !== "string") {
@@ -25,7 +25,7 @@ export function validateAskRequest(value: unknown): AskRequest {
   if (input.versions !== undefined) {
     if (!Array.isArray(input.versions) || input.versions.length === 0 ||
       !input.versions.every((version) => VERSIONS.includes(version as Version))) {
-      throw new RequestValidationError("문서 버전은 V1 또는 V2 중에서 선택해주세요.");
+      throw new RequestValidationError("스펙 버전은 V1 또는 V2 중에서 선택해주세요.");
     }
     versions = [...new Set(input.versions as Version[])];
   }

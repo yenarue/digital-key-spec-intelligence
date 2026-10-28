@@ -34,7 +34,7 @@
       "keyword": "AI 호출 없이 원문 근거만 찾아요.",
       "ai": "같은 검색 근거를 바탕으로 AI 답변을 생성해요."
     },
-    "versionLegend": "문서 버전",
+    "versionLegend": "스펙 버전",
     "versionAll": "전체",
     "questionLabel": "질문",
     "placeholder": "예: V2에서 NFC fallback을 사용할 수 있는 조건은?",
@@ -80,7 +80,7 @@
     "searchOnlyKeyword": "AI를 호출하지 않고 검색된 원문 근거를 보여드려요.",
     "searchOnlyAi": "AI 답변 없이 검색된 근거를 보여드려요.",
     "llmUnavailable": "검색된 근거는 아래에서 확인할 수 있어요. 필요하면 다시 질문해주세요.",
-    "insufficientEvidence": "다른 용어로 질문하거나 문서 버전을 바꿔보세요.",
+    "insufficientEvidence": "다른 용어로 질문하거나 스펙 버전을 바꿔보세요.",
     "citationLabel": "근거 {n}",
     "citationAria": "근거 {n}: {version} {requirementId}",
     "caveat": "인용과 원문 일치 확인은 답변의 논리적 정확성을 보장하지 않습니다."
@@ -96,7 +96,7 @@
     "questionTooLong": "질문은 500자 이내로 입력해주세요.",
     "network": "요청을 완료하지 못했어요. 연결을 확인하고 다시 시도해주세요.",
     "unreadable": "결과를 읽지 못했어요. 잠시 후 다시 시도해주세요.",
-    "badRequest": "질문과 문서 버전을 확인하고 다시 시도해주세요.",
+    "badRequest": "질문과 스펙 버전을 확인하고 다시 시도해주세요.",
     "generic": "요청을 완료하지 못했어요. 잠시 후 다시 시도해주세요."
   }
 }
