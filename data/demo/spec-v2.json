@@ -1,32 +1,49 @@
 {
-  "documentId": "DKSI-DEMO",
-  "title": "Fictional Digital Access Specification (Synthetic Demo)",
+  "documentId": "DKSI-SYNTHETIC",
+  "title": "Fictional Vehicle Digital Access Specification — Educational Demo Only",
   "version": "V2",
   "synthetic": true,
-  "disclaimer": "Entirely invented for academic UI testing; not CCC/OEM requirements.",
+  "disclaimer": "Entirely independently authored hypothetical requirements. NOT CCC Digital Key Specification, NOT actual 3.1.4 or 4.1.0 requirements, and not evidence of compliance. Version labels V1/V2 are fictional.",
+  "topics": [
+    "Owner/Friend Device",
+    "Provisioning",
+    "Key Sharing and Delegation",
+    "Revocation and Suspension",
+    "BLE Discovery",
+    "UWB Ranging",
+    "NFC Access",
+    "Entitlements",
+    "Offline Operation",
+    "Privacy"
+  ],
   "requirements": [
     {
       "requirementId": "DEMO-V2-REQ-001",
-      "sectionId": "3.1.1",
-      "heading": "Session Timeout",
-      "text": "In this fictional demonstration, a session SHALL expire 45 seconds after the final authenticated activity.",
+      "sectionId": "2.1.1",
+      "heading": "Owner Device Provisioning",
+      "text": "In this fictional protocol, a vehicle SHALL create an owner-device record only after a local enrollment challenge and a second owner confirmation step are completed.",
       "keywords": [
-        "timeout",
-        "expiration",
-        "session",
-        "만료"
+        "provisioning",
+        "owner",
+        "enrollment",
+        "pairing",
+        "오너",
+        "등록"
       ],
       "references": []
     },
     {
       "requirementId": "DEMO-V2-REQ-002",
-      "sectionId": "3.1.2",
-      "heading": "Timeout Exception",
-      "text": "A device MAY extend its active session by 15 seconds only when fictional maintenance mode is enabled and local confirmation succeeds.",
+      "sectionId": "2.1.2",
+      "heading": "Offline Initial Pairing",
+      "text": "If the fictional vehicle is offline, initial owner pairing MAY proceed using a locally issued enrollment token, provided that the token has not expired; cloud synchronization SHALL wait until connectivity returns.",
       "keywords": [
-        "exception",
-        "maintenance",
-        "연장"
+        "offline",
+        "pairing",
+        "provisioning",
+        "token",
+        "오프라인",
+        "페어링"
       ],
       "references": [
         "DEMO-V2-REQ-001"
@@ -34,86 +51,243 @@
     },
     {
       "requirementId": "DEMO-V2-REQ-003",
-      "sectionId": "3.2.1",
-      "heading": "Authorization Check",
-      "text": "Before granting fictional access, the controller SHALL verify the device authorization token and its expiration timestamp.",
+      "sectionId": "2.2.1",
+      "heading": "Friend Key Sharing",
+      "text": "A fictional owner device MAY issue a friend-device invitation only when sharing is enabled, an explicit entitlement set is assigned, and the invitation expiration time is recorded.",
       "keywords": [
-        "authentication",
-        "authorization",
-        "token",
-        "인증"
+        "friend",
+        "sharing",
+        "invitation",
+        "entitlement",
+        "친구",
+        "공유"
       ],
-      "references": []
+      "references": [
+        "DEMO-V2-REQ-012"
+      ]
     },
     {
       "requirementId": "DEMO-V2-REQ-004",
-      "sectionId": "3.2.2",
-      "heading": "Revoked Device",
-      "text": "A revoked fictional credential SHALL NOT authorize access even when a wireless connection is established.",
+      "sectionId": "2.2.2",
+      "heading": "Delegated Sharing",
+      "text": "In this fictional V2 profile, a friend device MAY create a single delegated invitation only if the owner explicitly enables delegation and the delegated entitlements are a subset of the friend's entitlements; further delegation SHALL NOT be permitted.",
       "keywords": [
-        "revocation",
-        "credential",
-        "access",
-        "폐기"
+        "delegation",
+        "friend",
+        "sharing",
+        "reshare",
+        "재공유",
+        "위임"
       ],
       "references": [
-        "DEMO-V2-REQ-003"
+        "DEMO-V2-REQ-003",
+        "DEMO-V2-REQ-012"
       ]
     },
     {
       "requirementId": "DEMO-V2-REQ-005",
-      "sectionId": "4.1.1",
-      "heading": "Proximity Detection",
-      "text": "The fictional controller SHALL begin proximity evaluation when an authorized device enters the demonstration area.",
+      "sectionId": "2.3.1",
+      "heading": "Key Revocation",
+      "text": "After a fictional key is marked revoked, the access controller SHALL reject subsequent operations using that credential and any invitations derived from it, even if radio authentication succeeds.",
       "keywords": [
-        "proximity",
-        "distance",
-        "접근"
+        "revocation",
+        "termination",
+        "credential",
+        "폐기",
+        "취소",
+        "권한"
       ],
       "references": [
-        "DEMO-V2-REQ-003"
+        "DEMO-V2-REQ-004"
       ]
     },
     {
       "requirementId": "DEMO-V2-REQ-006",
-      "sectionId": "4.1.2",
-      "heading": "Connection Loss",
-      "text": "When the demonstration radio connection is lost, the fictional application SHALL mark the current session as interrupted and require fresh authorization before resumption.",
+      "sectionId": "2.3.2",
+      "heading": "Temporary Suspension",
+      "text": "The fictional owner MAY temporarily suspend a friend credential. Suspension SHALL also block delegated credentials until an owner-approved resume event is completed.",
       "keywords": [
-        "disconnect",
-        "radio",
-        "connection",
-        "연결"
+        "suspension",
+        "resume",
+        "friend",
+        "delegation",
+        "중단",
+        "일시정지"
       ],
       "references": [
-        "DEMO-V2-REQ-003"
+        "DEMO-V2-REQ-004",
+        "DEMO-V2-REQ-005"
       ]
     },
     {
       "requirementId": "DEMO-V2-REQ-007",
-      "sectionId": "5.1.1",
-      "heading": "Audit Event",
-      "text": "The fictional application SHALL record a non-identifying event code when an access request is rejected.",
+      "sectionId": "3.1.1",
+      "heading": "BLE Discovery",
+      "text": "For this fictional demo, BLE discovery MAY indicate a nearby vehicle, but an access session SHALL proceed only after an explicit device capability check; discovery SHALL NOT grant access.",
       "keywords": [
-        "audit",
-        "event",
-        "logging",
-        "기록"
+        "BLE",
+        "discovery",
+        "nearby",
+        "capability",
+        "접근",
+        "발견"
+      ],
+      "references": [
+        "DEMO-V2-REQ-001"
+      ]
+    },
+    {
+      "requirementId": "DEMO-V2-REQ-008",
+      "sectionId": "3.1.2",
+      "heading": "BLE Connection Failure",
+      "text": "If a fictional BLE connection attempt times out, the mobile device MAY retry up to two times with backoff; it SHALL NOT report success without the authenticated session state.",
+      "keywords": [
+        "BLE",
+        "connection",
+        "timeout",
+        "retry",
+        "연결",
+        "재시도"
+      ],
+      "references": [
+        "DEMO-V2-REQ-007"
+      ]
+    },
+    {
+      "requirementId": "DEMO-V2-REQ-009",
+      "sectionId": "3.2.1",
+      "heading": "UWB Passive Entry",
+      "text": "When passive entry is enabled, the fictional vehicle SHALL verify an active credential, the requested operation entitlement, an authenticated session, and an acceptable UWB range before unlocking.",
+      "keywords": [
+        "UWB",
+        "passive entry",
+        "ranging",
+        "unlock",
+        "거리",
+        "패시브"
+      ],
+      "references": [
+        "DEMO-V2-REQ-012",
+        "DEMO-V2-REQ-013"
+      ]
+    },
+    {
+      "requirementId": "DEMO-V2-REQ-010",
+      "sectionId": "3.2.2",
+      "heading": "Ranging Unavailable",
+      "text": "If fictional UWB ranging is unavailable or confidence is insufficient, passive entry SHALL stop. The user MAY attempt NFC tap-to-access only when the credential permits NFC entry.",
+      "keywords": [
+        "UWB",
+        "NFC",
+        "fallback",
+        "ranging",
+        "unavailable",
+        "예외"
+      ],
+      "references": [
+        "DEMO-V2-REQ-009",
+        "DEMO-V2-REQ-011",
+        "DEMO-V2-REQ-012"
+      ]
+    },
+    {
+      "requirementId": "DEMO-V2-REQ-011",
+      "sectionId": "3.3.1",
+      "heading": "NFC Tap-to-Access",
+      "text": "For fictional NFC entry, a valid credential and explicit tap SHALL be verified; NFC access SHALL NOT depend on a prior UWB session, but a suspended credential SHALL be rejected.",
+      "keywords": [
+        "NFC",
+        "tap",
+        "fallback",
+        "near field",
+        "태그",
+        "접촉"
+      ],
+      "references": [
+        "DEMO-V2-REQ-006",
+        "DEMO-V2-REQ-012"
+      ]
+    },
+    {
+      "requirementId": "DEMO-V2-REQ-012",
+      "sectionId": "4.1.1",
+      "heading": "Operation Entitlements",
+      "text": "Every fictional access request SHALL be checked against the credential's allowed operations and channel restrictions. Entry-only or NFC-only permission SHALL NOT imply vehicle-start permission.",
+      "keywords": [
+        "entitlement",
+        "access",
+        "start",
+        "unlock",
+        "권한",
+        "시동"
       ],
       "references": []
     },
     {
-      "requirementId": "DEMO-V2-REQ-008",
-      "sectionId": "5.1.2",
-      "heading": "Offline Mode",
-      "text": "If fictional offline mode is configured, a previously authorized device MAY request local access for up to two minutes, except when the credential is revoked.",
+      "requirementId": "DEMO-V2-REQ-013",
+      "sectionId": "4.1.2",
+      "heading": "Time-Limited Access",
+      "text": "When a fictional shared credential has an active-time window, the vehicle SHALL reject access outside that window, including for delegated invitations, regardless of radio discovery success.",
+      "keywords": [
+        "time window",
+        "expiration",
+        "delegation",
+        "시간제한",
+        "만료"
+      ],
+      "references": [
+        "DEMO-V2-REQ-004",
+        "DEMO-V2-REQ-007"
+      ]
+    },
+    {
+      "requirementId": "DEMO-V2-REQ-014",
+      "sectionId": "4.2.1",
+      "heading": "Offline Operation",
+      "text": "While the fictional vehicle is offline, previously activated local credentials MAY be checked, but delegated invitations and changes to entitlements SHALL require an updated approval record.",
       "keywords": [
         "offline",
-        "fallback",
+        "local",
+        "sharing",
+        "network",
         "오프라인"
       ],
       "references": [
-        "DEMO-V2-REQ-004"
+        "DEMO-V2-REQ-004",
+        "DEMO-V2-REQ-012"
+      ]
+    },
+    {
+      "requirementId": "DEMO-V2-REQ-015",
+      "sectionId": "5.1.1",
+      "heading": "Minimal Event Logging",
+      "text": "For fictional audit trails, the system SHALL record an event category, result, and a short-lived pseudonymous correlation ID, while SHALL NOT export raw device identifiers with normal diagnostics.",
+      "keywords": [
+        "audit",
+        "privacy",
+        "logging",
+        "diagnostic",
+        "개인정보",
+        "로그"
+      ],
+      "references": []
+    },
+    {
+      "requirementId": "DEMO-V2-REQ-016",
+      "sectionId": "5.2.1",
+      "heading": "User-Facing Error",
+      "text": "A fictional client SHALL distinguish 'credential revoked or suspended', 'proximity not verified', and 'radio unavailable' as separate error categories without revealing secret keys.",
+      "keywords": [
+        "error",
+        "diagnostic",
+        "security",
+        "오류",
+        "실패"
+      ],
+      "references": [
+        "DEMO-V2-REQ-005",
+        "DEMO-V2-REQ-006",
+        "DEMO-V2-REQ-010"
       ]
     }
   ]
