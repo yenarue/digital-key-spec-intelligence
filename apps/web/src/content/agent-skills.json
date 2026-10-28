@@ -6,8 +6,8 @@
   },
   "hero": {
     "eyebrow": "Digital Key Spec Intelligence · 프로젝트 소개",
-    "title": "Digital Key Spec Intelligence는 단순한 RAG 챗봇이 아니라, 스펙 탐색과 검증을 표준화하는 프로젝트다.",
-    "lead": "웹앱은 서비스형 인터페이스이고, Agent Skills는 개발자 워크플로형 인터페이스다.",
+    "title": "누가 어떤 AI로 물어도, 같은 근거로 답하도록",
+    "lead": "Digital Key Spec Intelligence는 스펙 탐색과 검증을 표준화하는 프로젝트예요. 웹앱은 서비스형, Agent Skills는 개발자 워크플로형 인터페이스예요.",
     "primaryCta": "Spec Explorer 열기",
     "secondaryCta": "GitHub 저장소"
   },
@@ -163,20 +163,77 @@
         "step": "1",
         "name": "Web RAG",
         "body": "가상 스펙 데이터 기반 웹서비스. 지금 보고 있는 이 사이트예요.",
-        "status": "Live"
+        "status": "Live",
+        "pain": "용어를 몰라 조항을 못 찾고, 버전을 섞어 읽어요.",
+        "solved": "질문 한 번에 선택한 버전의 원문 근거를 확인해요."
       },
       {
         "step": "2",
         "name": "Agent Skills",
         "body": "Navigator / Auditor 워크플로. Codex에서 수동으로 실행해 확인했어요.",
-        "status": "정의 · 수동 검증"
+        "status": "정의 · 수동 검증",
+        "pain": "개발자마다 AI 쓰는 법이 달라 해석과 근거 확인이 제각각이에요.",
+        "solved": "같은 절차로 찾고, 답과 분리된 절차로 검증해요."
       },
       {
         "step": "3",
         "name": "Local MCP",
         "body": "승인된 로컬 환경에서 실제 CCC 규격을 색인하고, 사내 승인 AI Agent와 Skill이 같은 검색 도구를 쓰도록 연결할 계획이에요. 실제 규격 원문은 공개 저장소·Vercel에 올리지 않아요.",
-        "status": "Planned"
+        "status": "Planned",
+        "pain": "실제 스펙은 공개 서비스나 개인 AI에 넣을 수 없어요.",
+        "solved": "승인된 로컬 환경에서 실제 스펙을 같은 도구로 써요."
       }
-    ]
+    ],
+    "lead": "최종 목표는 실제 CCC 스펙을 사내에서 안전하게 쓰면서, 웹과 개발자의 AI가 같은 검색 코어와 같은 검증 절차를 쓰게 하는 거예요. 오늘은 공개할 수 있는 가상 스펙으로 그 구조를 먼저 증명했어요.",
+    "painLabel": "문제",
+    "solvedLabel": "해소",
+    "arch": {
+      "label": "구조",
+      "now": "지금",
+      "planned": "계획",
+      "columns": [
+        {
+          "title": "스펙 자료",
+          "boxes": [
+            {
+              "name": "가상 스펙 JSON",
+              "detail": "공개 저장소 · V1/V2",
+              "planned": false
+            },
+            {
+              "name": "실제 CCC 스펙",
+              "detail": "승인된 로컬 환경에만",
+              "planned": true
+            }
+          ]
+        },
+        {
+          "title": "공통 코어",
+          "boxes": [
+            {
+              "name": "검색·근거 검증 코어",
+              "detail": "spec-core",
+              "planned": false
+            }
+          ]
+        },
+        {
+          "title": "인터페이스",
+          "boxes": [
+            {
+              "name": "Web RAG",
+              "detail": "Vercel · 누구나",
+              "planned": false
+            },
+            {
+              "name": "Local MCP",
+              "detail": "사내 AI Agent + Skills",
+              "planned": true
+            }
+          ]
+        }
+      ],
+      "caption": "실선은 지금 동작하는 경로, 점선은 계획이에요. 지금 Skill은 코어를 거치지 않고 가상 스펙 JSON을 직접 읽어요."
+    }
   }
 }

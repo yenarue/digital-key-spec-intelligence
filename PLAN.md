@@ -636,6 +636,7 @@ Skill 목록 페이지가 아니라 **프로젝트와 Skill을 소개하는 랜�
 - [x] S0–S2: `/skills` 정적 랜딩, 헤더 3항목 메뉴, DESIGN §6·decisions 기록. Main 직접 구현.
 - [x] S3 로컬 검증: `npm run test` 215/215, `npm run eval` 21/21, lint·typecheck·build 통과(`/skills` 정적 prerender), E2E 11/11(신규: 메뉴 `aria-current`, 핵심 메시지, 비실행 안내, GitHub 링크 6개, `utm_` 없음, `main` 안 버튼 0개, MCP 비활성, 375px 가로 넘침 없음, `/api` 요청 0건). 1280/375px 스크린샷 확인. 병행 FR-21 미커밋 작업이 작업 트리에 있는 상태에서 실행했다. 배포·live 확인은 아직.
 - 발표 대본은 저장소 밖 과제 폴더(`발표대본.md`)에 저장했다.
+- [x] 후속: hero를 해요체 C안(“누가 어떤 AI로 물어도, 같은 근거로 답하도록”)으로 변경, Roadmap에 목표 설명·단계별 문제/해소·구조 띠(실선=지금, 점선=계획) 추가. v0.3.1 Patch.
 - [x] 후속: `docs/skills-plan.md`의 6개 Skill 계획 섹션 추가(목표·“왜 2개 먼저”·구현 2/계획 4, 계획 문서 링크). Skill 카드 앞에 배치. lint·typecheck·build, E2E 16/16(병행 FR-21 테스트 포함) 통과, 1280/375px 확인.
 
 ### 수용 기준

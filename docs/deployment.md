@@ -78,3 +78,10 @@ Not yet verified: a grounded `answered` response on Production (free-model timeo
 - Local verification: unit/integration168/168, browser7/7, lint/build passed. All three UI sample questions returned actual AI answers locally with validated exact citations.
 - Production homepage returned HTTP200, full product title, synthetic notice and `v0.1.1`. Actual POST asking whether V2 entry-only permits starting returned HTTP200 / `answered`, no warnings, V2-only evidence and the correct `DEMO-V2-REQ-012` citation; answer was manually checked against its source.
 - This supersedes the earlier missing Production-answer/version checks. Q5 and the remaining live browser/mobile/console/function-log checks are still pending. Free-model availability and answer quality are not guaranteed by one successful request.
+
+### 2026-10-29 — v0.3.0 (FR-20, FR-21, FR-22)
+
+- Source: `fbee593` pushed to `main`; Git-triggered Production deployment.
+- Local before push: `npm run test` 215/215, lint, typecheck, build passed; `npm run test:e2e` 16/16 (incl. FR-21 history and `/skills`).
+- Production: `/skills` returned HTTP 200 about a minute after the push; page HTML showed `v0.3.0`, the not-executed notice, the Skill plan section and `Local MCP · Coming soon`. HTML check only — no live browser/mobile run, and FR-21 history not exercised on Production.
+

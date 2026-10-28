@@ -216,10 +216,10 @@ Requirement ID               [근거 1] [근거 2]
 
 검색 화면은 “작업 화면”이므로 큰 hero를 쓰지 않지만, `/skills`는 **프로젝트를 소개하는 랜딩 페이지**라서 예외를 둔다. 같은 A안 토큰·Pretendard·카드 표면을 쓰고 새 색을 만들지 않는다.
 
-- **Hero:** 작은 eyebrow(`Digital Key Spec Intelligence`) → 큰 제목(데스크톱 40/52px 700, 태블릿 34/46px, 모바일 28/38px) → 핵심 메시지 문단 → `Spec Explorer 열기`(primary) · `GitHub 저장소`(secondary) 버튼. 핵심 메시지는 PRD FR-22 문구를 그대로 쓴다.
+- **Hero:** 작은 eyebrow(`Digital Key Spec Intelligence`) → 큰 제목(데스크톱 40/52px 700, 태블릿 34/46px, 모바일 28/38px) → 핵심 메시지 문단(사이트와 같은 해요체; 제목 “누가 어떤 AI로 물어도, 같은 근거로 답하도록”) → `Spec Explorer 열기`(primary) · `GitHub 저장소`(secondary) 버튼. 핵심 메시지는 PRD FR-22 문구를 그대로 쓴다.
 - **문제 → 두 인터페이스:** 3단계 흐름(Problem → Web RAG → Agent Skills)을 카드로 보여주고, 두 인터페이스는 나란히 비교한다. “Skills are not executed by this web application.”은 notice 색(`#FFF8E8`/`#715014`)의 한 줄 안내로 두 인터페이스 아래에 고정한다.
 - **Skill 카드:** 이름·한 줄 목적·사용 시나리오·호출 예시(코드 블록, monospace)·상태 label·README/SKILL.md 링크. 실행처럼 보이는 버튼·▶ 아이콘·“Try” 문구를 쓰지 않는다.
-- **Roadmap:** 번호가 붙은 3단계 목록. 상태 label(Live / 정의·수동 검증 / Planned)을 텍스트로 붙여 현재와 계획을 구분한다.
+- **Roadmap:** 목표 설명 1~2줄 → 번호가 붙은 3단계 목록. 상태 label(Live / 정의·수동 검증 / Planned)을 텍스트로 붙이고, 단계마다 `문제`/`해소` 한 줄씩. 아래에 작은 구조 띠(스펙 자료 → 공통 코어 → 인터페이스): 지금 동작하는 경로는 accent 실선 상자, 계획은 점선 상자에 `지금`/`계획` 텍스트를 함께 둬 색에만 의존하지 않는다. 모바일은 세로로 쌓고 화살표를 아래 방향으로 돌린다. Skill이 지금 코어를 거치지 않는다는 사실을 캡션에 적는다.
 - 섹션 간격 64px(모바일 48px), 카드 그리드는 1024px 이상 2열, 그 아래 1열. 그림자·그라데이션·일러스트는 쓰지 않는다.
 
 ## 7. 상태별 화면과 문구

@@ -95,13 +95,34 @@ export default function SkillsPage() {
 
       <section className="landing-section" aria-labelledby="roadmap-title">
         <h2 id="roadmap-title">{roadmap.heading}</h2>
+        <p className="section-lead">{roadmap.lead}</p>
         <ol className="roadmap">
           {roadmap.items.map(item => <li key={item.step}>
             <span className="roadmap-step" aria-hidden="true">{item.step}</span>
             <div><div className="card-head"><h3>{item.name}</h3><span className="status-label">{item.status}</span></div>
-              <p>{item.body}</p></div>
+              <p>{item.body}</p>
+              <dl className="roadmap-pain">
+                <div><dt>{roadmap.painLabel}</dt><dd>{item.pain}</dd></div>
+                <div><dt>{roadmap.solvedLabel}</dt><dd>{item.solved}</dd></div>
+              </dl></div>
           </li>)}
         </ol>
+        <figure className="arch" aria-labelledby="arch-caption">
+          <div className="arch-flow">
+            {roadmap.arch.columns.map((column, index) => <div className="arch-step" key={column.title}>
+              {index > 0 && <span className="arch-arrow" aria-hidden="true">→</span>}
+              <div className="arch-col">
+                <p className="arch-col-title">{column.title}</p>
+                {column.boxes.map(box => <div className={box.planned ? "arch-box is-planned" : "arch-box"} key={box.name}>
+                  <strong>{box.name}</strong>
+                  <span>{box.detail}</span>
+                  <span className="arch-state">{box.planned ? roadmap.arch.planned : roadmap.arch.now}</span>
+                </div>)}
+              </div>
+            </div>)}
+          </div>
+          <figcaption id="arch-caption"><strong>{roadmap.arch.label}</strong> · {roadmap.arch.caption}</figcaption>
+        </figure>
       </section>
     </main>
     <AppRelease />

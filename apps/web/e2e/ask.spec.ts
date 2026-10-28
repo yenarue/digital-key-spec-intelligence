@@ -200,8 +200,8 @@ test('Agent Skills landing page introduces the Skills without running them', asy
   await nav.getByRole('link', {name:'Agent Skills'}).click();
   await expect(page).toHaveURL(/\/skills$/);
   await expect(nav.getByRole('link', {name:'Agent Skills'})).toHaveAttribute('aria-current', 'page');
-  await expect(page.getByRole('heading', {level:1})).toHaveText('Digital Key Spec Intelligence는 단순한 RAG 챗봇이 아니라, 스펙 탐색과 검증을 표준화하는 프로젝트다.');
-  await expect(page.getByText('웹앱은 서비스형 인터페이스이고, Agent Skills는 개발자 워크플로형 인터페이스다.', {exact:true})).toBeVisible();
+  await expect(page.getByRole('heading', {level:1})).toHaveText('누가 어떤 AI로 물어도, 같은 근거로 답하도록');
+  await expect(page.getByText('Digital Key Spec Intelligence는 스펙 탐색과 검증을 표준화하는 프로젝트예요. 웹앱은 서비스형, Agent Skills는 개발자 워크플로형 인터페이스예요.', {exact:true})).toBeVisible();
   await expect(page.getByText('Skills are not executed by this web application.', {exact:true})).toBeVisible();
   for (const id of ['spec-requirement-navigator', 'spec-answer-auditor']) {
     for (const file of ['README.md', 'SKILL.md', 'example.md']) {
@@ -212,6 +212,8 @@ test('Agent Skills landing page introduces the Skills without running them', asy
   await expect(page.locator('.skill-plan > li')).toHaveCount(6);
   await expect(page.locator('.skill-plan > li.is-done')).toHaveCount(2);
   await expect(page.locator('a[href="https://github.com/yenarue/digital-key-spec-intelligence/blob/main/docs/skills-plan.md"]')).toHaveCount(1);
+  await expect(page.locator('.roadmap .roadmap-pain')).toHaveCount(3);
+  await expect(page.locator('.arch-box.is-planned')).toHaveCount(2);
   await expect(page.locator('a[href*="utm_"]')).toHaveCount(0);
   await expect(page.locator('main button')).toHaveCount(0);
   const mcp = page.getByRole('button', {name:'Local MCP · Coming soon'});
