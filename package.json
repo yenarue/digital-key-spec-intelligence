@@ -1,16 +1,34 @@
 {
   "name": "digital-key-spec-intelligence",
   "private": true,
-  "version": "0.0.0",
-  "description": "Planning scaffold: app workspaces to be implemented by Codex",
+  "version": "0.1.0",
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
+  "engines": {
+    "node": "24.x",
+    "npm": ">=11"
+  },
   "scripts": {
-    "dev": "echo \"Not implemented: scaffold Next.js app first\" && exit 1",
-    "build": "echo \"Not implemented: scaffold Next.js app first\" && exit 1",
-    "test": "echo \"Not implemented: add tests first\" && exit 1",
-    "lint": "echo \"Not implemented: add lint config first\" && exit 1"
-  }
+    "dev": "npm run dev --workspace @dksi/web",
+    "build": "npm run build --workspace @dksi/web",
+    "test": "vitest run",
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "tsc --noEmit -p apps/web/tsconfig.json",
+    "eval": "tsx evals/run.ts",
+    "test:e2e": "playwright test --config apps/web/playwright.config.ts"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3",
+    "vitest": "5.0.5",
+    "tsx": "^4.21.0",
+    "eslint": "^9.39.0",
+    "eslint-config-next": "16.4.3",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@playwright/test": "^1.58.0"
+  },
+  "type": "module"
 }

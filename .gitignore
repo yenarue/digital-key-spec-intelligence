@@ -15,3 +15,11 @@ apps/web/.env.local
 
 # Operator-provided CCC PDFs and all derived local indices
 /data/local/
+
+# Browser test artifacts
+output/
+**/test-results/
+**/playwright-report/
+.playwright-cli/
+
+.next-dev/

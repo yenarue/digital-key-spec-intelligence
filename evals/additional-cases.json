@@ -1,0 +1,13 @@
+{
+  "description": "Additional wording and unrelated lexical checks; original benchmark expectations are unchanged.",
+  "cases": [
+    { "id": "A1", "question": "오너 등록 절차", "versions": ["V1"], "expectedRequirementIds": ["DEMO-V1-REQ-001"] },
+    { "id": "A2", "question": "친구에게 키 재공유할 수 있나요?", "versions": ["V2"], "expectedRequirementIds": ["DEMO-V2-REQ-004"] },
+    { "id": "A3", "question": "BLE 재시도 규칙", "versions": ["V1", "V2"], "expectedRequirementIds": ["DEMO-V1-REQ-008", "DEMO-V2-REQ-008"] },
+    { "id": "A4", "question": "개인정보 로그", "versions": ["V2"], "expectedRequirementIds": ["DEMO-V2-REQ-015"] },
+    { "id": "A5", "question": "NFC 태그 조건", "versions": ["V1"], "expectedRequirementIds": ["DEMO-V1-REQ-011"] },
+    { "id": "N1", "question": "내일 서울 날씨 알려줘", "versions": ["V1", "V2"], "expectedRequirementIds": [] },
+    { "id": "N2", "question": "quantum spaceship propulsion", "versions": ["V1", "V2"], "expectedRequirementIds": [] },
+    { "id": "N3", "question": "점심 식당 추천", "versions": ["V2"], "expectedRequirementIds": [] }
+  ]
+}

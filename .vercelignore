@@ -1,0 +1,14 @@
+.git
+node_modules
+**/node_modules
+**/.next
+**/.env
+**/.env.*
+.env
+.env.*
+data/local
+.agents
+output
+**/test-results
+**/playwright-report
+design-preview.html
