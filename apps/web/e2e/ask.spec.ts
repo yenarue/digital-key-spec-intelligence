@@ -37,7 +37,7 @@ test('question to actual search, source expansion and inert MCP', async ({ page 
   await expect(page.getByRole('tooltip')).toBeHidden();
   await expect(page.getByRole('button', {name:'Local MCP · Coming soon'})).toBeDisabled();
   await page.getByText('이 서비스는 무엇인가요?').click();
-  await expect(page.getByText('원문 근거를 함께 보여줘요', {exact:false})).toBeVisible();
+  await expect(page.getByText('스펙 문서 원문 기반의 근거를 함께 보여줘요', {exact:false})).toBeVisible();
   await page.getByRole('radio', {name:'V1', exact:true}).check();
   await page.getByRole('textbox', {name:'질문', exact:true}).fill('NFC 태그로 접근할 수 있나?');
   await page.getByRole('button', {name:/^근거 찾기/}).click();
