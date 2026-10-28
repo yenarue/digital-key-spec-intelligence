@@ -31,7 +31,10 @@ test('question to actual search, source expansion and inert MCP', async ({ page 
   await expect(page).toHaveTitle('Digital Key Spec Intelligence');
   await expect(page.getByText('Digital Key Spec Intelligence', {exact:true})).toBeVisible();
   await expect(page.locator('.app-release')).toHaveText(`v${webPackage.version}`);
+  await page.getByRole('button', {name:'DEMO', exact:true}).hover();
   await expect(page.getByText('Synthetic demo — not an official specification', {exact:true})).toBeVisible();
+  await page.mouse.move(0, 700);
+  await expect(page.getByRole('tooltip')).toBeHidden();
   await expect(page.getByRole('button', {name:'Local MCP · Coming soon'})).toBeDisabled();
   await page.getByRole('radio', {name:'V1', exact:true}).check();
   await page.getByRole('textbox', {name:'질문', exact:true}).fill('NFC 태그로 접근할 수 있나?');

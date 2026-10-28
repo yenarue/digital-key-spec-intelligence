@@ -11,6 +11,12 @@ const examples: { label: string; question: string; scope: Scope }[] = [
   { label: "위임 공유", question: "V1과 V2에서 friend device의 재공유 규칙은 어떻게 다른가요?", scope: "all" },
   { label: "NFC 전환 조건", question: "V2에서 UWB ranging 실패 시 NFC fallback 조건은 무엇인가요?", scope: "V2" },
   { label: "시동 권한", question: "V2에서 entry-only 권한으로 시동을 걸 수 있나요?", scope: "V2" },
+  { label: "BLE 재시도", question: "BLE 연결이 시간 초과되면 몇 번까지 다시 시도할 수 있나요?", scope: "all" },
+  { label: "키 폐기", question: "키를 폐기하면 그 키에서 파생된 초대도 함께 거부되나요?", scope: "V2" },
+  { label: "일시 정지 키", question: "일시 정지된 친구 키로 NFC 출입을 할 수 있나요?", scope: "V2" },
+  { label: "오프라인 동작", question: "차량이 오프라인일 때 대기 중인 초대 승인은 어떻게 처리되나요?", scope: "all" },
+  { label: "진단 로그", question: "진단 로그에 기기 식별자를 그대로 남겨도 되나요?", scope: "all" },
+  { label: "오류 구분", question: "사용자에게 보여줄 오류 종류는 V1과 V2에서 어떻게 다른가요?", scope: "all" },
 ];
 export function AskPanel() {
   const [question, setQuestion] = useState("");
@@ -57,7 +63,7 @@ export function AskPanel() {
           onKeyDown={shortcut} disabled={pending} rows={3} aria-invalid={error ? true : undefined}
           aria-describedby={error ? "question-hint question-error" : "question-hint"}
           placeholder="예: V2에서 NFC fallback을 사용할 수 있는 조건은?" />
-        <div className="composer-bottom"><span id="question-hint">합성 문서만 검색합니다 · 최대 500자</span>
+        <div className="composer-bottom"><span id="question-hint">실제 규격이 아닌 데모용 가상 문서(V1·V2)에서만 검색해요 · 최대 500자</span>
           <div className="composer-actions"><span className={questionLength(question) > 500 ? "character-count too-long" : "character-count"}>{questionLength(question)}/500</span>
             <button className="primary-button" disabled={pending} type="submit">{pending ? "찾는 중…" : "근거 찾기"}<span aria-hidden="true"> ↗</span></button></div></div>
       </div>
