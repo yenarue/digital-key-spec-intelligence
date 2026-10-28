@@ -8,6 +8,9 @@
     "wordmark": "DKSI",
     "brandName": "Digital Key Spec Intelligence",
     "demoTag": "DEMO",
+    "navLabel": "주요 메뉴",
+    "navExplorer": "Spec Explorer",
+    "navSkills": "Agent Skills",
     "mcpPreview": "Local MCP · Coming soon",
     "demoTooltipTitle": "Synthetic demo — not an official specification",
     "demoTooltipParagraphs": [

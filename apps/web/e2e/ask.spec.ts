@@ -190,3 +190,32 @@ test('AI failure preserves evidence with a different label from intentional keyw
   await expect(page.getByText(actual.sources[0].requirementId,{exact:true}).first()).toBeVisible();
   await expect(page.getByRole('heading',{name:'키워드 검색 결과',exact:true})).toHaveCount(0);
 });
+
+test('Agent Skills landing page introduces the Skills without running them', async ({ page }) => {
+  const apiCalls: string[] = [];
+  page.on('request', req => { if (new URL(req.url()).pathname.startsWith('/api/')) apiCalls.push(req.url()); });
+  await page.goto('/');
+  const nav = page.getByRole('navigation', {name:'주요 메뉴'});
+  await expect(nav.getByRole('link', {name:'Spec Explorer'})).toHaveAttribute('aria-current', 'page');
+  await nav.getByRole('link', {name:'Agent Skills'}).click();
+  await expect(page).toHaveURL(/\/skills$/);
+  await expect(nav.getByRole('link', {name:'Agent Skills'})).toHaveAttribute('aria-current', 'page');
+  await expect(page.getByRole('heading', {level:1})).toHaveText('Digital Key Spec Intelligence는 단순한 RAG 챗봇이 아니라, 스펙 탐색과 검증을 표준화하는 프로젝트다.');
+  await expect(page.getByText('웹앱은 서비스형 인터페이스이고, Agent Skills는 개발자 워크플로형 인터페이스다.', {exact:true})).toBeVisible();
+  await expect(page.getByText('Skills are not executed by this web application.', {exact:true})).toBeVisible();
+  for (const id of ['spec-requirement-navigator', 'spec-answer-auditor']) {
+    for (const file of ['README.md', 'SKILL.md', 'example.md']) {
+      await expect(page.locator(`a[href="https://github.com/yenarue/digital-key-spec-intelligence/blob/main/.agents/skills/${id}/${file}"]`)).toHaveCount(1);
+    }
+  }
+  await expect(page.locator('a[href*="utm_"]')).toHaveCount(0);
+  await expect(page.locator('main button')).toHaveCount(0);
+  const mcp = page.getByRole('button', {name:'Local MCP · Coming soon'});
+  await expect(mcp).toBeDisabled();
+  await expect(mcp).toHaveAttribute('aria-disabled', 'true');
+  await page.setViewportSize({width:375, height:800});
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
+  await nav.getByRole('link', {name:'Spec Explorer'}).click();
+  await expect(page.getByRole('textbox', {name:'질문', exact:true})).toBeVisible();
+  expect(apiCalls).toEqual([]);
+});

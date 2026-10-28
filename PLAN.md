@@ -321,7 +321,7 @@ Vercel 계정 접근/프로젝트 연결/secret 설정 권한이 없다면 필�
 - 실제 CCC V3.1.4/V4.1.0 파일 확보·열람·파싱·색인, 사용자 업로드, `data/local` 처리, 로컬 Web 모드, Ollama·외부 실자료 전송 게이트.
 - vector/embedding/hybrid retrieval, reranker, 전용 버전 diff/영향 분석 엔진, cross-spec 관계 그래프.
 - 로그인·DB·사용자 질문/답변 영속화·회사 통합·ACL·공유 지식 저장소·분석 추적.
-- Skill 파일을 웹앱이 실행하는 기능, 신규 Skill 확장, Skill을 RAG/MCP 구현으로 포장하는 동작.
+- Skill 파일을 웹앱이 실행하는 기능, 신규 Skill 확장, Skill을 RAG/MCP 구현으로 포장하는 동작. (Skill을 **소개만** 하는 정적 페이지는 §16 후속 기능으로 별도 계획한다.)
 
 공유 네 가지 인터페이스와 무결한 원문·버전·인용 계약만 미래 확장 지점으로 남긴다. 후속 로컬 실증은 문서 이용 권한·조직 정책을 확인한 별도 계획으로 수행한다.
 
@@ -338,7 +338,7 @@ Vercel 계정 접근/프로젝트 연결/secret 설정 권한이 없다면 필�
 | 빈 versions, 잘못된 JSON, 실패 status 구분, invalid 인용 처리 세부가 미정 | 본 계획의 400/413 및 보수적 답변 전체 보류 정책을 기본으로 구현하고 `docs/decisions.md`에 기록 |
 | 경과된 Skill 문서의 미검증 표현과 최신 예시 기록 | 최신 기록은 명시적 수동 1회씩만 인정. 전체 회귀 검증 완료로 확대 해석하지 않음 |
 | 기존 계획은 P1 전체 완료를 선행조건처럼 표현 | 이번 사용자 요청에 따라 P0 우선·P1 보류 가능으로 변경. 보안/원문/기본 사용성은 유지하고 보류 FR을 공개 |
-| 디자인·폰트·메뉴 | A안 Clear Desk와 Pretendard 확정 반영. 메뉴 형태 재검토는 실제 항목이 필요할 때; 이번은 비활성 MCP 유지 |
+| 디자인·폰트·메뉴 | A안 Clear Desk와 Pretendard 확정 반영. 메뉴 형태 재검토는 실제 항목이 필요할 때; 이번은 비활성 MCP 유지. §16 Agent Skills 페이지로 실제 항목이 생겨 상단형 3항목 메뉴로 결정(S0에서 DESIGN 갱신) |
 | 배포 계정/프로젝트/도메인, Vercel Node 및 실제 무료 모델 지원 | Phase 0/1에 확인; 커스텀 도메인은 필수가 아니며 생성된 live URL로 충분 |
 
 이 항목들은 계획 검토 결과이며 이번 작업에서 기존 요구사항 문서를 수정하지 않는다. 실제 구현 때 새로운 결정·범위 이탈은 `docs/decisions.md`에 기록한다. 설치 버전과 계정 설정 외에는 현 정보로 Phase 0을 시작할 수 있으며, AI 제공자 장애는 검색·근거 배포를 막지 않게 한다.
@@ -559,3 +559,83 @@ interface HistoryEntry {
 - 행 삭제·전체 삭제가 즉시 반영되고 새로고침 후에도 유지된다.
 - `localStorage`에 잘못된 JSON을 넣거나 접근을 막아도 페이지와 검색이 정상 동작한다.
 - 기존 test/E2E/eval 통과.
+
+## 16. Follow-up — Agent Skills 소개 페이지 (PRD FR-22)
+
+**상태: S0–S3 구현·로컬 검증 완료 (2026-10-29), 미배포. 우선순위 P1 (2026-10-29 P2에서 상향 — 당일 발표에서 보여줄 페이지).** 발표에서 이 프로젝트가 단순 RAG 챗봇이 아니라 **스펙 탐색·검증 절차를 표준화하는 프로젝트**임을 보여주기 위해, 웹앱에 `Agent Skills` 메뉴와 정적 소개 페이지를 추가한다. 웹앱은 서비스형 인터페이스, Agent Skills는 개발자 워크플로형 인터페이스이며 향후 Local MCP로 같은 검색 도구에 연결하는 방향이다. **현재 두 인터페이스는 서로 호출하지 않는다.** 페이지는 이 구분을 숨기지 않고 설명하는 것이 목적이다.
+
+### 우선순위
+
+- 오늘(10/29) 발표에서 이 페이지를 직접 보여준다. 발표의 중심은 여전히 업무 적용 사례와 Web RAG의 검색·근거 시연이며, 이 페이지는 프로젝트 전체 그림과 확장 방향을 30~60초에 설명하는 용도다.
+- P1이지만 핵심 RAG 경로(`/api/ask`, spec-core, 검색 화면 동작)는 수정하지 않는다. §15 FR-21과 파일이 겹치지 않게 헤더·새 라우트·CSS 끝부분만 건드린다.
+
+### 페이지 성격 — 프로젝트 랜딩 페이지
+
+Skill 목록 페이지가 아니라 **프로젝트와 Skill을 소개하는 랜딩 페이지**다. 첫 화면에 아래 핵심 메시지를 그대로 노출한다.
+
+> Digital Key Spec Intelligence는 단순한 RAG 챗봇이 아니라, 스펙 탐색과 검증을 표준화하는 프로젝트다. 웹앱은 서비스형 인터페이스이고, Agent Skills는 개발자 워크플로형 인터페이스다.
+
+흐름: Hero(핵심 메시지 + `Spec Explorer 열기`·GitHub CTA) → 문제(개발자마다 각자 AI에 스펙을 넣어 질문 → 중복 검색·버전 혼동·근거 검증 어려움) → 두 인터페이스 비교(Web RAG / Agent Skills, “서로 호출하지 않음” 명시) → Skill 카드 2개 → Roadmap. 디자인은 기존 A안 토큰·Pretendard를 유지하되 검색 화면보다 큰 hero 타이포와 넉넉한 섹션 간격을 허용한다(DESIGN §6에 기록).
+
+### 화면 구성
+
+```text
+헤더:  [Spec Explorer]  [Agent Skills]  [Local MCP · Coming soon (disabled)]
+        /  현재 검색 화면   /skills 랜딩    기존 FR-12 그대로
+
+/skills
+  Hero: 핵심 메시지 · [Spec Explorer 열기] [GitHub]
+  Problem: 각자 AI에 스펙 → 중복 검색 · 버전 혼동 · 근거 검증 어려움
+  Two interfaces: Web RAG(서비스형, Live) | Agent Skills(개발자 워크플로형, 2 Skills)
+  ⚠ Skills are not executed by this web application.
+     Codex 등 호환 에이전트 클라이언트에서 저장소를 열고 사용합니다. (현재 실행 기록: Codex)
+
+  [Spec Requirement Navigator]           [Spec Answer Auditor]
+   목적 / 사용 시나리오                     목적 / 사용 시나리오
+   $spec-requirement-navigator             $spec-answer-auditor
+   예시 프롬프트 (복사 가능한 텍스트)          예시 프롬프트
+   상태: SKILL.md 작성 · Codex 수동 실행 1회   상태: 동일
+   README · SKILL.md (GitHub)              README · SKILL.md (GitHub)
+
+  Roadmap
+   1. Web RAG — 합성 데이터 웹서비스            Live
+   2. Agent Skills — Navigator / Auditor      정의 · 수동 검증
+   3. Local MCP — 실제 CCC 자료 + 사내 승인 AI   Planned
+```
+
+### 콘텐츠 원칙
+
+- 출처는 각 Skill의 `README.md`·`example.md`. 예시 프롬프트는 합성 코퍼스로 실제 답할 수 있는 것만 쓴다(Navigator: “가상 V2 스펙에서 UWB ranging 실패 시 NFC fallback이 가능한 조건…”, Auditor: “방금 spec-requirement-navigator가 작성한 답변을 검증해줘.”).
+- 링크는 `https://github.com/yenarue/digital-key-spec-intelligence/blob/main/.agents/skills/<name>/{README,SKILL}.md`. 추적 파라미터(`utm_*`)는 붙이지 않는다.
+- 상태 문구는 기록된 검증만 쓴다: 각 Skill 명시적 Codex 수동 실행 1회. 전체 activation/negative/adversarial 회귀는 미완료로 표시하거나 언급하지 않는다. “Tested”, “Integrated” 같은 표현 금지.
+- 실행 클라이언트는 “Codex CLI” 하나로 한정하지 않는다. `.claude/skills` symlink로 Claude Code도 발견할 수 있으나, 실행 기록이 생기기 전에는 검증된 클라이언트로 표시하지 않는다.
+- 합성 데이터 경고(헤더 demo tag)는 이 페이지에서도 보인다. 실제 CCC 내용이나 사내 정보를 넣지 않는다.
+- 실행·체험 버튼, Skill 호출, `/api/*` 호출, LLM 호출, MCP 페이지·endpoint를 만들지 않는다. 새 의존성 없이 정적 콘텐츠로 구현한다.
+
+### 작업
+
+| ID | 담당 | 파일 | 내용 / 완료 조건 |
+| --- | --- | --- | --- |
+| S0 | Main | PRD/PLAN, `DESIGN.md`, `docs/decisions.md` | 범위·문구 원칙 확정. DESIGN “메뉴 확장 원칙”을 상단형 3항목 메뉴(현재 위치 `aria-current`, 좁은 화면 줄바꿈, MCP disabled 유지)로 갱신하고 결정 기록 |
+| S1 | Frontend Agent | `apps/web/src/components/app-header.tsx`, `globals.css`, `content/ui-text.json` | `Spec Explorer`/`Agent Skills` 링크 추가, 현재 위치 표시, `Local MCP` 버튼은 그대로. 375px에서 가로 스크롤 없음 |
+| S2 | Frontend Agent | `apps/web/src/app/skills/page.tsx`, `content/agent-skills.json`(또는 ui-text 하위), `globals.css` | 위 화면 구성의 정적 페이지. 기존 A안 토큰·카드 스타일 재사용, 새 디자인 시스템 만들지 않음. 서버/클라이언트 데이터 요청 없음 |
+| S3 | Main | `apps/web/e2e/**`, `docs/decisions.md` | 헤더 이동·`aria-current`·키보드, `/skills`에서 `/api/ask` 요청 0건, MCP 비활성 유지, 링크 URL 형식, 1280/375px 확인. test/lint/typecheck/build/eval/E2E 실행 결과 기록. 배포는 별도 승인 |
+
+- 발표 당일 일정상 S1–S2도 Main이 직접 구현한다(위임 비용 대비 작업이 작음). 병행 세션의 FR-21 작업과 겹치지 않도록 `ask-panel.tsx`는 건드리지 않는다.
+- 발표 대본은 저장소 밖(사용자 Google Drive 과제 폴더)에 둔다.
+- 사용자에게 보이는 기능 추가이므로 출시 시 Web 버전 Minor를 올린다(docs/versioning.md). §14·§15와 같은 배포에 묶일 경우 한 번만 올린다.
+
+### 진행 기록
+
+- [x] S0–S2: `/skills` 정적 랜딩, 헤더 3항목 메뉴, DESIGN §6·decisions 기록. Main 직접 구현.
+- [x] S3 로컬 검증: `npm run test` 215/215, `npm run eval` 21/21, lint·typecheck·build 통과(`/skills` 정적 prerender), E2E 11/11(신규: 메뉴 `aria-current`, 핵심 메시지, 비실행 안내, GitHub 링크 6개, `utm_` 없음, `main` 안 버튼 0개, MCP 비활성, 375px 가로 넘침 없음, `/api` 요청 0건). 1280/375px 스크린샷 확인. 병행 FR-21 미커밋 작업이 작업 트리에 있는 상태에서 실행했다. 배포·live 확인은 아직.
+- 발표 대본은 저장소 밖 과제 폴더(`발표대본.md`)에 저장했다.
+
+### 수용 기준
+
+- 헤더에서 `Agent Skills`로 이동하고 `Spec Explorer`로 돌아올 수 있다. 현재 페이지가 시각·`aria-current`로 구분된다.
+- `Local MCP · Coming soon`은 두 페이지 모두에서 disabled·aria-disabled, href·라우트 없음(FR-12 회귀 없음).
+- `/skills` 첫 화면에 핵심 메시지가 그대로 보이고, “웹앱에서 실행되지 않는다”는 문구가 보이며, 실행 버튼이 없다.
+- 두 Skill의 README/SKILL.md 링크가 저장소의 실제 경로를 가리킨다.
+- Roadmap에서 현재 상태(Live / 정의·수동 검증)와 계획(Planned)이 구분된다.
+- 기존 test/E2E/eval 통과, 375px 가로 스크롤 없음.

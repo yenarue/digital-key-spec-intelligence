@@ -8,7 +8,7 @@ const { intro } = uiText;
 export default function Home() {
   return <div className="app-shell">
     <a className="skip-link" href="#main">{intro.skipLink}</a>
-    <AppHeader />
+    <AppHeader current="explorer" />
     <main id="main">
       <div className="page-intro"><h1>{intro.heading}</h1>
         <p>{intro.subheading}</p></div>
