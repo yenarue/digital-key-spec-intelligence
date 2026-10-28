@@ -14,3 +14,10 @@
 .about summary{display:inline-block;cursor:pointer;color:var(--accent);font-weight:600;min-height:28px}
 .about ul{margin:8px 0 0;padding:14px 18px 14px 34px;background:var(--surface);border:1px solid var(--line);border-radius:10px}
 .about li+li{margin-top:4px}
+
+.search-controls{display:flex;align-items:flex-start;flex-wrap:wrap;gap:8px 32px}
+.search-controls .version-options{margin-bottom:0}
+.mode-hint{font-size:13px;line-height:22px;color:var(--secondary);margin:8px 0 16px}
+.mode-control span{min-height:44px;padding:9px 16px;white-space:nowrap}
+.cached-result{font-weight:600;color:var(--secondary)}
+@media(max-width:767px){.search-controls{gap:8px 20px}.mode-control span{padding-inline:14px}.mode-hint{font-size:12px}}

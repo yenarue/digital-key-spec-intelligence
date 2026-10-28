@@ -10,6 +10,13 @@ describe("question validation", () => {
   });
 });
 describe("ask client", () => {
+  it.each(["keyword", "ai"] as const)("sends an explicit %s mode without changing query or version scope", async mode => {
+    const result = { status: "search_only", answer: null, sources: [], warnings: [] };
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(Response.json(result));
+    await askQuestion({ question: " NFC 조건 ", versions: ["V2"], topK: 5, mode }, { fetcher });
+    expect(fetcher).toHaveBeenCalledOnce();
+    expect(JSON.parse(fetcher.mock.calls[0][1]?.body as string)).toEqual({ question: "NFC 조건", versions: ["V2"], topK: 5, mode });
+  });
   it("posts the submitted version and trimmed question without extra requests", async () => {
     const result = { status: "search_only", answer: null, sources: [], warnings: [] };
     const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(JSON.stringify(result), { status: 200 }));
