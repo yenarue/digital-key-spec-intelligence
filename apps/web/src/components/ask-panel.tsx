@@ -12,7 +12,7 @@ import webPackage from "../../package.json";
 
 type Scope = "all" | "V1" | "V2";
 // `saved` marks a snapshot restored from browser history rather than a fresh response.
-type SearchRun = { question: string; scope: Scope; mode: SearchMode; response: AskResponse; saved?: { at: string; appVersion: string } };
+type SearchRun = { question: string; scope: Scope; mode: SearchMode; response: AskResponse; saved?: { id: string; at: string; appVersion: string } };
 const text = uiText.search;
 const historyText = uiText.history;
 const modeLabels = text.modeLabels as Record<SearchMode, string>;
@@ -53,7 +53,7 @@ export function AskPanel() {
     const nextScope: Scope = entry.versions.length > 1 ? "all" : entry.versions[0];
     setQuestion(entry.question); setScope(nextScope); setMode(entry.mode); setError(null); setReused(false);
     setResults({ [entry.mode]: { question: entry.question, scope: nextScope, mode: entry.mode, response: entry.response,
-      saved: { at: entry.submittedAt, appVersion: entry.appVersion } } });
+      saved: { id: entry.id, at: entry.submittedAt, appVersion: entry.appVersion } } });
   }
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -88,7 +88,7 @@ export function AskPanel() {
     if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) { event.preventDefault(); event.currentTarget.form?.requestSubmit(); }
   }
   return <div className="ask-panel">
-    <form ref={form} onSubmit={submit} aria-busy={pending} noValidate>
+    <form ref={form} className="search-form" onSubmit={submit} aria-busy={pending} noValidate>
       <div className="search-controls">
       <fieldset disabled={pending} className="version-options mode-options" aria-describedby="search-mode-hint"><legend>{text.modeLegend}</legend>
         <div className="version-control mode-control">{(["keyword", "ai"] as const).map(value => <label key={value}>
@@ -100,7 +100,7 @@ export function AskPanel() {
           <span>{version === "all" ? text.versionAll : version}</span></label>)}</div></fieldset>
       </div>
       <p className="mode-hint" id="search-mode-hint">{text.modeHints[mode]}</p>
-      <label className="question-label" htmlFor="question">{text.questionLabel}</label>
+      <label className="question-label visually-hidden" htmlFor="question">{text.questionLabel}</label>
       <div className={`question-composer${error ? " has-error" : ""}`}>
         <textarea id="question" ref={input} value={question} onChange={event => updateInput(event.target.value)}
           onKeyDown={shortcut} disabled={pending} rows={3} aria-invalid={error ? true : undefined}
@@ -108,20 +108,20 @@ export function AskPanel() {
           placeholder={text.placeholder} />
         <div className="composer-bottom"><span id="question-hint">{text.inputHint}</span>
           <div className="composer-actions"><span className={questionLength(question) > 500 ? "character-count too-long" : "character-count"}>{questionLength(question)}/500</span>
-            <button className="primary-button" disabled={pending} type="submit">{pending ? text.submitPending : text.submit}<span aria-hidden="true"> ↗</span></button></div></div>
+            <button className="primary-button" disabled={pending} type="submit">{pending ? text.submitPending : text.submit}</button></div></div>
       </div>
       {error && <p className="input-error" id="question-error" role="alert">{error}</p>}
       <div className="examples"><span>{text.examplesLabel}</span>{examples.map(example => <button type="button" key={example.label} disabled={pending}
-        onClick={() => { updateInput(example.question, example.scope); input.current?.focus(); }}>{example.label}<span aria-hidden="true"> ↗</span></button>)}</div>
+        onClick={() => { updateInput(example.question, example.scope); input.current?.focus(); }}>{example.label}</button>)}</div>
     </form>
-    <QuestionHistory entries={history} disabled={pending} onOpen={openHistory}
+    <QuestionHistory entries={history} disabled={pending} currentId={submitted?.saved?.id} onOpen={openHistory}
       onRemove={id => historyStore.set(removeHistory(id))} onClear={() => historyStore.set(clearHistory())} />
     <p className="search-status" role="status" aria-live="polite">{pending ? (mode === "keyword" ? text.statusPendingKeyword : text.statusPendingAi) : result ? `${submitted?.saved ? historyText.statusSaved : reused ? text.statusReused : text.statusDone} ${fill(submitted?.mode === "keyword" ? text.statusCountKeyword : text.statusCount, { count: result.sources.length })}` : ""}</p>
     {pending && <div className="loading-skeleton" aria-hidden="true"><div /><div /><div /></div>}
     {!pending && result && <div className="result-block">
       {submitted?.saved && <div className="saved-banner"><strong>{historyText.savedLabel}</strong>
         <span>{savedTime(submitted.saved.at)} · {modeLabels[submitted.mode]} · {scopeLabel(submitted.scope === "all" ? ["V1", "V2"] : [submitted.scope])}</span>
-        <button type="button" onClick={() => form.current?.requestSubmit()}>{historyText.rerun}</button>
+        <button type="button" onClick={() => form.current?.requestSubmit()}><span aria-hidden="true">↻ </span>{historyText.rerun}</button>
         {submitted.saved.appVersion !== webPackage.version && <p>{historyText.versionMismatch}</p>}</div>}
       <div className="result-context"><span>{reused && <><span className="cached-result">{text.contextReused}</span> · </>}{submitted && modeLabels[submitted.mode]}{submitted?.mode === "ai" && (result.status === "llm_unavailable" || result.status === "search_only") ? ` · ${text.contextAiFallback}` : ""} · {submitted?.scope === "all" ? text.contextScopeAll : submitted?.scope} {text.contextScopeSuffix}</span>
         <span>{text.contextQuestion} {submitted?.question}</span></div>

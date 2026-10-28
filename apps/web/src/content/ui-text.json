@@ -109,6 +109,8 @@
   },
   "history": {
     "summary": "최근 질문",
+    "modeShort": { "keyword": "키워드", "ai": "AI" },
+    "scopeAll": "전체",
     "count": "{count}건",
     "note": "이 브라우저에만 저장돼요 · 최근 5건",
     "clearAll": "전체 삭제",

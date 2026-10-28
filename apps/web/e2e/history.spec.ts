@@ -20,7 +20,8 @@ test('keeps the latest five questions across reloads, collapsed by default', asy
   await page.reload();
   const history = page.locator('details.question-history');
   await expect(history).not.toHaveAttribute('open', '');
-  await expect(history.locator('summary')).toHaveText('최근 질문 5건');
+  await expect(history.locator('summary')).toContainText('최근 질문');
+  await expect(history.locator('.history-count')).toHaveText(/^5건/);
   await history.locator('summary').click();
   await expect(history.locator('.history-question')).toHaveText(['로그', '공유', '폐기', 'UWB', 'BLE']);
   await expect(history.getByText('이 브라우저에만 저장돼요 · 최근 5건')).toBeVisible();
@@ -40,6 +41,9 @@ test('opening a saved question restores it without a request and re-run asks onc
   await expect(page.locator('.saved-banner')).toContainText('저장된 결과');
   await expect(page.getByRole('status')).toContainText('저장된 결과예요.');
   await expect(page.getByText('DEMO-V2-REQ-011', {exact:true}).first()).toBeVisible();
+  await expect(page.locator('details.question-history')).not.toHaveAttribute('open', '');
+  await page.locator('details.question-history summary').click();
+  await expect(page.locator('.question-history li.current .history-question')).toHaveText('NFC 태그로 접근할 수 있나?');
   await expect(page.locator('.saved-banner p')).toHaveCount(0);
   expect(requests.n).toBe(0);
   await page.getByRole('button', {name:'다시 실행', exact:true}).click();
