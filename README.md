@@ -4,7 +4,7 @@
 
 KAIST ITM.690 2026-10-29 발표를 위한 공개 합성 데이터 데모와 **실제 CCC V3.1.4/V4.1.0 PDF를 사용하는 후속 로컬 RAG**를 공통 코어로 연결하는 프로젝트. 구체적 설계: [CCC PDF RAG architecture](docs/ccc-rag-architecture.md). 실제 디지털키 개발에서 겪는 문서 검색·조건 해석·버전 혼동·근거 부재·지식 파편화 문제를 출발점으로 한다.
 
-**상태:** 초기 저장소/설계 문서만 준비됨. **웹앱·RAG·Vercel 배포는 아직 구현되지 않음.**
+**상태:** A안 Clear Desk·Pretendard Web 앱, 실제 MiniSearch 검색, 근거 카드, 서버 전용 OpenRouter 어댑터와 안전한 fallback을 구현했다. 로컬 `npm run dev`는 [http://localhost:3000](http://localhost:3000)에서 동작한다. **Vercel 로그인과 OpenRouter 키가 아직 설정되지 않아 실제 배포·실모델 답변 검증은 미완료**다. 수동 절차: [배포 가이드](docs/deployment.md).
 
 > **Public repository safety:** 실제 CCC 사양 원문(배포 권한을 확인하지 않은 자료 포함), 추출 텍스트/정제본/임베딩/인덱스, OEM/사내 문서, 소스·로그, 키·고객/개인정보를 공개 저장소와 Vercel에 추가하지 않는다. `data/demo`에는 독립 창작한 **Synthetic/Fictional** 자료만 보관한다.
 
@@ -33,11 +33,11 @@ KAIST ITM.690 2026-10-29 발표를 위한 공개 합성 데이터 데모와 **�
 
 | 단계 | 구현 목표 | 상태 |
 | --- | --- | --- |
-| **A** | 합성 규격 2개 버전(V1/V2)과 Requirement ID | 샘플 데이터 제공 |
-| **B** | MiniSearch 기반 요구사항 검색, 버전 필터 | 구현 예정 |
-| **C** | 정확한 문서·버전·Section·ID·원문 근거 카드 | 구현 예정 |
-| **D** | 서버 측 OpenRouter 무료 모델 답변 + 실패 시 검색 폴백 | 구현 예정 |
-| **E** | Next.js Web MVP를 Vercel에 배포 | 구현 예정 |
+| **A** | 합성 규격 2개 버전(V1/V2)과 Requirement ID | 구현·원문 검사 완료 |
+| **B** | MiniSearch 기반 요구사항 검색, 버전 필터 | 로컬 구현·검증 완료 |
+| **C** | 정확한 문서·버전·Section·ID·원문 근거 카드 | 로컬 구현·검증 완료 |
+| **D** | 서버 측 OpenRouter 무료 모델 답변 + 실패 시 검색 폴백 | 구현·mock 통합 검사 완료; 실모델 키 대기 |
+| **E** | Next.js Web MVP를 Vercel에 배포 | 로컬 빌드 완료; 로그인·live 검증 대기 |
 | **F** | 공통 검색 코어를 사용하는 **Local MCP** | 다음 단계 (웹 메뉴만 disabled / Coming soon) |
 
 **이번 발표 A–E:** 합성 데이터 Web RAG와 Vercel + OpenRouter 무료 모델 배포. **후속 사내 실증(F):** 사용자가 보유한 CCC PDF 두 개를 `data/local/ccc/`에서 로컬 파싱·색인하고, **Local MCP**를 통해 회사에서 승인한 Codex·Claude·Gemini 에이전트에 근거를 제공한다. **Ollama 설치나 별도 LLM API는 필수가 아니다.** 로컬 MCP의 도구 결과가 연결된 모델에 전달될 수 있으므로, 사내 승인 범위에서만 사용한다. 개인 OpenRouter에 실제 스펙 발췌를 보내는 기능은 별도 권한 확인·명시적 허용 전까지 비활성화한다.
@@ -57,7 +57,7 @@ apps/mcp (future local stdio MCP; not implemented)
 
 MiniSearch는 **키워드 기반 full-text search**다. 첫 버전에서는 한·영 용어 매핑과 메타데이터 검색을 사용하며, 임베딩 기반 semantic search라고 주장하지 않는다. 질문에 답할 근거가 없으면 추측하지 않는다. LLM 키가 없거나 무료 모델 호출이 실패해도 검색·원문 확인은 작동해야 한다.
 
-## Planned repository layout
+## Repository layout
 
 ```text
 .
@@ -79,27 +79,33 @@ MiniSearch는 **키워드 기반 full-text search**다. 첫 버전에서는 한�
 └── docs/decisions.md
 ```
 
-실제 Next.js 소스·npm 의존성·lockfile은 Codex가 A–E 구현 시 추가한다.
+루트 lockfile로 workspace 의존성을 고정한다. `DESIGN.md`는 A안·Pretendard 기준이며 비교 HTML은 고정 데이터 디자인 기록일 뿐 앱 런타임이 아니다.
 
-## Getting started (after implementation)
+Web 버전은 `apps/web/package.json`을 기준으로 footer 위에 표시한다. Major/Minor/Patch 증가 기준과 배포 절차는 [버전 관리 정책](docs/versioning.md)을 따른다. 현재는 첫 배포 준비 버전 `0.1.0`이다.
 
-Node.js LTS, npm 필요. 현재 아래 명령은 **완성 목표에 대한 실행 계약**이며, 앱 구현 전에는 `npm run dev`가 동작하지 않는다.
+## Getting started
+
+Node.js 24.x, npm 11+ 필요. 키를 설정하지 않아도 실제 검색과 원문 확인이 동작한다.
 
 ```bash
-npm install
+npm ci
 cp .env.example apps/web/.env.local
 # apps/web/.env.local에 OPENROUTER_API_KEY 설정 (선택)
 npm run dev
 npm run test
+npm run eval
 npm run lint
 npm run build
+npm run test:e2e
 ```
 
 - `OPENROUTER_API_KEY`: 서버에서만 사용, 미설정 시 검색 전용 모드.
 - `OPENROUTER_MODEL`: 기본 `openrouter/free`; 무료 모델 가용성/호출 한도는 변동 가능.
 - 모델과 API 키 설정은 Vercel 서버 환경변수에만 입력한다. `NEXT_PUBLIC_` 접두사 사용 금지.
 - Vercel에서는 `apps/web`을 Root Directory로 선택하고, npm workspaces 경로 해석·빌드를 검증한다.
-- **배포 URL:** 미배포.
+- **배포 URL:** 미배포. 현재 Vercel CLI 미로그인; [배포 가이드](docs/deployment.md)의 계정 연결·Root Directory·환경변수·live 검증 절차가 남아 있다.
+- 브라우저 검사는 설치된 Google Chrome과 포트 3100의 프로덕션 서버를 사용한다. dev는 `.next-dev`, production은 `.next`를 사용해 동시에 검증할 수 있다.
+- 실제 실행 결과: Vitest **163개**, 검색 평가 **18개**(기대 ID 17/17 top-5, 버전 누출 0), 브라우저 **7개**, lint/typecheck/build 통과. 작은 합성 코퍼스 평가이며 일반 정확도나 논리적 함의 보증이 아니다. 모델 응답 UI 검사는 stub이고 실제 OpenRouter 검증은 아니다.
 
 ## MVP demo flow
 
@@ -129,7 +135,7 @@ See the [Skill roadmap, demo script and acceptance tests](docs/skills-plan.md). 
 
 ## Handoff to Codex
 
-먼저 **[AGENTS.md](AGENTS.md)**와 **[PRD.md](PRD.md)**를 읽고, P0 기능을 A→B→C→D→E 순서로 구현한다. 우선순위는 **동작하는 배포 > 정확한 검색 > 근거 확인 > LLM 답변 > 시각적 장식**이다. 완료되지 않은 기능·테스트·배포는 명시한다.
+먼저 **[AGENTS.md](AGENTS.md)**와 **[PRD.md](PRD.md)**를 읽고, 진행 상태와 소유권은 **[PLAN.md](PLAN.md)**의 체크리스트와 실행 로그를 따른다. 우선순위는 **동작하는 배포 > 정확한 검색 > 근거 확인 > LLM 답변 > 시각적 장식**이다. 완료되지 않은 기능·테스트·배포는 명시한다.
 
 ## References
 
