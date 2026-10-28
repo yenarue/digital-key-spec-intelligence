@@ -512,7 +512,7 @@ interface Evidence { /* 기존 필드 */ matches?: MatchedTerm[] }
 
 ## 15. Follow-up — 브라우저 로컬 질문 이력 (PRD FR-21)
 
-**상태: 계획, 미착수. 우선순위 P1 (2026-10-29 P2에서 상향).** 사용자가 이전 질문과 결과를 다시 볼 수 있게 한다. 로그인이 없으므로 서버·DB에 저장하지 않고 브라우저 `localStorage`에만 둔다. 전체 사용자 질의 로그 수집(분석·eval 보강)은 서버 영속화와 사내 문구 유입 위험이 있어 이 범위에서 제외한다. UI는 DESIGN §6 “질문 이력” C안(입력창 아래, 기본 접힘, 최근 5건)을 따르고, B안(헤더 버튼 + 드로어)은 사용 후 전환할 대안으로 기록했다. 시안: `docs/design-previews/question-history.html`.
+**상태: Q1–Q3 구현·로컬 검증 완료 (2026-10-29), 미배포. 우선순위 P1 (2026-10-29 P2에서 상향).** 사용자가 이전 질문과 결과를 다시 볼 수 있게 한다. 로그인이 없으므로 서버·DB에 저장하지 않고 브라우저 `localStorage`에만 둔다. 전체 사용자 질의 로그 수집(분석·eval 보강)은 서버 영속화와 사내 문구 유입 위험이 있어 이 범위에서 제외한다. UI는 DESIGN §6 “질문 이력” C안(입력창 아래, 기본 접힘, 최근 5건)을 따르고, B안(헤더 버튼 + 드로어)은 사용 후 전환할 대안으로 기록했다. 시안: `docs/design-previews/question-history.html`.
 
 ### 저장 형식 (클라이언트 전용)
 
@@ -546,6 +546,12 @@ interface HistoryEntry {
 | Q3 | `e2e/**`, `docs/decisions.md` | 새로고침 후 유지, 스냅샷 열 때 요청 0건, 삭제, 모바일 375px 확인. test/lint/build/eval 결과 기록. 배포는 별도 승인 |
 
 사용자에게 보이는 기능 추가이므로 출시 시 Web 버전 Minor를 올린다(docs/versioning.md).
+
+### 진행 기록
+
+- [x] Q1 `client/history.ts`: 읽기·추가(같은 질문+모드+버전 교체)·5건 제한·삭제·전체 삭제. 기존 응답 guard `isAskResponse`를 export해 저장 항목을 검사하고, 손상·위조 항목은 버린다. storage 차단·용량 초과 시 메모리 목록만 유지. React에는 `useSyncExternalStore` 어댑터(`historyStore`)로 연결해 서버 렌더·hydration은 빈 목록을 쓴다.
+- [x] Q2 `components/question-history.tsx` + `ask-panel.tsx`: 폼 아래 접힌 `최근 질문 N건`, 행(질문 한 줄·모드·버전·결과 요약·시각)·행별 삭제·전체 삭제. 행을 열면 폼 조건과 해당 모드 결과 슬롯을 복원하고 `저장된 결과` 배너·`다시 실행`(일반 제출과 동일)·앱 버전 불일치 경고를 표시한다. 요청 0건.
+- [x] Q3 `e2e/history.spec.ts`(병행 FR-22 작업과 겹치지 않게 별도 파일): 6건 → 새로고침 후 5건·최신순·기본 접힘, 열기 요청 0건과 `다시 실행` 1건, 삭제·전체 삭제 유지, 손상 JSON·위조 항목 무시, 이전 버전 경고, 375px 가로 스크롤 없음. `npm run test` 215/215, E2E 16/16, lint·typecheck·build 통과. 1280/375px 스크린샷 확인. 배포·Minor 버전 올림은 아직 하지 않았다.
 
 ### 보류
 

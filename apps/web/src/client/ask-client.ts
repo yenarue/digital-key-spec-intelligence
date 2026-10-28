@@ -18,7 +18,7 @@ function isEvidence(value: unknown): boolean {
     && (source.version === "V1" || source.version === "V2")
     && (source.heading === undefined || typeof source.heading === "string");
 }
-function isAskResponse(value: unknown): value is AskResponse {
+export function isAskResponse(value: unknown): value is AskResponse {
   if (value === null || typeof value !== "object") return false;
   const response = value as Partial<AskResponse>;
   return ["answered", "insufficient_evidence", "search_only", "llm_unavailable"].includes(response.status ?? "")

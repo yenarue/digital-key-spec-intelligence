@@ -1,15 +1,20 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import type { FormEvent, KeyboardEvent } from "react";
 import type { AskResponse, SearchMode } from "../contracts/ask";
 import { askQuestion, questionError, questionLength } from "../client/ask-client";
+import { addHistory, clearHistory, historyStore, removeHistory, type HistoryEntry } from "../client/history";
 import { EvidenceCard } from "./evidence-card";
 import { AnswerPanel } from "./answer-panel";
+import { QuestionHistory, savedTime, scopeLabel } from "./question-history";
 import { fill, uiText } from "../content/ui-text";
+import webPackage from "../../package.json";
 
 type Scope = "all" | "V1" | "V2";
-type SearchRun = { question: string; scope: Scope; mode: SearchMode; response: AskResponse };
+// `saved` marks a snapshot restored from browser history rather than a fresh response.
+type SearchRun = { question: string; scope: Scope; mode: SearchMode; response: AskResponse; saved?: { at: string; appVersion: string } };
 const text = uiText.search;
+const historyText = uiText.history;
 const modeLabels = text.modeLabels as Record<SearchMode, string>;
 const examples = text.examples as { label: string; question: string; scope: Scope }[];
 export function AskPanel() {
@@ -21,6 +26,8 @@ export function AskPanel() {
   // Only the current input is retained: at most one latest result per mode.
   const [results, setResults] = useState<Partial<Record<SearchMode, SearchRun>>>({});
   const [reused, setReused] = useState(false);
+  const history = useSyncExternalStore(historyStore.subscribe, historyStore.getSnapshot, historyStore.getServerSnapshot);
+  const form = useRef<HTMLFormElement>(null);
   const input = useRef<HTMLTextAreaElement>(null);
   const activeRequest = useRef<AbortController | null>(null);
   useEffect(() => () => { activeRequest.current?.abort(); }, []);
@@ -41,6 +48,13 @@ export function AskPanel() {
     setReused(Boolean(results[nextMode]));
     setError(null);
   }
+  function openHistory(entry: HistoryEntry) {
+    if (activeRequest.current) return;
+    const nextScope: Scope = entry.versions.length > 1 ? "all" : entry.versions[0];
+    setQuestion(entry.question); setScope(nextScope); setMode(entry.mode); setError(null); setReused(false);
+    setResults({ [entry.mode]: { question: entry.question, scope: nextScope, mode: entry.mode, response: entry.response,
+      saved: { at: entry.submittedAt, appVersion: entry.appVersion } } });
+  }
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (activeRequest.current) return;
@@ -49,6 +63,7 @@ export function AskPanel() {
     const controller = new AbortController();
     activeRequest.current = controller;
     const snapshot = { question: question.trim(), scope, mode };
+    const versions: HistoryEntry["versions"] = snapshot.scope === "all" ? ["V1", "V2"] : [snapshot.scope];
     setPending(true); setError(null); setReused(false);
     setResults(previous => {
       const next = { ...previous };
@@ -56,8 +71,12 @@ export function AskPanel() {
       return next;
     });
     try {
-      const response = await askQuestion({ question: snapshot.question, versions: snapshot.scope === "all" ? ["V1", "V2"] : [snapshot.scope], topK: 5, mode: snapshot.mode }, { signal: controller.signal });
-      if (activeRequest.current === controller) setResults(previous => ({ ...previous, [snapshot.mode]: { ...snapshot, response } }));
+      const response = await askQuestion({ question: snapshot.question, versions, topK: 5, mode: snapshot.mode }, { signal: controller.signal });
+      if (activeRequest.current === controller) {
+        setResults(previous => ({ ...previous, [snapshot.mode]: { ...snapshot, response } }));
+        historyStore.set(addHistory({ question: snapshot.question, mode: snapshot.mode, versions, topK: 5,
+          submittedAt: new Date().toISOString(), appVersion: webPackage.version, response }));
+      }
     } catch (caught) {
       if (!controller.signal.aborted) setError(caught instanceof Error ? caught.message : uiText.errors.generic);
     } finally {
@@ -69,7 +88,7 @@ export function AskPanel() {
     if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) { event.preventDefault(); event.currentTarget.form?.requestSubmit(); }
   }
   return <div className="ask-panel">
-    <form onSubmit={submit} aria-busy={pending} noValidate>
+    <form ref={form} onSubmit={submit} aria-busy={pending} noValidate>
       <div className="search-controls">
       <fieldset disabled={pending} className="version-options mode-options" aria-describedby="search-mode-hint"><legend>{text.modeLegend}</legend>
         <div className="version-control mode-control">{(["keyword", "ai"] as const).map(value => <label key={value}>
@@ -95,9 +114,15 @@ export function AskPanel() {
       <div className="examples"><span>{text.examplesLabel}</span>{examples.map(example => <button type="button" key={example.label} disabled={pending}
         onClick={() => { updateInput(example.question, example.scope); input.current?.focus(); }}>{example.label}<span aria-hidden="true"> ↗</span></button>)}</div>
     </form>
-    <p className="search-status" role="status" aria-live="polite">{pending ? (mode === "keyword" ? text.statusPendingKeyword : text.statusPendingAi) : result ? `${reused ? text.statusReused : text.statusDone} ${fill(submitted?.mode === "keyword" ? text.statusCountKeyword : text.statusCount, { count: result.sources.length })}` : ""}</p>
+    <QuestionHistory entries={history} disabled={pending} onOpen={openHistory}
+      onRemove={id => historyStore.set(removeHistory(id))} onClear={() => historyStore.set(clearHistory())} />
+    <p className="search-status" role="status" aria-live="polite">{pending ? (mode === "keyword" ? text.statusPendingKeyword : text.statusPendingAi) : result ? `${submitted?.saved ? historyText.statusSaved : reused ? text.statusReused : text.statusDone} ${fill(submitted?.mode === "keyword" ? text.statusCountKeyword : text.statusCount, { count: result.sources.length })}` : ""}</p>
     {pending && <div className="loading-skeleton" aria-hidden="true"><div /><div /><div /></div>}
     {!pending && result && <div className="result-block">
+      {submitted?.saved && <div className="saved-banner"><strong>{historyText.savedLabel}</strong>
+        <span>{savedTime(submitted.saved.at)} · {modeLabels[submitted.mode]} · {scopeLabel(submitted.scope === "all" ? ["V1", "V2"] : [submitted.scope])}</span>
+        <button type="button" onClick={() => form.current?.requestSubmit()}>{historyText.rerun}</button>
+        {submitted.saved.appVersion !== webPackage.version && <p>{historyText.versionMismatch}</p>}</div>}
       <div className="result-context"><span>{reused && <><span className="cached-result">{text.contextReused}</span> · </>}{submitted && modeLabels[submitted.mode]}{submitted?.mode === "ai" && (result.status === "llm_unavailable" || result.status === "search_only") ? ` · ${text.contextAiFallback}` : ""} · {submitted?.scope === "all" ? text.contextScopeAll : submitted?.scope} {text.contextScopeSuffix}</span>
         <span>{text.contextQuestion} {submitted?.question}</span></div>
       <div className={`results-grid${result.sources.length ? "" : " no-sources"}`}>

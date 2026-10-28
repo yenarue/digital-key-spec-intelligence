@@ -106,5 +106,20 @@
     "unreadable": "결과를 읽지 못했어요. 잠시 후 다시 시도해주세요.",
     "badRequest": "질문과 스펙 버전을 확인하고 다시 시도해주세요.",
     "generic": "요청을 완료하지 못했어요. 잠시 후 다시 시도해주세요."
+  },
+  "history": {
+    "summary": "최근 질문",
+    "count": "{count}건",
+    "note": "이 브라우저에만 저장돼요 · 최근 5건",
+    "clearAll": "전체 삭제",
+    "remove": "이 질문 삭제: {question}",
+    "resultAnswered": "AI 답변",
+    "resultSources": "근거 {count}개",
+    "resultSourcesKeyword": "관련 원문 {count}개",
+    "resultNone": "근거 없음",
+    "savedLabel": "저장된 결과",
+    "rerun": "다시 실행",
+    "versionMismatch": "이전 앱 버전에서 저장된 결과예요. 다시 실행해 최신 원문을 확인하세요.",
+    "statusSaved": "저장된 결과예요."
   }
 }
