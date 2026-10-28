@@ -11,7 +11,7 @@ const skillFile = (id: string, file: string) => `${REPO}/blob/main/.agents/skill
 
 export const metadata: Metadata = { title: content.meta.title, description: content.meta.description };
 
-const { hero, problem, interfaces, skills, roadmap } = content;
+const { hero, problem, interfaces, skills, skillPlan, roadmap } = content;
 export default function SkillsPage() {
   return <div className="app-shell">
     <a className="skip-link" href="#main">{uiText.intro.skipLink}</a>
@@ -52,6 +52,22 @@ export default function SkillsPage() {
           <strong lang="en">{interfaces.noticeTitle}</strong>
           <p>{interfaces.noticeBody}</p>
         </div>
+      </section>
+
+      <section className="landing-section" aria-labelledby="skill-plan-title">
+        <h2 id="skill-plan-title">{skillPlan.heading}</h2>
+        <dl className="skill-rationale">
+          <div><dt>{skillPlan.goalLabel}</dt><dd>{skillPlan.goal}</dd></div>
+          <div><dt>{skillPlan.whyLabel}</dt><dd>{skillPlan.why}</dd></div>
+        </dl>
+        <ol className="skill-plan">
+          {skillPlan.items.map(item => <li key={item.id} className={item.done ? "is-done" : undefined}>
+            <div className="card-head"><h3>{item.name}</h3><span className="status-label">{item.status}</span></div>
+            <code>{item.id}</code>
+            <p>{item.body}</p>
+          </li>)}
+        </ol>
+        <p className="skill-plan-link"><a href={`${REPO}/blob/main/docs/skills-plan.md`} target="_blank" rel="noopener noreferrer">{skillPlan.linkLabel}</a></p>
       </section>
 
       <section className="landing-section" aria-labelledby="skills-title">

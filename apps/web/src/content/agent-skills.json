@@ -14,9 +14,21 @@
   "problem": {
     "heading": "왜 만들었나요?",
     "items": [
-      { "label": "Problem", "title": "개발자마다 각자 AI에 스펙을 넣고 질문해요", "body": "같은 조항을 여러 번 찾고, 버전을 섞고, 답변의 근거를 확인하는 방법도 사람마다 달라요." },
-      { "label": "Web RAG", "title": "검색·해석·근거 확인을 하나의 서비스로", "body": "누구나 브라우저에서 질문하고, 선택한 버전의 원문 근거와 함께 답을 확인해요." },
-      { "label": "Agent Skills", "title": "개발자가 쓰는 AI의 분석 절차를 표준화", "body": "탐색과 검증을 두 개의 Skill로 나눠, 어떤 개발자가 물어도 같은 순서로 찾고 확인하게 해요." }
+      {
+        "label": "Problem",
+        "title": "개발자마다 각자 AI에 스펙을 넣고 질문해요",
+        "body": "같은 조항을 여러 번 찾고, 버전을 섞고, 답변의 근거를 확인하는 방법도 사람마다 달라요."
+      },
+      {
+        "label": "Web RAG",
+        "title": "검색·해석·근거 확인을 하나의 서비스로",
+        "body": "누구나 브라우저에서 질문하고, 선택한 버전의 원문 근거와 함께 답을 확인해요."
+      },
+      {
+        "label": "Agent Skills",
+        "title": "개발자가 쓰는 AI의 분석 절차를 표준화",
+        "body": "탐색과 검증을 두 개의 Skill로 나눠, 어떤 개발자가 물어도 같은 순서로 찾고 확인하게 해요."
+      }
     ]
   },
   "interfaces": {
@@ -27,22 +39,82 @@
         "kind": "서비스형 인터페이스",
         "status": "Live",
         "body": "브라우저에서 질문하면 스펙을 검색하고 원문 근거와 함께 답해요.",
-        "points": ["가상 V1/V2 스펙 검색과 버전 필터", "원문 근거 카드와 인용 검증", "링크만 있으면 누구나 사용"]
+        "points": [
+          "가상 V1/V2 스펙 검색과 버전 필터",
+          "원문 근거 카드와 인용 검증",
+          "링크만 있으면 누구나 사용"
+        ]
       },
       {
         "name": "Agent Skills",
         "kind": "개발자 워크플로형 인터페이스",
         "status": "2 Skills",
         "body": "개발자가 쓰는 AI 에이전트에 스펙을 찾고 검증하는 절차를 알려줘요.",
-        "points": ["저장소의 .agents/skills/에 정의", "Codex 등 호환 에이전트에서 호출", "탐색(Navigator)과 검증(Auditor)을 분리"]
+        "points": [
+          "저장소의 .agents/skills/에 정의",
+          "Codex 등 호환 에이전트에서 호출",
+          "탐색(Navigator)과 검증(Auditor)을 분리"
+        ]
       }
     ],
     "noticeTitle": "Skills are not executed by this web application.",
-    "noticeBody": "Skill은 이 웹앱 안에서 실행되지 않아요. 저장소를 Codex 등 호환 에이전트에서 열고 사용해요. 지금은 두 인터페이스가 서로 호출하지 않고, 향후 Local MCP로 같은 검색 도구에 연결할 계획이에요."
+    "noticeBody": "Skill은 이 웹앱 안에서 실행되지 않아요. 저장소를 Codex 등 호환 에이전트에서 열고 사용하며, 시연에는 이 사이트와 같은 가상 V1/V2 스펙만 써요. 지금은 두 인터페이스가 서로 호출하지 않고, 향후 Local MCP로 같은 검색 도구에 연결할 계획이에요."
+  },
+  "skillPlan": {
+    "heading": "Skill 설계 — 6개를 계획하고 2개를 먼저",
+    "linkLabel": "전체 Skill 계획 보기 (docs/skills-plan.md)",
+    "items": [
+      {
+        "id": "spec-requirement-navigator",
+        "name": "Requirement Navigator",
+        "body": "요구사항을 찾고 조건·예외를 해석해 원문 근거와 함께 답해요.",
+        "status": "구현 · P0",
+        "done": true
+      },
+      {
+        "id": "spec-answer-auditor",
+        "name": "Answer Auditor",
+        "body": "AI 답변의 주장과 인용을 원문과 대조해 검증해요.",
+        "status": "구현 · P0",
+        "done": true
+      },
+      {
+        "id": "spec-version-diff",
+        "name": "Version Diff",
+        "body": "V1→V2(향후 실제 규격 버전 간)에서 무엇이 바뀌었는지 구조화해 비교해요.",
+        "status": "계획 · P1",
+        "done": false
+      },
+      {
+        "id": "spec-testcase-deriver",
+        "name": "Testcase Deriver",
+        "body": "검증된 요구사항에서 Given/When/Then·경계·부정 테스트 케이스를 도출해요.",
+        "status": "계획 · P2",
+        "done": false
+      },
+      {
+        "id": "spec-impact-analyzer",
+        "name": "Impact Analyzer",
+        "body": "요구사항 변경이 영향을 줄 수 있는 구현 영역을 체크리스트로 정리해요.",
+        "status": "계획 · P2",
+        "done": false
+      },
+      {
+        "id": "spec-knowledge-curator",
+        "name": "Knowledge Curator",
+        "body": "검증된 팀 답변을 저장·갱신하고 스펙 버전이 바뀌면 무효화해요.",
+        "status": "계획 · P3",
+        "done": false
+      }
+    ],
+    "goalLabel": "목표",
+    "goal": "누가 어떤 AI로 물어도 같은 순서로 요구사항을 찾고, 원문 근거로 뒷받침되는 만큼만 답하게 만드는 것이에요. 그래서 검색 기능이 아니라 탐색 순서·조건과 예외 확인·근거 판정·답변 형식을 Skill로 정의했어요.",
+    "whyLabel": "왜 2개 먼저",
+    "why": "버전 비교, 테스트 케이스 도출, 영향 분석, 팀 지식 관리는 모두 ‘정확히 찾은 근거’와 ‘검증된 해석’을 입력으로 써요. 그래서 그 바탕이 되는 탐색(Navigator)과 검증(Auditor)을 먼저 만들었어요."
   },
   "skills": {
-    "heading": "Agent Skills",
-    "subheading": "저장소에 정의된 두 Skill이에요. Skill 시연도 이 사이트와 같은 독립 창작 가상 V1/V2 스펙을 사용해요. 실제 CCC 규격이 아니에요.",
+    "heading": "먼저 구현한 2개 Skill",
+    "subheading": "찾는 Skill과 확인하는 Skill을 일부러 나눴어요. 답을 만든 AI가 자기 답을 스스로 승인하지 않도록, 검증은 별도 절차로 실행해요.",
     "invokeLabel": "호출 예시",
     "statusLabel": "현재 상태",
     "linksLabel": "자세히 보기",
@@ -78,14 +150,33 @@
         "status": "SKILL.md 작성 완료 · Codex 수동 실행 기록 1건"
       }
     ],
-    "links": { "readme": "사용 가이드", "skill": "SKILL.md", "example": "실행 기록" }
+    "links": {
+      "readme": "사용 가이드",
+      "skill": "SKILL.md",
+      "example": "실행 기록"
+    }
   },
   "roadmap": {
     "heading": "Roadmap",
     "items": [
-      { "step": "1", "name": "Web RAG", "body": "가상 스펙 데이터 기반 웹서비스. 지금 보고 있는 이 사이트예요.", "status": "Live" },
-      { "step": "2", "name": "Agent Skills", "body": "Navigator / Auditor 워크플로. Codex에서 수동으로 실행해 확인했어요.", "status": "정의 · 수동 검증" },
-      { "step": "3", "name": "Local MCP", "body": "승인된 로컬 환경에서 실제 CCC 규격을 색인하고, 사내 승인 AI Agent와 Skill이 같은 검색 도구를 쓰도록 연결할 계획이에요. 실제 규격 원문은 공개 저장소·Vercel에 올리지 않아요.", "status": "Planned" }
+      {
+        "step": "1",
+        "name": "Web RAG",
+        "body": "가상 스펙 데이터 기반 웹서비스. 지금 보고 있는 이 사이트예요.",
+        "status": "Live"
+      },
+      {
+        "step": "2",
+        "name": "Agent Skills",
+        "body": "Navigator / Auditor 워크플로. Codex에서 수동으로 실행해 확인했어요.",
+        "status": "정의 · 수동 검증"
+      },
+      {
+        "step": "3",
+        "name": "Local MCP",
+        "body": "승인된 로컬 환경에서 실제 CCC 규격을 색인하고, 사내 승인 AI Agent와 Skill이 같은 검색 도구를 쓰도록 연결할 계획이에요. 실제 규격 원문은 공개 저장소·Vercel에 올리지 않아요.",
+        "status": "Planned"
+      }
     ]
   }
 }

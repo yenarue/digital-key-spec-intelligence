@@ -208,6 +208,10 @@ test('Agent Skills landing page introduces the Skills without running them', asy
       await expect(page.locator(`a[href="https://github.com/yenarue/digital-key-spec-intelligence/blob/main/.agents/skills/${id}/${file}"]`)).toHaveCount(1);
     }
   }
+  await expect(page.getByRole('heading', {name:/6개를 계획하고 2개를 먼저/})).toBeVisible();
+  await expect(page.locator('.skill-plan > li')).toHaveCount(6);
+  await expect(page.locator('.skill-plan > li.is-done')).toHaveCount(2);
+  await expect(page.locator('a[href="https://github.com/yenarue/digital-key-spec-intelligence/blob/main/docs/skills-plan.md"]')).toHaveCount(1);
   await expect(page.locator('a[href*="utm_"]')).toHaveCount(0);
   await expect(page.locator('main button')).toHaveCount(0);
   const mcp = page.getByRole('button', {name:'Local MCP · Coming soon'});
