@@ -8,7 +8,7 @@ export default function Home() {
     <a className="skip-link" href="#main">본문으로 건너뛰기</a>
     <AppHeader />
     <main id="main">
-      <div className="page-intro"><h1>궁금한 스펙 규칙을 근거와 함께 확인하세요</h1>
+      <div className="page-intro"><h1>디지털 키 스펙, 이제 질문으로 찾아보세요</h1>
         <p>디지털 키 스펙 문서에서 궁금한 규칙과 예외 사항을 질문해 보세요.</p></div>
       <details className="about">
         <summary>이 서비스는 무엇인가요?</summary>

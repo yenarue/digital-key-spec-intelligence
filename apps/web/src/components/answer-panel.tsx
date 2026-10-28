@@ -8,7 +8,7 @@ const labels = {
   answered: "근거 기반 답변",
   search_only: "검색 결과를 확인하세요",
   llm_unavailable: "AI 답변을 가져오지 못했어요",
-  insufficient_evidence: "이 데모용 가상 문서에서 답변 근거를 찾지 못했어요",
+  insufficient_evidence: "스펙 문서에서 답변 근거를 찾지 못했어요",
 };
 function focusEvidence(event: MouseEvent<HTMLAnchorElement>, targetId: string) {
   const target = document.getElementById(targetId);

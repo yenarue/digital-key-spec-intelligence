@@ -103,7 +103,7 @@ export function AskPanel() {
       <div className="examples"><span>예시 질문</span>{examples.map(example => <button type="button" key={example.label} disabled={pending}
         onClick={() => { updateInput(example.question, example.scope); input.current?.focus(); }}>{example.label}<span aria-hidden="true"> ↗</span></button>)}</div>
     </form>
-    <p className="search-status" role="status" aria-live="polite">{pending ? mode === "keyword" ? "원문 근거를 찾고 있어요." : "근거와 AI 답변을 준비하고 있어요." : result ? `${reused ? "이전 실행 결과예요." : "검색이 완료됐어요."} 근거 ${result.sources.length}개를 찾았어요.` : ""}</p>
+    <p className="search-status" role="status" aria-live="polite">{pending ? mode === "keyword" ? "스펙 문서 속을 열심히 뒤져 보고 있어요 🕵️" : "스펙 문서 속을 열심히 뒤져서 AI 답변을 준비하고 있어요 🕵️" : result ? `${reused ? "이전 실행 결과예요." : "검색이 완료됐어요."} 근거 ${result.sources.length}개를 찾았어요.` : ""}</p>
     {pending && <div className="loading-skeleton" aria-hidden="true"><div /><div /><div /></div>}
     {!pending && result && <div className="result-block">
       <div className="result-context"><span>{reused && <><span className="cached-result">이전 실행 결과</span> · </>}{submitted && modeLabels[submitted.mode]}{submitted?.mode === "ai" && (result.status === "llm_unavailable" || result.status === "search_only") ? " · 답변 생성 불가, 검색 근거 표시" : ""} · {submitted?.scope === "all" ? "전체 버전" : submitted?.scope} 문서</span>
