@@ -6,7 +6,7 @@ This public deployment uses only the independently authored files in `data/demo`
 
 - Node 24.x and npm 11+; repository-root `npm ci`.
 - Vercel CLI authentication (`vercel whoami`). The existing token was rejected during implementation; no successful deployment is recorded yet.
-- Optional OpenRouter free-model key, entered into local/Vercel server environment settings rather than chat, source files or CLI arguments.
+- Optional OpenRouter free-model key: locally use the repository-root `.env` or `apps/web/.env.local`; existing process/app variables take priority. Never use chat, tracked files or CLI arguments. Vercel needs its own server environment settings; local `.env` is not uploaded.
 
 ## Local verification
 
@@ -36,7 +36,7 @@ If account/project selection, a paid upgrade, or new permissions are required, r
 ## Verify the actual final URL
 
 - Homepage shows Digital Key Spec Intelligence in the header/browser title, the synthetic disclaimer, correct font and disabled Local MCP item on desktop/mobile.
-- `Web vX.Y.Z` above the signature footer matches `apps/web/package.json`; follow [versioning policy](versioning.md) for subsequent releases.
+- `vX.Y.Z` above the signature footer matches `apps/web/package.json`; follow [versioning policy](versioning.md) for subsequent releases.
 - Q1 with V1, Q3 with V2, Q5 with both: expected evidence in top five; no wrong-version results under a single-version filter.
 - Every quote/fullText matches the committed fictional requirement; expansion and citation navigation work.
 - Unknown spaceship question: `insufficient_evidence`, null answer and empty sources.

@@ -8,7 +8,7 @@
 
 ### 현재 실행 결과
 
-로컬 Core/API/UI 구현과 독립 리뷰를 마쳤다. 단위·통합163개, 검색 평가18개, 브라우저7개, lint/typecheck/build를 실제 실행해 통과했다. dev는 http://localhost:3000 에서 계속 실행 중이다. 전체 제품명과 manifest 기반 Web v0.1.0 표시도 추가했다. Vercel 로그인·OpenRouter 키가 없어 M2/M4(실모델)/M6(live)와 전체 A–E 완료 판정은 남아 있다.
+로컬 Core/API/UI 구현과 독립 리뷰를 마쳤다. 단위·통합163개, 검색 평가18개, 브라우저7개, lint/typecheck/build를 실제 실행해 통과했다. dev는 http://localhost:3000 에서 계속 실행 중이다. 전체 제품명과 manifest 기반 v0.1.0 표시도 추가했다. 루트 .env 로딩을 연결해 실제 무료 모델의 answered 응답과 원문 인용을 확인했다. Vercel 미로그인으로 M2/M6(live)와 전체 A–E 완료 판정은 남아 있다.
 
 ### 착수 시점의 자산과 부족한 부분 (기준 기록)
 
@@ -141,7 +141,7 @@ type ApiError = { error: { code: "invalid_request" | "payload_too_large" | "inte
 
 - [x] **U3 · Frontend · G1-local 후:** `answer-panel.tsx`, 기존 UI/client 파일에서 네 정상 status와 입력/네트워크 오류·warnings·검증된 인용→근거 focus를 구현한다. pending·중복 submit 방지·오래된 응답 차단·안전한 text 렌더링을 적용한다. Main 소유 shared fixture로 API agent와 독립 검증한다. 375/390px·1280px에서 Pretendard/긴 ID/원문을 읽을 수 있어야 한다.
 - [ ] **U4 · Frontend · U3 후, P1:** FR-15 예시 3개, FR-16 심화 keyboard/aria-live/대비·200% 확대·320px, FR-17 세분화된 loading/429 문구, 여유 시 시각 간격을 다듬는다. A안·Pretendard·기본 폼 label·비활성 MCP는 유지한다. G2는 U3만 기다리고 U4는 지연시키지 않는다.
-- [ ] **M4 · Main · G2 후:** Main 소유 `apps/web/e2e/ask.spec.ts`, Playwright 설정으로 실제 서버의 검색/버전/quote/확장/무근거/키 없음/비활성 MCP를 검증한다. 실제 AI는 별도 통제된 1회 확인과 조건·예외 수동 평가를 수행한다. 위임 권한·NFC 조건·시동 권한을 대조한다. 실제 성공 미확인은 FR-07 미확인으로 기록하고 전체 A–E 완료라 하지 않는다. U4는 해당 파일 소유권을 지키며 병행할 수 있으나 최종 브라우저 검사 전에 멈춘다.
+- [x] **M4 · Main · G2 후:** Main 소유 `apps/web/e2e/ask.spec.ts`, Playwright 설정으로 실제 서버의 검색/버전/quote/확장/무근거/키 없음/비활성 MCP를 검증한다. 실제 AI는 별도 통제된 1회 확인과 조건·예외 수동 평가를 수행한다. 위임 권한·NFC 조건·시동 권한을 대조한다. 실제 성공 미확인은 FR-07 미확인으로 기록하고 전체 A–E 완료라 하지 않는다. U4는 해당 파일 소유권을 지키며 병행할 수 있으나 최종 브라우저 검사 전에 멈춘다.
 
 **G3 완료:** 실제 사용자 흐름·안전·기본 모바일 화면이 동작하고 실제 모델 성공/미확인을 구분한 기록이 있다. P1 보류 항목을 표시한다.
 
@@ -366,3 +366,9 @@ Vercel 계정 접근/프로젝트 연결/secret 설정 권한이 없다면 필�
 - [x] **I1 / Main / N1+V1:** Place version above signature footer, document policy, verify build/test/browser including mobile overflow.
 
 - Implementation commits: f10d484 (workspace/contracts/core), db91949 (RAG API/fallback), ecd4a81 (A안 UI/browser regressions), 9e45c29 (full name), dae2a24 (Web version policy/display). Documentation/report commit follows. These commits partition the final integrated source by responsibility; the final integrated tree, not every intermediate commit, was tested. No remote push or deployment is claimed.
+
+- User follow-up: removed visible `Web` prefix; release stays above signature footer as `v0.1.0`. Root `.env` is now an optional Next configuration-time fallback (Node24 loadEnvFile), preserving process/app variable precedence. Dummy precedence check passed. Real key remains ignored and never printed, committed or uploaded. `.vercelignore` also excludes `.next-dev` caches.
+- Actual OpenRouter through local app/server API: three explicitly bounded manual trials (no automatic retries). Trial1 topK5: citation validation withheld the response, 5 search hits retained. Trial2 diagnostic: 10s timeout. Trial3 topK1: HTTP200 answered in2508ms, one original V2 REQ012 source. Korean answer correctly states entry-only does not imply vehicle-start permission; exact source and citation manually checked. This confirms one real case, not general model reliability; default topK5 free-router availability/format variability remains a known limitation.
+- M4 actual model check completed; G3 complete for tested local flows. Vercel CLI remains logged out. M2/M5(deployment prerequisite)/M6/D1–D7 remain pending actual Vercel setup/URL. Latest implementation push will precede the user's first deployment.
+
+- Post-root-env regression: `npm run test`163/163, lint/build, Playwright7/7 passed with the E2E process key explicitly blank (root .env did not override it). Actual key scan across45 production/dev client files found no key in bundles. `.env` is ignored and excluded from commit/deployment. Release display is now `v0.1.0` without the Web prefix.

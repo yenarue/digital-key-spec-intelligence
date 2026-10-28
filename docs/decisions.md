@@ -53,3 +53,9 @@
 - Use the full product name, Digital Key Spec Intelligence, in the header and browser title. Keep the DKSI wordmark.
 - Web release version is a separate concern from fictional spec V1/V2. Display Web vX.Y.Z above the signature footer, read from apps/web/package.json.
 - Use Major for incompatible contracts/workflows, Minor for compatible feature additions, Patch for fixes/UI/copy; increase per subsequent release, not per commit. Initial unshipped implementation remains 0.1.0. Full policy: docs/versioning.md.
+
+## 2026-10-29 — Root env and actual free-model verification
+- User-provided repository-root .env is loaded only at Next configuration time with Node24 loadEnvFile. Existing process/app environment values take precedence, including the blank test key. No secret value was printed or added to Git/Vercel uploads.
+- Actual local server API trial: a V2 entry-only query with topK1 returned answered in2508ms and cited exactly REQ012; manual check confirmed the explicit prohibition. Two other bounded trials were withheld for citation validation/timeout. Keep free-router failure fallback and no automatic retry; one real success is not a reliability guarantee.
+- Removed the visible Web prefix: show v0.1.0 above the signature footer. Root dotenv support is a local configuration improvement, not an upload of env files.
+- After root-env support, 163 tests/lint/build and 7 E2E passed; explicitly blank test environment key stays blank. Actual credential scan across 45 client bundle files passed without printing its value.

@@ -2,7 +2,7 @@
 
 Next.js App Router + TypeScript + Tailwind. A안 Clear Desk, local Pretendard WOFF2와 license를 사용한다. 실제 `POST /api/ask`가 shared core 검색을 호출하며 키 미설정 시 검색 전용으로 동작한다.
 
-저장소 루트에서 `npm ci`, `npm run dev` 후 http://localhost:3000 을 연다. 선택적 `.env.local`은 이 디렉터리에 두고 절대 커밋하지 않는다. `OPENROUTER_API_KEY`는 서버 전용, `OPENROUTER_MODEL` 기본은 `openrouter/free`다.
+저장소 루트에서 `npm ci`, `npm run dev` 후 http://localhost:3000 을 연다. 선택적 키는 저장소 루트 `.env` 또는 이 디렉터리의 `.env.local`에 두고 절대 커밋하지 않는다. Next 설정 로딩 시 루트 `.env`를 보충하며 기존 process 환경변수와 앱 설정이 우선한다. `OPENROUTER_API_KEY`는 서버 전용, `OPENROUTER_MODEL` 기본은 `openrouter/free`다.
 
 - `src/contracts`: client/server wire types
 - `src/server/corpus.ts`, `ask-runtime.ts`: Main이 관리하는 synthetic-only 조립점
@@ -12,4 +12,4 @@ Next.js App Router + TypeScript + Tailwind. A안 Clear Desk, local Pretendard WO
 
 무근거는 insufficient_evidence, 키 없음은 search_only, 모델 오류/인용 검증 실패는 llm_unavailable과 검색 sources를 반환한다. same-origin 검사는 인증이나 전역 rate limit이 아니다. Local MCP는 disabled/aria-disabled이고 별도 서버/페이지는 없다.
 
-Vercel 인증·실제 URL·실모델 확인은 아직 미완료다. [배포 가이드](../../docs/deployment.md)와 [PLAN](../../PLAN.md)을 확인한다. Skill 파일은 Web에서 실행하지 않는다.
+Vercel 인증·실제 URL 확인은 아직 미완료다. 실모델 결과는 PLAN 실행 로그를 확인한다. [배포 가이드](../../docs/deployment.md)와 [PLAN](../../PLAN.md)을 확인한다. Skill 파일은 Web에서 실행하지 않는다.

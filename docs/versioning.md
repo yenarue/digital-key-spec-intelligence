@@ -4,9 +4,9 @@ Digital Key Spec Intelligence Web 앱은 **`major.minor.patch`** 형식을 사�
 
 ## 버전의 기준
 
-Web 앱 버전의 단일 기준은 [`apps/web/package.json`](../apps/web/package.json)의 `version`이다. 화면은 이 값을 빌드 시 읽어 제작자 서명 footer 바로 위에 `Web v0.1.0`처럼 표시한다. 버전 문자열을 컴포넌트·환경변수에 따로 하드코딩하지 않는다. 버전 변경 뒤에는 새 빌드·배포가 필요하다.
+Web 앱 버전의 단일 기준은 [`apps/web/package.json`](../apps/web/package.json)의 `version`이다. 화면은 이 값을 빌드 시 읽어 제작자 서명 footer 바로 위에 `v0.1.0`처럼 표시한다. 버전 문자열을 컴포넌트·환경변수에 따로 하드코딩하지 않는다. 버전 변경 뒤에는 새 빌드·배포가 필요하다.
 
-합성 규격 데이터의 **V1/V2는 문서 버전**이며 Web 앱의 릴리스 버전과 독립적이다. 예를 들어 Web v0.1.1에서도 합성 V1/V2를 모두 검색할 수 있다. 루트 관리 패키지나 `spec-core` 패키지 버전도 Web 표시 값의 기준으로 사용하지 않는다.
+합성 규격 데이터의 **V1/V2는 문서 버전**이며 Web 앱의 릴리스 버전과 독립적이다. 예를 들어 앱 v0.1.1에서도 합성 V1/V2를 모두 검색할 수 있다. 루트 관리 패키지나 `spec-core` 패키지 버전도 Web 표시 값의 기준으로 사용하지 않는다.
 
 ## 증가 규칙
 
@@ -33,7 +33,7 @@ Web 앱 버전의 단일 기준은 [`apps/web/package.json`](../apps/web/package
 
 3. `apps/web/package.json`과 루트 `package-lock.json`의 해당 workspace 버전 변경을 함께 검토·커밋한다. 루트/다른 workspace 버전을 일괄 변경하지 않는다.
 4. 릴리스 기록에 버전·주요 변경·알려진 한계·검증 결과를 남긴다. `npm run test`, `npm run lint`, `npm run build`를 실행하고, 검색·API 변경은 `npm run eval`, 화면/흐름 변경은 해당 브라우저 회귀도 확인한다.
-5. 검증된 소스를 배포하고 실제 URL의 `Web vX.Y.Z`가 배포 대상 버전과 일치하는지 확인한다. 모델·배포 미확인 항목을 완료로 기록하지 않는다.
+5. 검증된 소스를 배포하고 실제 URL의 `vX.Y.Z`가 배포 대상 버전과 일치하는지 확인한다. 모델·배포 미확인 항목을 완료로 기록하지 않는다.
 6. 필요하면 실제 배포 검증을 마친 커밋에 `web-vX.Y.Z` 태그를 붙인다. `--no-git-tag-version`을 사용하므로 버전 명령 자체는 커밋·태그를 자동 생성하지 않는다. Git push·배포는 Main Agent가 조율한다.
 
 현재 릴리스 기준은 `0.1.0`이며 실제 배포 URL과 실모델 검증 결과는 별도의 배포 기록에서 관리한다. 버전 숫자만으로 배포·테스트 완료를 주장하지 않는다.

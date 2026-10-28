@@ -2,6 +2,8 @@
 node_modules
 **/node_modules
 **/.next
+.next-dev
+**/.next-dev
 **/.env
 **/.env.*
 .env
@@ -12,3 +14,7 @@ output
 **/test-results
 **/playwright-report
 design-preview.html
+
+# Agent-only local configuration is not part of the Web runtime
+.claude
+CLAUDE.md
