@@ -8,7 +8,7 @@ const request = {question:'NFC 태그로 접근할 수 있나?',versions:['V1'] 
 const actual = retriever.searchRequirements(request.question,{versions:request.versions});
 const source = actual[0];
 function setup(payload: unknown, status=200) {
-  const fetchImpl = vi.fn<typeof fetch>().mockResolvedValue(Response.json(payload,{status}));
+  const fetchImpl = vi.fn<typeof fetch>().mockImplementation(async()=>Response.json(payload,{status}));
   return {fetchImpl, service:createAskService({corpus,retriever,validator:new SourceEvidenceValidator(),llmProvider:new OpenRouterProvider({apiKey:'unit-test-not-a-real-key',fetchImpl})})};
 }
 function completion(citationId=source.citationId, quote=source.quote) {
@@ -43,5 +43,18 @@ describe('actual retrieval + provider parsing + original-source validation',()=>
     const {service,fetchImpl}=setup(completion());
     expect(await service({question:'우주선 추진엔진 사양이 뭐야?'})).toMatchObject({status:'insufficient_evidence',answer:null,sources:[]});
     expect(fetchImpl).not.toHaveBeenCalled();
+  });
+  it('changes only generation between modes: identical exact sources, zero keyword calls and one AI call',async()=>{
+    const {service,fetchImpl}=setup(completion());
+    const keyword=await service({...request,mode:'keyword'});
+    expect(keyword).toEqual({status:'search_only',answer:null,sources:actual,warnings:[]});
+    expect(fetchImpl).not.toHaveBeenCalled();
+    const ai=await service({...request,mode:'ai'});
+    expect(ai.status).toBe('answered');
+    expect(ai.sources).toEqual(keyword.sources);
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+    const legacy=await service(request);
+    expect(legacy).toEqual(ai);
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
   });
 });

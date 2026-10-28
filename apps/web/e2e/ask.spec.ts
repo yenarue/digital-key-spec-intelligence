@@ -66,11 +66,12 @@ for (const width of [375,1280]) {
 }
 
 test('mocked answered UI safely links to an actual source and focuses its card', async ({ page, request }) => {
-  const actualResponse=await request.post('/api/ask',{data:{question:'NFC',versions:['V1']}});
+  const actualResponse=await request.post('/api/ask',{data:{question:'NFC',versions:['V1'],mode:'keyword'}});
   const actual=await actualResponse.json();
   const source=actual.sources[0];
   await page.route('**/api/ask',route=>route.fulfill({json:{...actual,status:'answered',answer:`<b>권한</b>은 별도로 확인해야 합니다. [${source.citationId}]`,warnings:[]}}));
   await page.goto('/');
+  await page.getByRole('radio',{name:'AI 검색',exact:true}).check();
   await page.getByRole('textbox',{name:'질문',exact:true}).fill('NFC');
   await page.getByRole('button',{name:/^근거 찾기/}).click();
   await expect(page.getByText('<b>권한</b>은 별도로 확인해야 합니다.',{exact:false})).toBeVisible();
@@ -84,20 +85,94 @@ test('mocked answered UI safely links to an actual source and focuses its card',
 });
 
 test('pending request prevents duplicate sends and preserves input on fallback',async({page,request})=>{
-  const actual=await (await request.post('/api/ask',{data:{question:'NFC',versions:['V1']}})).json();
+  const actual=await (await request.post('/api/ask',{data:{question:'NFC',versions:['V1'],mode:'keyword'}})).json();
   let calls=0;
   let release!:()=>void;
   const ready=new Promise<void>(resolve=>{release=resolve;});
   await page.route('**/api/ask',async route=>{calls++;await ready;await route.fulfill({json:actual});});
   await page.goto('/');
+  await page.getByRole('radio',{name:'AI 검색',exact:true}).check();
   const input=page.getByRole('textbox',{name:'질문',exact:true});
   await input.fill('NFC');
   await page.getByRole('button',{name:/^근거 찾기/}).click();
   await expect(input).toBeDisabled();
+  await expect(page.getByRole('radio',{name:'키워드 검색',exact:true})).toBeDisabled();
+  await expect(page.getByRole('radio',{name:'AI 검색',exact:true})).toBeDisabled();
   await expect(page.getByRole('button',{name:/^찾는 중/})).toBeDisabled();
   await page.locator('form').evaluate(form=>{(form as HTMLFormElement).requestSubmit();});
   release();
   await expect(page.getByText('검색 결과를 확인하세요',{exact:true})).toBeVisible();
   expect(calls).toBe(1);
   await expect(input).toHaveValue('NFC');
+});
+
+
+test('explicit modes reuse current-input results without automatic requests and clear on input/version changes',async({page,request})=>{
+  const actual=await (await request.post('/api/ask',{data:{question:'NFC',versions:['V1'],mode:'keyword'}})).json();
+  const source=actual.sources[0];
+  const calls: {mode:string;question:string;versions:string[];topK:number}[]=[];
+  await page.route('**/api/ask',async route=>{
+    const body=route.request().postDataJSON();
+    calls.push(body);
+    await route.fulfill({json:body.mode==='keyword' ? {...actual,warnings:[]} : {...actual,status:'answered',answer:`가상 조건입니다. [${source.citationId}]`,warnings:[]}});
+  });
+  await page.goto('/');
+  const keyword=page.getByRole('radio',{name:'키워드 검색',exact:true});
+  const ai=page.getByRole('radio',{name:'AI 검색',exact:true});
+  const input=page.getByRole('textbox',{name:'질문',exact:true});
+  const submit=page.getByRole('button',{name:/^근거 찾기/});
+  await expect(keyword).toBeChecked();
+  await page.getByRole('button',{name:/^시동 권한/}).click();
+  await ai.check(); await keyword.check();
+  await input.fill('NFC');
+  await page.getByRole('radio',{name:'V1',exact:true}).check();
+  expect(calls).toHaveLength(0);
+  await submit.click();
+  await expect(page.getByRole('heading',{name:'키워드 검색 결과',exact:true})).toBeVisible();
+  expect(calls).toEqual([{question:'NFC',versions:['V1'],topK:5,mode:'keyword'}]);
+  await expect(page.locator('.result-context')).toContainText('키워드 검색');
+  await ai.check();
+  await expect(page.locator('.result-block')).toHaveCount(0);
+  expect(calls).toHaveLength(1);
+  await submit.click();
+  await expect(page.getByRole('heading',{name:'근거 기반 답변',exact:true})).toBeVisible();
+  expect(calls[1]).toMatchObject({mode:'ai',question:'NFC',versions:['V1'],topK:5});
+  await expect(page.locator('.result-context')).toContainText('AI 검색');
+  await keyword.check();
+  await expect(page.getByRole('heading',{name:'키워드 검색 결과',exact:true})).toBeVisible();
+  await expect(page.locator('.result-context')).toContainText('이전 실행 결과');
+  await ai.check();
+  await expect(page.getByRole('heading',{name:'근거 기반 답변',exact:true})).toBeVisible();
+  await expect(page.locator('.result-context')).toContainText('이전 실행 결과');
+  expect(calls).toHaveLength(2);
+  // Explicit resubmission is intentional: it must not silently reuse the cache.
+  await submit.click();
+  await expect(page.getByRole('heading',{name:'근거 기반 답변',exact:true})).toBeVisible();
+  expect(calls).toHaveLength(3);
+  await input.fill('BLE');
+  await expect(page.locator('.result-block')).toHaveCount(0);
+  await keyword.check();
+  await expect(page.locator('.result-block')).toHaveCount(0);
+  await input.fill('NFC');
+  await expect(page.locator('.result-block')).toHaveCount(0);
+  await submit.click();
+  await expect(page.getByRole('heading',{name:'키워드 검색 결과',exact:true})).toBeVisible();
+  expect(calls).toHaveLength(4);
+  await page.getByRole('radio',{name:'V2',exact:true}).check();
+  await page.getByRole('radio',{name:'V1',exact:true}).check();
+  await expect(page.locator('.result-block')).toHaveCount(0);
+  expect(calls).toHaveLength(4);
+});
+
+test('AI failure preserves evidence with a different label from intentional keyword search',async({page,request})=>{
+  const actual=await (await request.post('/api/ask',{data:{question:'NFC',versions:['V1'],mode:'keyword'}})).json();
+  await page.route('**/api/ask',route=>route.fulfill({json:{...actual,status:'llm_unavailable',warnings:['AI 답변 대기 시간이 초과되었습니다. 검색된 근거를 확인해주세요.']}}));
+  await page.goto('/');
+  await page.getByRole('radio',{name:'AI 검색',exact:true}).check();
+  await page.getByRole('textbox',{name:'질문',exact:true}).fill('NFC');
+  await page.getByRole('button',{name:/^근거 찾기/}).click();
+  await expect(page.getByRole('heading',{name:'AI 답변을 가져오지 못했어요',exact:true})).toBeVisible();
+  await expect(page.locator('.result-context')).toContainText('AI 검색');
+  await expect(page.getByText(actual.sources[0].requirementId,{exact:true}).first()).toBeVisible();
+  await expect(page.getByRole('heading',{name:'키워드 검색 결과',exact:true})).toHaveCount(0);
 });

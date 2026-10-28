@@ -31,4 +31,16 @@ describe('real synthetic corpus to search service', () => {
   it('does not invent an answer or sources for an unsupported question', async () => {
     expect(await getAskService()({question:'우주선 추진엔진 사양이 뭐야?'})).toEqual({status:'insufficient_evidence',answer:null,sources:[],warnings:[]});
   });
+  it('explicit keyword mode bypasses even a keyed forbidden model at the runtime boundary', async () => {
+    vi.stubEnv('OPENROUTER_API_KEY','unit-test-not-a-real-key');
+    vi.stubEnv('OPENROUTER_MODEL','paid/model');
+    const fetchSpy = vi.spyOn(globalThis,'fetch').mockRejectedValue(new Error('No network allowed'));
+    try {
+      const result = await getAskService()({question:'NFC',versions:['V1'],mode:'keyword'});
+      expect(result).toMatchObject({status:'search_only',answer:null,warnings:[]});
+      expect(result.sources.length).toBeGreaterThan(0);
+      expect(result.sources.every(source=>source.version==='V1')).toBe(true);
+      expect(fetchSpy).not.toHaveBeenCalled();
+    } finally { fetchSpy.mockRestore(); }
+  });
 });

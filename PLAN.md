@@ -425,9 +425,9 @@ UI는 `mode`를 항상 명시한다. **API에서 mode를 생략한 기존 클라
 경로는 `apps/web/` 기준이며 Main 계약/fixture/설정 파일은 Subagent가 수정하지 않는다. 공통 파일 변경은 기존 §6 절차를 따른다.
 
 - [x] **S0 · Main · G4 및 M7 후 / 후속 P1:** 배포 기준 커밋·버전을 기록한 뒤 위 mode 계약·UI 기본 keyword/API 생략 ai·모드별 메모리 결과 범위를 확정하고 PRD/DESIGN/테스트 fixture를 갱신한다. 첫 배포가 미완료이면 시작하지 않는다.
-- [ ] **S1 · API Agent · S0 후 / S2와 병렬:** mode 검증과 서버 생성 분기를 구현한다. keyword는 항상 retriever까지만 실행하고 모델 호출을 건너뛴다. ai의 인용 검증·실패 fallback·1회 상한은 유지한다. 설정된 fake 키/금지 모델에서도 keyword 결과가 정상이고 provider가 호출되지 않는 targeted 테스트를 제출한다.
-- [ ] **S2 · UI Agent · S0 후 / S1과 병렬:** 검색 방식 선택, 요청 mode 전달, 제출 당시 모드 표기, 의도된 keyword와 AI fallback 안내 구분을 구현한다. 전환만으로 호출하지 않고 동일 입력의 모드별 최신 결과를 재사용해 비교한다. 입력 변경·pending·재제출·모바일·keyboard 상태를 검사한다.
-- [ ] **S3 · Main · S1+S2 후 / Integration Gate G5:** 실제 UI→API→코어를 통합하고 아래 수용 기준과 test/eval/lint/build·관련 E2E를 실행한다. 단순 화면 상태가 아니라 서버 provider 호출 횟수를 검사한다. 기존 무근거·버전 격리·인용 거부·AI 장애 회귀가 통과해야 한다.
+- [x] **S1 · API Agent · S0 후 / S2와 병렬:** mode 검증과 서버 생성 분기를 구현한다. keyword는 항상 retriever까지만 실행하고 모델 호출을 건너뛴다. ai의 인용 검증·실패 fallback·1회 상한은 유지한다. 설정된 fake 키/금지 모델에서도 keyword 결과가 정상이고 provider가 호출되지 않는 targeted 테스트를 제출한다.
+- [x] **S2 · UI Agent · S0 후 / S1과 병렬:** 검색 방식 선택, 요청 mode 전달, 제출 당시 모드 표기, 의도된 keyword와 AI fallback 안내 구분을 구현한다. 전환만으로 호출하지 않고 동일 입력의 모드별 최신 결과를 재사용해 비교한다. 입력 변경·pending·재제출·모바일·keyboard 상태를 검사한다.
+- [x] **S3 · Main · S1+S2 후 / Integration Gate G5:** 실제 UI→API→코어를 통합하고 아래 수용 기준과 test/eval/lint/build·관련 E2E를 실행한다. 단순 화면 상태가 아니라 서버 provider 호출 횟수를 검사한다. 기존 무근거·버전 격리·인용 거부·AI 장애 회귀가 통과해야 한다.
 - [ ] **S4 · Main · S3/G5 후 / 다음 릴리스:** 호환 기능 추가로 Minor를 증가시킨다. 첫 배포가0.1.0이면 다음 목표는0.2.0이며, 실제 배포 기준이 다르면 그 버전에서 계산한다. 지금 버전을 올리거나 태그를 만들지 않는다. Preview→Production 배포 후 실제 URL에서 두 모드·표시 버전·키워드 무호출을 확인하고 결과를 기록한다.
 
 ### 수용 기준과 검증
@@ -462,3 +462,7 @@ Evidence before the final60s/2,400-token combination: live app sharing answered 
 
 - S0: baseline first Production v0.1.1, latest shared revision fb83427 (other session copy edits preserved). Main added SearchMode and optional AskRequest.mode, PRD FR-18/19 and DESIGN interaction rules. UI default keyword, omitted API mode ai, response unchanged; no Core changes. API/UI exclusive owners follow §13; Main owns contracts/integration/E2E/docs/release. Baseline npm run test168/168 passed.
 - Read-only live reviewer: v0.1.1 desktop1280/mobile375 no overflow, inert MCP, actual Q5 answered with V1/V2 REQ008 ranks1/2, correct once vs two retries/backoff, citation focus and full-text expansion verified. Recent Vercel error-level function logs empty. Remaining cosmetic favicon404 will be fixed in follow-up. These are actual live checks, separate from stubbed E2E.
+
+- S1 complete: API Agent changed request-validation/ask-service and tests plus route tests. Targeted73/73 passed; keyword with configured fake key and free/forbidden model skips generation/validator/network. Invalid mode rejected before runtime; omitted ai compatible.
+- S2 complete: UI Agent changed ask-panel/answer-panel/globals.css/client tests. Default keyword, explicit mode, same-input two-slot memory, reused labels and snapshot context, pending controls and current-input invalidation implemented; 9 examples/user wording/footer preserved.
+- S3/G5: Main added actual runtime/real retriever-provider-validator mode integration and browser regressions. Full npm run test198/198, eval18/18 (17/17 expectedIDs@5), lint/build and E2E9/9 passed. Fixed repeated-Response test fixture consumption (new Response per fake fetch), not runtime behavior. Keyword/ai source equality and zero keyword calls proven; E2E AI states explicitly stubbed, live-model proof recorded separately. Cross-review by API/UI agents found no material defect. Added icon.svg for live favicon404. S4 release/live checks next.
