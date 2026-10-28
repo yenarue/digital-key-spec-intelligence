@@ -1,0 +1,16 @@
+{
+  "name": "digital-key-spec-intelligence",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Planning scaffold: app workspaces to be implemented by Codex",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "echo \"Not implemented: scaffold Next.js app first\" && exit 1",
+    "build": "echo \"Not implemented: scaffold Next.js app first\" && exit 1",
+    "test": "echo \"Not implemented: add tests first\" && exit 1",
+    "lint": "echo \"Not implemented: add lint config first\" && exit 1"
+  }
+}
