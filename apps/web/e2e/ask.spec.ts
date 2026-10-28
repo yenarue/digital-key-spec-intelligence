@@ -36,13 +36,15 @@ test('question to actual search, source expansion and inert MCP', async ({ page 
   await page.mouse.move(0, 700);
   await expect(page.getByRole('tooltip')).toBeHidden();
   await expect(page.getByRole('button', {name:'Local MCP · Coming soon'})).toBeDisabled();
+  await page.getByText('이 서비스는 무엇인가요?').click();
+  await expect(page.getByText('원문 근거를 함께 보여줘요', {exact:false})).toBeVisible();
   await page.getByRole('radio', {name:'V1', exact:true}).check();
   await page.getByRole('textbox', {name:'질문', exact:true}).fill('NFC 태그로 접근할 수 있나?');
   await page.getByRole('button', {name:/^근거 찾기/}).click();
   await expect(page.getByText('DEMO-V1-REQ-011', {exact:true}).first()).toBeVisible();
   await expect(page.getByText('DEMO-V2-REQ-011', {exact:true})).toHaveCount(0);
   await page.getByText('원문 전체 보기', {exact:true}).first().click();
-  await expect(page.locator('details[open]')).toHaveCount(1);
+  await expect(page.locator('details[open]:not(.about)')).toHaveCount(1);
 });
 
 test('unsupported question shows honest empty state', async ({ page }) => {

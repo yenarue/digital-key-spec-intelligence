@@ -9,3 +9,8 @@
 
 .app-release{margin:0;padding-top:24px;text-align:center;font-size:13px;line-height:22px;color:var(--muted)}
 .app-release+.signature-footer{margin-top:16px}
+
+.about{margin:0 0 24px;font-size:14px;line-height:24px;color:var(--secondary)}
+.about summary{display:inline-block;cursor:pointer;color:var(--accent);font-weight:600;min-height:28px}
+.about ul{margin:8px 0 0;padding:14px 18px 14px 34px;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+.about li+li{margin-top:4px}
