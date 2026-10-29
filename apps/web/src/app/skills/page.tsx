@@ -79,17 +79,6 @@ export default function SkillsPage() {
       <section className="landing-section" aria-labelledby="roadmap-title">
         <h2 id="roadmap-title">{roadmap.heading}</h2>
         <p className="section-lead">{roadmap.lead}</p>
-        <ol className="roadmap">
-          {roadmap.items.map(item => <li key={item.step}>
-            <span className="roadmap-step" aria-hidden="true">{item.step}</span>
-            <div><div className="card-head"><h3>{item.name}</h3><span className="status-label">{item.status}</span></div>
-              <p>{item.body}</p>
-              <dl className="roadmap-pain">
-                <div><dt>{roadmap.painLabel}</dt><dd>{item.pain}</dd></div>
-                <div><dt>{roadmap.solvedLabel}</dt><dd>{item.solved}</dd></div>
-              </dl></div>
-          </li>)}
-        </ol>
         <figure className="arch" aria-labelledby="arch-caption">
           <div className="arch-flow">
             {roadmap.arch.columns.map((column, index) => <div className="arch-step" key={column.title}>
@@ -106,6 +95,17 @@ export default function SkillsPage() {
           </div>
           <figcaption id="arch-caption"><strong>{roadmap.arch.label}</strong> · {roadmap.arch.caption}</figcaption>
         </figure>
+        <ol className="roadmap">
+          {roadmap.items.map(item => <li key={item.step}>
+            <span className="roadmap-step" aria-hidden="true">{item.step}</span>
+            <div><div className="card-head"><h3>{item.name}</h3><span className="status-label">{item.status}</span></div>
+              <p>{item.body}</p>
+              <dl className="roadmap-pain">
+                <div><dt>{roadmap.painLabel}</dt><dd>{item.pain}</dd></div>
+                <div><dt>{roadmap.solvedLabel}</dt><dd>{item.solved}</dd></div>
+              </dl></div>
+          </li>)}
+        </ol>
       </section>
     </main>
     <AppRelease />
