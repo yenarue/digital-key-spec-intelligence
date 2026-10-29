@@ -42,11 +42,11 @@ test('scenario simulator applies reviewed rules step by step', async ({ page }) 
   await expect(verdict('출입')).toContainText('출입 허용');
   await expect(verdict('시동')).toContainText('시동 불가');
   await expect(verdict('시동')).toContainText('시동 권한 없음');
-  await expect(page.locator('.scenario-steps code', {hasText:'DEMO-V2-REQ-011'})).toBeVisible();
+  await expect(page.locator('.scenario-steps .ref-button', {hasText:'DEMO-V2-REQ-011'})).toBeVisible();
 
   await page.getByLabel('스펙 버전').selectOption('V1');
-  await expect(page.locator('.scenario-steps code', {hasText:'DEMO-V1-REQ-011'})).toBeVisible();
-  await expect(page.locator('.scenario-steps code', {hasText:'DEMO-V2-REQ-011'})).toHaveCount(0);
+  await expect(page.locator('.scenario-steps .ref-button', {hasText:'DEMO-V1-REQ-011'})).toBeVisible();
+  await expect(page.locator('.scenario-steps .ref-button', {hasText:'DEMO-V2-REQ-011'})).toHaveCount(0);
 
   await page.getByLabel('NFC 출입 허용').selectOption('n');
   await expect(verdict('출입')).toContainText('출입 거부');
@@ -70,3 +70,30 @@ for (const width of [375, 1280]) {
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   });
 }
+
+test('rule reference opens the original text with the supporting quote highlighted', async ({ page }) => {
+  await page.setViewportSize({width:1280, height:900});
+  await page.goto('/overview');
+  await expect(page.getByText('단계의 순서는 이해를 돕기 위한 정리예요.')).toBeVisible();
+  await expect(page.locator('.source-empty')).toBeVisible();
+  await page.locator('.ref-button', {hasText:'DEMO-V2-REQ-012'}).click();
+  await expect(page.locator('.source-text mark')).toHaveText("Entry-only or NFC-only permission SHALL NOT imply vehicle-start permission");
+  await expect(page.locator('.source-id')).toContainText('V2');
+  await page.getByLabel('스펙 버전').selectOption('V1');
+  await expect(page.locator('.source-empty')).toBeVisible();
+  await page.locator('.ref-button', {hasText:'DEMO-V1-REQ-012'}).click();
+  await expect(page.locator('.source-text mark')).toHaveText("Entry-only access SHALL NOT imply permission to start the vehicle");
+  await page.keyboard.press('Escape');
+  await expect(page.locator('.source-empty')).toBeVisible();
+});
+
+test('on a phone the original text opens as a bottom sheet without overflow', async ({ page }) => {
+  await page.setViewportSize({width:375, height:800});
+  await page.goto('/overview');
+  await expect(page.locator('.source-panel')).toBeHidden();
+  await page.locator('.ref-button').first().click();
+  await expect(page.locator('.source-panel.open')).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.getByRole('button', {name:'닫기'}).click();
+  await expect(page.locator('.source-panel')).toBeHidden();
+});

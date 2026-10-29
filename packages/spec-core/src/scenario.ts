@@ -3,7 +3,14 @@ import { VERSIONS, type Version } from "./types";
 
 export type ScenarioKind = "ok" | "no" | "go";
 export interface ScenarioFactor { id: string; label: string; default: string; options: { value: string; label: string }[] }
-export interface ScenarioItem { kind: ScenarioKind; text: string; /** Versionless requirement keys, see `OverviewPair.key`. */ requirements: string[] }
+/** The requirement a rule rests on and the exact wording that supports it. */
+export interface ScenarioRequirementRef {
+  /** Versionless requirement key, see `OverviewPair.key`. */
+  key: string;
+  /** Verbatim substring of the original text. One string must occur in every version the rule applies to; use a per-version map when the wording differs. */
+  quote: string | Partial<Record<Version, string>>;
+}
+export interface ScenarioItem { kind: ScenarioKind; text: string; requirements: ScenarioRequirementRef[] }
 export interface ScenarioRule { when: Record<string, string | string[]>; items: ScenarioItem[]; set?: Record<string, boolean>; stop?: boolean }
 export interface ScenarioStep { id: string; onlyIf?: Record<string, boolean>; rules: ScenarioRule[] }
 export interface ScenarioVerdict {
@@ -17,7 +24,8 @@ export interface ScenarioDefinition {
   review: { status: "draft" | "author-reviewed" | "expert-reviewed"; note: string };
   versionFactor: string; factors: ScenarioFactor[]; steps: ScenarioStep[]; verdicts: ScenarioVerdict[];
 }
-export interface ScenarioRef { key: string; requirementId: string; citationId: string; heading: string }
+/** `start`/`end` locate the supporting quote inside the original text of `citationId`. */
+export interface ScenarioRef { key: string; requirementId: string; citationId: string; heading: string; start: number; end: number }
 export interface ScenarioResult {
   items: { kind: ScenarioKind; text: string; refs: ScenarioRef[] }[];
   verdicts: { flag: string; label: string; allowed: boolean; value: string; note: string }[];
@@ -39,10 +47,13 @@ export function runScenario(definition: ScenarioDefinition, pairs: readonly Over
     const rule = step.rules.find(candidate => matches(candidate.when, inputs));
     if (!rule) continue;
     for (const item of rule.items) {
-      const refs = item.requirements.flatMap(key => {
-        const entry = pairs.find(pair => pair.key === key)?.entries[version];
+      const refs = item.requirements.flatMap(({ key, quote }) => {
         const pair = pairs.find(candidate => candidate.key === key);
-        return entry && pair ? [{ key, requirementId: entry.requirementId, citationId: entry.citationId, heading: pair.heading }] : [];
+        const entry = pair?.entries[version];
+        const wanted = typeof quote === "string" ? quote : quote[version];
+        const start = entry && wanted ? entry.text.indexOf(wanted) : -1;
+        return pair && entry && wanted && start >= 0
+          ? [{ key, requirementId: entry.requirementId, citationId: entry.citationId, heading: pair.heading, start, end: start + wanted.length }] : [];
       });
       items.push({ kind: item.kind, text: item.text, refs });
     }
@@ -82,12 +93,18 @@ export function validateScenarioDefinition(definition: ScenarioDefinition, pairs
     }
     for (const flag of Object.keys(rule.set ?? {})) setFlags.add(flag);
     const versions = versionFactor ? versionFactor.options.map(option => option.value as Version) : [];
-    for (const item of rule.items) for (const key of item.requirements) {
+    for (const item of rule.items) for (const { key, quote } of item.requirements) {
       const pair = pairs.find(candidate => candidate.key === key);
       if (!pair) { problems.push(`step "${step.id}": 요구사항 "${key}"를 찾을 수 없어요.`); continue; }
       const required = typeof rule.when[definition.versionFactor] === "string" ? [rule.when[definition.versionFactor] as Version]
         : Array.isArray(rule.when[definition.versionFactor]) ? rule.when[definition.versionFactor] as Version[] : versions;
-      for (const version of required) if (!pair.entries[version]) problems.push(`step "${step.id}": "${key}"가 ${version}에 없어요.`);
+      for (const version of required) {
+        const entry = pair.entries[version];
+        if (!entry) { problems.push(`step "${step.id}": "${key}"가 ${version}에 없어요.`); continue; }
+        const wanted = typeof quote === "string" ? quote : quote[version];
+        if (!wanted) problems.push(`step "${step.id}": "${key}"의 ${version} 근거 문구가 없어요.`);
+        else if (!entry.text.includes(wanted)) problems.push(`step "${step.id}": "${key}"의 ${version} 원문에 근거 문구 "${wanted}"가 글자 그대로 없어요.`);
+      }
     }
   }
   for (const step of definition.steps) for (const flag of Object.keys(step.onlyIf ?? {})) if (!setFlags.has(flag)) problems.push(`step "${step.id}": onlyIf 플래그 "${flag}"를 설정하는 규칙이 없어요.`);

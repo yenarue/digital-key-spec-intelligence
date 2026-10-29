@@ -8,5 +8,5 @@ export { diffWords, wordSimilarity, type DiffSegment } from './text-diff';
 export { buildOverview, versionlessKey, type OverviewEntry, type OverviewPair, type SpecOverview } from './overview';
 export {
   precomputeScenarios, runScenario, scenarioKey, validateScenarioDefinition,
-  type ScenarioDefinition, type ScenarioFactor, type ScenarioItem, type ScenarioKind, type ScenarioRef, type ScenarioResult, type ScenarioRule, type ScenarioStep, type ScenarioVerdict,
+  type ScenarioDefinition, type ScenarioFactor, type ScenarioItem, type ScenarioKind, type ScenarioRef, type ScenarioRequirementRef, type ScenarioResult, type ScenarioRule, type ScenarioStep, type ScenarioVerdict,
 } from './scenario';

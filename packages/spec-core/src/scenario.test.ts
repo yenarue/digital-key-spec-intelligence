@@ -15,13 +15,39 @@ describe("scenario definition", () => {
   });
   it("reports a rule that cites a requirement missing from the corpus or a version", () => {
     const broken = structuredClone(definition);
-    broken.steps[1].rules[0].items[0].requirements = ["DEMO-REQ-999"];
+    broken.steps[1].rules[0].items[0].requirements = [{ key: "DEMO-REQ-999", quote: "x" }];
     broken.steps[0].rules[0].when = { credential: "revoked" };
     const problems = validateScenarioDefinition(broken, pairs);
     expect(problems.some(problem => problem.includes("DEMO-REQ-999"))).toBe(true);
     expect(problems.some(problem => problem.includes("revoked"))).toBe(true);
     const withoutV1 = pairs.map(pair => pair.key === "DEMO-REQ-009" ? { ...pair, entries: { V2: pair.entries.V2 } } : pair);
     expect(validateScenarioDefinition(definition, withoutV1).some(problem => problem.includes("DEMO-REQ-009") && problem.includes("V1"))).toBe(true);
+  });
+});
+describe("scenario quotes", () => {
+  it("rejects a supporting quote that is not verbatim in every applicable version", () => {
+    const altered = structuredClone(definition);
+    altered.steps[1].rules[0].items[0].requirements = [{ key: "DEMO-REQ-009", quote: "verify an active  credential" }];
+    expect(validateScenarioDefinition(altered, pairs).some(problem => problem.includes("글자 그대로 없어요"))).toBe(true);
+    const wrongVersion = structuredClone(definition);
+    wrongVersion.steps[0].rules[2].items[0].requirements = [{ key: "DEMO-REQ-006", quote: "temporarily suspend a friend credential" }];
+    expect(validateScenarioDefinition(wrongVersion, pairs).some(problem => problem.includes("V1") && problem.includes("글자 그대로 없어요"))).toBe(true);
+    const missing = structuredClone(definition);
+    missing.steps[0].rules[2].items[0].requirements = [{ key: "DEMO-REQ-006", quote: { V1: "A suspended credential SHALL NOT authorize access" } }];
+    expect(validateScenarioDefinition(missing, pairs).some(problem => problem.includes("V2") && problem.includes("근거 문구가 없어요"))).toBe(true);
+  });
+  it("locates each quote inside the original text of the selected version", () => {
+    for (const version of ["V1", "V2"]) {
+      const result = runScenario(definition, pairs, { ...base, version });
+      for (const ref of result.items.flatMap(item => item.refs)) {
+        const text = pairs.flatMap(pair => Object.values(pair.entries)).find(entry => entry!.citationId === ref.citationId)!.text;
+        expect(ref.start).toBeGreaterThanOrEqual(0);
+        expect(text.slice(ref.start, ref.end).length).toBe(ref.end - ref.start);
+        expect(ref.end).toBeLessThanOrEqual(text.length);
+      }
+    }
+    const [ref] = runScenario(definition, pairs, { ...base, uwb: "ok", permission: "both" }).items.at(-1)!.refs;
+    expect(pairs.find(pair => pair.key === ref.key)!.entries.V2!.text.slice(ref.start, ref.end)).toBe("checked against the credential's allowed operations");
   });
 });
 describe("runScenario", () => {

@@ -146,6 +146,12 @@
       "reviewStatus": { "draft": "초안", "author-reviewed": "작성자 검수", "expert-reviewed": "전문가 검수" },
       "controlsLabel": "시나리오 조건",
       "stepsHeading": "적용된 규칙",
+      "stepsNote": "단계의 순서는 이해를 돕기 위한 정리예요. 스펙이 정한 절차가 아니에요.",
+      "sourceTitle": "근거 원문",
+      "sourceEmpty": "규칙 옆의 요구사항 번호를 누르면 원문과 근거 문구를 볼 수 있어요.",
+      "sourceHint": "표시된 부분이 이 규칙의 근거 문구예요.",
+      "sourceClose": "닫기",
+      "refTitle": "{heading} 원문 보기",
       "verdictHeading": "결과",
       "refsLabel": "근거 요구사항",
       "disclaimer": "가상 문서를 바탕으로 한 예시 규칙이에요. 실제 스펙 해석이나 업무 판단에 사용하지 마세요."

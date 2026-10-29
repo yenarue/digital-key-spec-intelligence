@@ -20,6 +20,8 @@ const definition = scenarios as ScenarioDefinition;
 const problems = validateScenarioDefinition(definition, overview.pairs);
 if (problems.length > 0) throw new Error(`Invalid scenario definition:\n${problems.join("\n")}`);
 const table = precomputeScenarios(definition, overview.pairs);
+const sources = Object.fromEntries(overview.pairs.flatMap(pair => Object.values(pair.entries).map(entry =>
+  [entry.citationId, { requirementId: entry.requirementId, version: entry.version, sectionId: pair.sectionId, heading: pair.heading, text: entry.text }])));
 const [oldest, newest] = [overview.versions[0], overview.versions[overview.versions.length - 1]];
 const tiles: MapTile[] = overview.pairs.map(pair => {
   const from = pair.entries[oldest], to = pair.entries[newest];
@@ -49,7 +51,7 @@ export default function OverviewPage() {
       <section className="overview-section" aria-labelledby="scenario-title">
         <h2 id="scenario-title">{text.scenario.heading}</h2>
         <p className="overview-lead">{text.scenario.lead}</p>
-        <ScenarioSimulator factors={definition.factors} review={definition.review} table={table} />
+        <ScenarioSimulator factors={definition.factors} review={definition.review} table={table} sources={sources} />
       </section>
     </main>
     <AppRelease />

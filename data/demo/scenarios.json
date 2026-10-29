@@ -89,14 +89,41 @@
       "rules": [
         {
           "when": {
-            "credential": "suspended"
+            "credential": "suspended",
+            "version": "V1"
           },
           "items": [
             {
               "kind": "no",
               "text": "일시 정지된 크리덴셜은 접근을 승인하지 않아요.",
               "requirements": [
-                "DEMO-REQ-006"
+                {
+                  "key": "DEMO-REQ-006",
+                  "quote": "A suspended credential SHALL NOT authorize access"
+                }
+              ]
+            }
+          ],
+          "stop": true
+        },
+        {
+          "when": {
+            "credential": "suspended",
+            "version": "V2"
+          },
+          "items": [
+            {
+              "kind": "no",
+              "text": "일시 정지된 크리덴셜은 거부돼요. 패시브 엔트리는 활성 크리덴셜을 요구하고, NFC는 정지된 크리덴셜을 명시적으로 거부해요.",
+              "requirements": [
+                {
+                  "key": "DEMO-REQ-009",
+                  "quote": "verify an active credential"
+                },
+                {
+                  "key": "DEMO-REQ-011",
+                  "quote": "a suspended credential SHALL be rejected"
+                }
               ]
             }
           ],
@@ -107,10 +134,19 @@
           "items": [
             {
               "kind": "ok",
-              "text": "크리덴셜이 유효해요.",
+              "text": "폐기되거나 정지되지 않은 유효한 크리덴셜이에요.",
               "requirements": [
-                "DEMO-REQ-005",
-                "DEMO-REQ-006"
+                {
+                  "key": "DEMO-REQ-005",
+                  "quote": "the access controller SHALL reject subsequent operations using that credential"
+                },
+                {
+                  "key": "DEMO-REQ-006",
+                  "quote": {
+                    "V1": "A suspended credential SHALL NOT authorize access",
+                    "V2": "temporarily suspend a friend credential"
+                  }
+                }
               ]
             }
           ]
@@ -130,7 +166,10 @@
               "kind": "ok",
               "text": "활성 크리덴셜, 요청 권한, 인증된 세션, UWB 거리를 모두 확인했어요.",
               "requirements": [
-                "DEMO-REQ-009"
+                {
+                  "key": "DEMO-REQ-009",
+                  "quote": "verify an active credential, the requested operation entitlement, an authenticated session, and an acceptable UWB range before unlocking"
+                }
               ]
             }
           ],
@@ -148,7 +187,10 @@
               "kind": "ok",
               "text": "유효한 크리덴셜, 챌린지 응답, UWB 거리를 확인했어요.",
               "requirements": [
-                "DEMO-REQ-009"
+                {
+                  "key": "DEMO-REQ-009",
+                  "quote": "require a valid credential, a completed challenge response, and an acceptable UWB distance estimate before unlocking"
+                }
               ]
             }
           ],
@@ -167,21 +209,30 @@
               "kind": "no",
               "text": "UWB 거리 측정에 실패해서 패시브 엔트리를 멈춰요.",
               "requirements": [
-                "DEMO-REQ-010"
+                {
+                  "key": "DEMO-REQ-010",
+                  "quote": "passive entry SHALL stop"
+                }
               ]
             },
             {
               "kind": "go",
               "text": "크리덴셜이 NFC 출입을 허용하니 NFC 탭으로 시도할 수 있어요.",
               "requirements": [
-                "DEMO-REQ-010"
+                {
+                  "key": "DEMO-REQ-010",
+                  "quote": "only when the credential permits NFC entry"
+                }
               ]
             },
             {
               "kind": "ok",
               "text": "탭 이벤트와 크리덴셜을 확인했어요. UWB 성공 여부는 필요 없어요.",
               "requirements": [
-                "DEMO-REQ-011"
+                {
+                  "key": "DEMO-REQ-011",
+                  "quote": "a valid credential and explicit tap SHALL be verified; NFC access SHALL NOT depend on a prior UWB session"
+                }
               ]
             }
           ],
@@ -200,21 +251,30 @@
               "kind": "no",
               "text": "UWB 거리 측정에 실패해서 패시브 엔트리를 멈춰요.",
               "requirements": [
-                "DEMO-REQ-010"
+                {
+                  "key": "DEMO-REQ-010",
+                  "quote": "passive entry SHALL stop"
+                }
               ]
             },
             {
               "kind": "go",
               "text": "NFC가 켜져 있어 NFC 탭으로 시도할 수 있어요.",
               "requirements": [
-                "DEMO-REQ-010"
+                {
+                  "key": "DEMO-REQ-010",
+                  "quote": "the separate NFC tap-to-access procedure if enabled"
+                }
               ]
             },
             {
               "kind": "ok",
               "text": "탭 이벤트와 크리덴셜을 확인했어요. UWB 성공 여부는 필요 없어요.",
               "requirements": [
-                "DEMO-REQ-011"
+                {
+                  "key": "DEMO-REQ-011",
+                  "quote": "a valid credential and an explicit tap event SHALL be verified. NFC access SHALL NOT require a successful prior UWB ranging session"
+                }
               ]
             }
           ],
@@ -233,14 +293,20 @@
               "kind": "no",
               "text": "UWB 거리 측정에 실패해서 패시브 엔트리를 멈춰요.",
               "requirements": [
-                "DEMO-REQ-010"
+                {
+                  "key": "DEMO-REQ-010",
+                  "quote": "passive entry SHALL stop"
+                }
               ]
             },
             {
               "kind": "no",
               "text": "크리덴셜이 NFC 출입을 허용하지 않아 시도할 수 없어요.",
               "requirements": [
-                "DEMO-REQ-010"
+                {
+                  "key": "DEMO-REQ-010",
+                  "quote": "only when the credential permits NFC entry"
+                }
               ]
             }
           ]
@@ -256,14 +322,20 @@
               "kind": "no",
               "text": "UWB 거리 측정에 실패해서 패시브 엔트리를 멈춰요.",
               "requirements": [
-                "DEMO-REQ-010"
+                {
+                  "key": "DEMO-REQ-010",
+                  "quote": "passive entry SHALL stop"
+                }
               ]
             },
             {
               "kind": "no",
               "text": "NFC가 꺼져 있어 시도할 수 없어요.",
               "requirements": [
-                "DEMO-REQ-010"
+                {
+                  "key": "DEMO-REQ-010",
+                  "quote": "the separate NFC tap-to-access procedure if enabled"
+                }
               ]
             }
           ]
@@ -285,7 +357,10 @@
               "kind": "ok",
               "text": "시동 권한이 있어요.",
               "requirements": [
-                "DEMO-REQ-012"
+                {
+                  "key": "DEMO-REQ-012",
+                  "quote": "checked against the credential's allowed operations"
+                }
               ]
             }
           ],
@@ -300,7 +375,13 @@
               "kind": "no",
               "text": "출입 권한만으로는 시동 권한이 생기지 않아요.",
               "requirements": [
-                "DEMO-REQ-012"
+                {
+                  "key": "DEMO-REQ-012",
+                  "quote": {
+                    "V1": "Entry-only access SHALL NOT imply permission to start the vehicle",
+                    "V2": "Entry-only or NFC-only permission SHALL NOT imply vehicle-start permission"
+                  }
+                }
               ]
             }
           ]
