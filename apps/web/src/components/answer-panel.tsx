@@ -28,11 +28,12 @@ function withHover(value: string, from: number, span: [number, number] | null): 
 }
 export function AnswerPanel({ result, mode = "ai" }: { result: AskResponse; mode?: SearchMode }) {
   const keywordResult = mode === "keyword" && result.status === "search_only";
+  const failure = result.status === "llm_unavailable" && result.failureReason ? text.failures[result.failureReason] : undefined;
   const groups = groupEvidence(result.sources);
   const [hover, setHover] = useState<[number, number] | null>(null);
   const paragraphs = [...(result.answer ?? "").matchAll(/(?:[^\n]|\n(?!\n))+/g)].map(match => ({ paragraph: match[0], start: match.index }));
   return <section className="answer-panel" aria-labelledby="answer-heading">
-    <div className="section-title"><h2 id="answer-heading">{keywordResult ? text.keywordResultHeading : text.labels[result.status]}</h2></div>
+    <div className="section-title"><h2 id="answer-heading">{keywordResult ? text.keywordResultHeading : failure?.heading ?? text.labels[result.status]}</h2></div>
     {result.status === "answered" && result.answer && <div className="answer-prose">{paragraphs.map(({ paragraph, start }, paragraphIndex) => { let offset = start; return <p className="answer-text" key={paragraphIndex}>
       {splitAnswerCitations(paragraph, result.sources).map((part, index) => {
         const from = offset;

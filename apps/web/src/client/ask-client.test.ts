@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { askQuestion, questionError, questionLength } from "./ask-client";
+import { askQuestion, isAskResponse, questionError, questionLength } from "./ask-client";
 
 describe("question validation", () => {
   it("counts Unicode code points after trim and preserves Korean", () => {
@@ -37,5 +37,20 @@ describe("ask client", () => {
     await expect(askQuestion({ question: " " }, { fetcher })).rejects.toThrow();
     expect(fetcher).not.toHaveBeenCalled();
     await expect(askQuestion({ question: "NFC" }, { fetcher })).rejects.toThrow("결과를 읽지 못했어요");
+  });
+});
+
+
+describe("failure response handling", () => {
+  it.each([408, 504])("reports HTTP %s as timeout even when the platform returns HTML", async status => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response("<html>timeout</html>", { status }));
+    await expect(askQuestion({question:"NFC"}, {fetcher})).rejects.toThrow("시간 초과");
+  });
+  it("accepts legacy results but rejects unknown failure reasons", () => {
+    const response = {status:"llm_unavailable", answer:null, sources:[], warnings:[]};
+    expect(isAskResponse(response)).toBe(true);
+    expect(isAskResponse({...response, failureReason:"timeout"})).toBe(true);
+    expect(isAskResponse({...response, failureReason:"untrusted"})).toBe(false);
+    expect(isAskResponse({...response, status:"answered", failureReason:"timeout"})).toBe(false);
   });
 });

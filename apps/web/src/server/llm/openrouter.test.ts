@@ -43,7 +43,7 @@ describe("free OpenRouter provider", () => {
     expect(isFreeModel("meta-llama/llama-3.3-70b-instruct:free")).toBe(true);
     expect(isFreeModel("openrouter/free")).toBe(true);
   });
-  it.each([[429, "rate_limit"], [401, "unavailable"], [500, "unavailable"]])("handles HTTP %s without leaking body or retrying", async (status, reason) => {
+  it.each([[429, "rate_limit"], [408, "timeout"], [504, "timeout"], [401, "unavailable"], [500, "unavailable"]])("handles HTTP %s without leaking body or retrying", async (status, reason) => {
     const fetchMock = vi.fn().mockResolvedValue(new Response("secret upstream body", { status: status as number }));
     await expect(providerWith(fetchMock).generateGroundedAnswer(input)).rejects.toMatchObject({ reason, message: "AI 답변을 가져올 수 없습니다." });
     expect(fetchMock).toHaveBeenCalledOnce();

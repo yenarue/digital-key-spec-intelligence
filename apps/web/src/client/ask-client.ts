@@ -1,4 +1,5 @@
 import type { AskRequest, AskResponse } from "../contracts/ask";
+import { ASK_FAILURE_REASONS } from "../contracts/ask";
 import { uiText } from "../content/ui-text";
 
 const errors = uiText.errors;
@@ -22,6 +23,7 @@ export function isAskResponse(value: unknown): value is AskResponse {
   if (value === null || typeof value !== "object") return false;
   const response = value as Partial<AskResponse>;
   return ["answered", "insufficient_evidence", "search_only", "llm_unavailable"].includes(response.status ?? "")
+    && (response.failureReason === undefined || response.status === "llm_unavailable" && ASK_FAILURE_REASONS.includes(response.failureReason))
     && (response.answer === null || typeof response.answer === "string")
     && Array.isArray(response.sources) && response.sources.every(isEvidence) && Array.isArray(response.warnings)
     && response.warnings.every(warning => typeof warning === "string");
@@ -40,6 +42,7 @@ export async function askQuestion(request: AskRequest, options: { signal?: Abort
     if (options.signal?.aborted) throw caught;
     throw new Error(errors.network);
   }
+  if (response.status === 408 || response.status === 504) throw new Error(errors.timeout);
   let body: unknown;
   try { body = await response.json(); }
   catch { throw new Error(errors.unreadable); }

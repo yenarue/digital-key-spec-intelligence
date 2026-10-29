@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import type { CorpusProvider, EvidenceValidator, LLMProvider, Retriever } from "@dksi/spec-core";
 import { evidenceFixture } from "../test-fixtures/ask";
+import { uiText } from "../content/ui-text";
 import { createAskService } from "./ask-service";
 import { LLMProviderError, OpenRouterProvider } from "./llm/openrouter";
 
@@ -95,7 +96,8 @@ describe("grounded generation orchestration", () => {
     deps.validator.validateCitations.mockReturnValue({ valid: false, warnings: ["untrusted raw model string"] });
     const result = await createAskService(deps)({ question: "NFC 조건" });
     expect(result).toMatchObject({ status: "llm_unavailable", answer: null, sources: [evidenceFixture] });
-    expect(result.warnings.join(" ")).toContain("출처를 확인할 수 없어");
+    expect(result.failureReason).toBe("citation_validation");
+    expect(result.warnings).toEqual([uiText.answer.failures.citation_validation.message]);
     expect(JSON.stringify(result)).not.toContain("untrusted raw model string");
   });
   it.each(["rate_limit", "timeout", "malformed", "unavailable", "response_too_large", "invalid_configuration"] as const)("keeps usable evidence after %s with one call", async (reason) => {
@@ -103,9 +105,10 @@ describe("grounded generation orchestration", () => {
     deps.llmProvider.generateGroundedAnswer.mockRejectedValue(new LLMProviderError(reason));
     const result = await createAskService(deps)({ question: "NFC 조건" });
     expect(result).toMatchObject({ status: "llm_unavailable", answer: null, sources: [evidenceFixture] });
-    expect(result.warnings.length).toBeGreaterThan(0);
+    expect(result.failureReason).toBe(reason);
+    expect(result.warnings).toEqual([uiText.answer.failures[reason].message]);
     if (reason === "timeout") {
-      expect(result.warnings).toEqual(["AI 답변 대기 시간이 초과되었습니다. 검색된 근거를 확인해주세요."]);
+      expect(result.warnings).toEqual([uiText.answer.failures.timeout.message]);
       expect(deps.validator.validateCitations).not.toHaveBeenCalled();
     }
     expect(deps.llmProvider.generateGroundedAnswer).toHaveBeenCalledOnce();

@@ -69,7 +69,8 @@ export class OpenRouterProvider implements LLMProvider {
       });
       if (!response.ok) {
         void response.body?.cancel().catch(() => undefined);
-        throw new LLMProviderError(response.status === 429 ? "rate_limit" : "unavailable");
+        throw new LLMProviderError(response.status === 429 ? "rate_limit"
+          : response.status === 408 || response.status === 504 ? "timeout" : "unavailable");
       }
       const declaredSize = Number(response.headers.get("content-length"));
       if (declaredSize > RESPONSE_MAX_BYTES) {

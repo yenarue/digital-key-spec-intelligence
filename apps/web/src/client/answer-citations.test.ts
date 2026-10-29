@@ -32,3 +32,26 @@ describe("answer citation rendering", () => {
     expect(markup).toContain("AI 답변을 가져오지 못했어요");
   });
 });
+
+
+describe("failure-specific answer display", () => {
+  it.each(["timeout", "rate_limit", "citation_validation", "malformed", "response_too_large", "invalid_configuration", "unavailable"] as const)("renders the service's %s reason without mislabeling it as citation rejection", async reason => {
+    const { createAskService } = await import("../server/ask-service");
+    const { LLMProviderError } = await import("../server/llm/openrouter");
+    const { uiText } = await import("../content/ui-text");
+    const result = await createAskService({
+      retriever: {searchRequirements:()=>[evidenceFixture], getRequirement:()=>undefined},
+      corpus: {listDocuments:()=>[], getChunks:()=>[], getSourceSpan:()=>undefined},
+      validator: {validateCitations:()=>({valid:false,warnings:[]})},
+      llmProvider: {generateGroundedAnswer:async()=> {
+        if(reason !== "citation_validation") throw new LLMProviderError(reason);
+        return {answer:"invalid",citations:[]};
+      }},
+    })({question:"NFC"});
+    const markup = renderToStaticMarkup(createElement(AnswerPanel, {result}));
+    expect(markup).toContain(uiText.answer.failures[reason].heading);
+    expect(markup).toContain(uiText.answer.failures[reason].message);
+    if(reason !== "citation_validation") expect(markup).not.toContain(uiText.answer.failures.citation_validation.heading);
+    expect(result.sources).toEqual([evidenceFixture]);
+  });
+});
