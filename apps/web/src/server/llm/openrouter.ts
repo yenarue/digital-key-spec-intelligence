@@ -21,7 +21,7 @@ export const RESPONSE_MAX_BYTES = 65536;
 // OpenRouter counts reasoning and visible JSON against this shared limit.
 export const MAX_OUTPUT_TOKENS = 8000;
 // Whole-response budget: free reasoning models need room beyond a ten-second cutoff.
-export const MODEL_TIMEOUT_MS = 90_000;
+export const MODEL_TIMEOUT_MS = 180_000;
 
 export function isFreeModel(model: string): boolean {
   return model === MODEL_DEFAULT || /^[a-zA-Z0-9][a-zA-Z0-9._-]*\/[a-zA-Z0-9][a-zA-Z0-9._-]*:free$/.test(model);

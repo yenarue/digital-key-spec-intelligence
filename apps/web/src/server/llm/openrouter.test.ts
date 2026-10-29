@@ -77,15 +77,15 @@ describe("free OpenRouter provider", () => {
     expect(cancel).toHaveBeenCalledOnce();
     expect(fetchMock).toHaveBeenCalledOnce();
   });
-  it("accepts a valid completion after the former ten-second deadline", async () => {
+  it("accepts a valid completion after the former ninety-second deadline", async () => {
     vi.useFakeTimers();
     try {
       const fetchMock = vi.fn().mockImplementation(() => new Promise<Response>(resolve => {
-        setTimeout(() => resolve(completion()), 12_000);
+        setTimeout(() => resolve(completion()), 100_000);
       }));
       const outcome = providerWith(fetchMock).generateGroundedAnswer(input)
         .then(answer => ({ answer }), error => ({ reason: error.reason }));
-      await vi.advanceTimersByTimeAsync(12_000);
+      await vi.advanceTimersByTimeAsync(100_000);
       expect(await outcome).toEqual({ answer: candidate });
       expect(fetchMock).toHaveBeenCalledOnce();
     } finally { vi.useRealTimers(); }

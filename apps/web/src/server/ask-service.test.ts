@@ -104,6 +104,10 @@ describe("grounded generation orchestration", () => {
     const result = await createAskService(deps)({ question: "NFC 조건" });
     expect(result).toMatchObject({ status: "llm_unavailable", answer: null, sources: [evidenceFixture] });
     expect(result.warnings.length).toBeGreaterThan(0);
+    if (reason === "timeout") {
+      expect(result.warnings).toEqual(["AI 답변 대기 시간이 초과되었습니다. 검색된 근거를 확인해주세요."]);
+      expect(deps.validator.validateCitations).not.toHaveBeenCalled();
+    }
     expect(deps.llmProvider.generateGroundedAnswer).toHaveBeenCalledOnce();
     expect(deps.validator.validateCitations).not.toHaveBeenCalled();
   });

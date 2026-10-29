@@ -96,3 +96,9 @@ Not yet verified: a grounded `answered` response on Production (free-model timeo
 - Actual isolated-browser QA: initial0POSTs; keyword submit1POST gives search_only/null/no warnings; AI switch no request; explicit AI submit gives secondPOST/answered with correct V2 entry-only/start REQ012 citation; switching back keyword reuses previous result with no third request. Same5 sources in both modes. One actual AI call for this final QA.
 - Mobile375/desktop1280 no horizontal overflow; source citation focus, icon200, browser0errors/0warnings, Skills navigation, version and isolated history records verified. Screenshots: output/playwright/live-033-mobile-ai.png and live-033-desktop-keyword.png.
 - A–E core live Gate and FR-18/19 accepted. Keyword zero-provider calls are proven by server/runtime spy tests; live response status alone is not used as model-call telemetry. Retain free-model nondeterminism, full assistive-tech/Skill activation/CI limitations; no reliability or quota-savings percentage claimed. No new secrets/environment/model settings were changed in this closure.
+
+### 2026-10-29 — v0.3.7 longer AI deadline
+- Model deadline 90s → 180s; route maxDuration 120s → 210s. Output budget, free-only model policy, citation validation and one-call/no-retry behavior unchanged.
+- Executed: `npm run test` (239/239), `npm run eval` (21/21; no version leaks), `npm run lint`, `npm run build`, `git diff --check` — passed. Eval needed execution outside the sandbox because tsx IPC listen was denied. Build's functions-config-manifest records maxDuration210.
+- Fake-clock regression accepts a complete valid response at100s; timeout regression confirms sources retained and no citation validator call. This does not reproduce or fix the owner's citation rejection; that remains distinct from timeout.
+- Direct `vercel deploy --prod --yes` failed with `Not authorized`; checking the existing Git-connected Production route next. Live deployment is not yet verified.
