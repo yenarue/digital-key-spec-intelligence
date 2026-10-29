@@ -5,6 +5,8 @@ import type { AskResponse, SearchMode } from "../contracts/ask";
 import { askQuestion, questionError, questionLength } from "../client/ask-client";
 import { addHistory, clearHistory, historyStore, removeHistory, type HistoryEntry } from "../client/history";
 import { EvidenceCard } from "./evidence-card";
+import { EvidenceTabsCard } from "./evidence-tabs-card";
+import { groupEvidence } from "../client/group-evidence";
 import { AnswerPanel } from "./answer-panel";
 import { SearchProgress } from "./search-progress";
 import { QuestionHistory, savedTime, scopeLabel } from "./question-history";
@@ -129,7 +131,9 @@ export function AskPanel() {
       <div className={`results-grid${result.sources.length ? "" : " no-sources"}`}>
         <AnswerPanel result={result} mode={submitted?.mode} />
         {result.sources.length > 0 && <section className="sources-panel" aria-labelledby="sources-heading"><div className="section-title"><h2 id="sources-heading">{submitted?.mode === "keyword" ? text.sourcesHeadingKeyword : text.sourcesHeading}<span className="source-count">{result.sources.length}</span></h2><span>{text.sourcesSubtitle}</span></div>
-          {result.sources.map((source, index) => <EvidenceCard key={source.citationId} evidence={source} index={index} />)}</section>}
+          {groupEvidence(result.sources).map((group, index) => group.items.length > 1
+            ? <EvidenceTabsCard key={group.key} items={group.items} index={index} />
+            : <EvidenceCard key={group.items[0].citationId} evidence={group.items[0]} index={index} />)}</section>}
       </div>
     </div>}
     {!pending && !result && !error && <div className="first-visit"><span className="empty-rule" /><h2>{text.firstVisitHeading}</h2><p>{text.firstVisitLine1}<br />{text.firstVisitLine2}</p></div>}

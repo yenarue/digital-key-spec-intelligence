@@ -7,7 +7,7 @@ import { uiText } from "../content/ui-text";
 const text = uiText.evidence;
 
 export function evidenceTargetId(citationId: string) { return `source-${citationId.replaceAll(":", "-")}`; }
-function Highlighted({ text: value, evidence }: { text: string; evidence: Evidence }) {
+export function Highlighted({ text: value, evidence }: { text: string; evidence: Evidence }) {
   return highlightParts(value, evidence.fullText, evidence.matches).map((part, index) => part.marked ? <mark key={index}>{part.text}</mark> : part.text);
 }
 export function EvidenceCard({ evidence, index }: { evidence: Evidence; index: number }) {

@@ -1,0 +1,11 @@
+.version-tabs{display:inline-flex;gap:2px;padding:3px;background:#e9edf2;border-radius:8px}
+.version-tabs button{border:0;background:none;border-radius:6px;min-height:28px;padding:2px 14px;font-size:13px;color:var(--secondary)}
+.version-tabs button[aria-selected="true"]{background:#fff;color:var(--text);font-weight:600;box-shadow:0 1px 2px rgba(25,31,40,.15)}
+.version-tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.change-toggle{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;margin:4px 0 8px;font-size:13px;color:var(--secondary)}
+.change-toggle .change-count{color:var(--muted)}
+.evidence-tabs [role="tabpanel"]:not([hidden]){animation:tab-in .2s ease-out}
+.changes-view ins{background:#e3f5ec;color:#0b7a4b;text-decoration:none;border-radius:3px;padding:0 2px}
+.changes-view del{background:#fdeceb;color:#b42318;border-radius:3px;padding:0 2px}
+@keyframes tab-in{from{opacity:0;transform:translateY(3px)}}
+@media(prefers-reduced-motion:reduce){.evidence-tabs [role="tabpanel"]:not([hidden]){animation:none}}

@@ -251,3 +251,37 @@ test('Agent Skills landing page introduces the Skills without running them', asy
   await expect(page.getByRole('textbox', {name:'질문', exact:true})).toBeVisible();
   expect(apiCalls).toEqual([]);
 });
+
+test('same requirement in V1 and V2 shares one card with version tabs and optional change highlight', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('textbox', {name:'질문', exact:true}).fill('NFC 태그로 접근할 수 있나?');
+  await page.getByRole('button', {name:/^근거 찾기/}).click();
+  const card = page.locator('article.evidence-tabs').first();
+  await expect(card.getByRole('tab')).toHaveText(['V1', 'V2']);
+  await expect(card.getByRole('tab', {name:'V2'})).toHaveAttribute('aria-selected', 'true');
+  await expect(card.locator('code.requirement-id:visible')).toHaveText(/DEMO-V2-REQ-/);
+  await card.getByRole('tab', {name:'V1'}).click();
+  await expect(card.locator('code.requirement-id:visible')).toHaveText(/DEMO-V1-REQ-/);
+  await card.getByRole('checkbox', {name:'바뀐 부분 강조'}).check();
+  await expect(card.locator('blockquote:visible del').first()).toBeVisible();
+  await card.getByRole('tab', {name:'V1'}).press('ArrowRight');
+  await expect(card.getByRole('tab', {name:'V2'})).toHaveAttribute('aria-selected', 'true');
+  await expect(card.locator('blockquote:visible ins').first()).toBeVisible();
+  await card.getByRole('tab', {name:'V2'}).press('ArrowLeft');
+  await expect(card.getByRole('tab', {name:'V1'})).toHaveAttribute('aria-selected', 'true');
+});
+
+test('answer citation to a version in an inactive tab opens that tab and focuses the card', async ({ page, request }) => {
+  const actual=await (await request.post('/api/ask',{data:{question:'NFC 태그로 접근할 수 있나?',versions:['V1','V2'],mode:'keyword'}})).json();
+  const v1=actual.sources.find((s:{version:string,requirementId:string})=>s.version==='V1' && actual.sources.some((o:{version:string,requirementId:string})=>o.version==='V2' && o.requirementId.replace('-V2-','-')===s.requirementId.replace('-V1-','-')));
+  expect(v1).toBeTruthy();
+  await page.route('**/api/ask',route=>route.fulfill({json:{...actual,status:'answered',answer:`이전 버전 규칙입니다. [${v1.citationId}]`,warnings:[]}}));
+  await page.goto('/');
+  await page.getByRole('radio',{name:'AI 검색',exact:true}).check();
+  await page.getByRole('textbox',{name:'질문',exact:true}).fill('NFC');
+  await page.getByRole('button',{name:/^근거 찾기/}).click();
+  await page.getByRole('link',{name:new RegExp(`^근거 \\d+: V1 ${v1.requirementId}$`)}).click();
+  const card=page.locator('article.evidence-tabs').filter({has:page.locator(`code.requirement-id:visible`,{hasText:v1.requirementId})});
+  await expect(card).toBeFocused();
+  await expect(card.getByRole('tab',{name:'V1'})).toHaveAttribute('aria-selected','true');
+});
