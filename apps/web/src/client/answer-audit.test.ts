@@ -17,6 +17,13 @@ describe("auditAnswer", () => {
     const answer = `직접 결론이에요 [${A}].\n\n- 근거 있는 항목 [${B}]\n- 해석이 섞인 항목\n이건 원문에 없는 해석이에요.`;
     expect(auditAnswer(answer, [source(A), source(B)]).uncited.map(sentence => sentence.text)).toEqual(["해석이 섞인 항목", "이건 원문에 없는 해석이에요."]);
   });
+  it("does not flag a reply word on its own, but still flags a reply that carries a claim", () => {
+    const texts = (answer: string) => auditAnswer(answer, [source(A)]).uncited.map(sentence => sentence.text);
+    expect(texts(`네.\n\n시동은 불가해요 [${A}].`)).toEqual([]);
+    expect(texts(`아니요, 안 돼요 [${A}]. No.`)).toEqual([]);
+    expect(texts(`네, 가능해요.`)).toEqual(["네, 가능해요."]);
+    expect(texts(`네.\n[${A}]\n해석이에요.`)).toEqual(["해석이에요."]);
+  });
   it("returns the exact range of each uncited sentence inside the original answer", () => {
     const answer = `직접 결론이에요 [${A}].\n\n- 해석이 섞인 항목\n이건 원문에 없는 해석이에요.`;
     const ranges = auditAnswer(answer, [source(A)]).uncited.map(({ start, end }) => answer.slice(start, end));
