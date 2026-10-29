@@ -1,0 +1,331 @@
+{
+  "schemaVersion": 1,
+  "documentId": "DKSI-SYNTHETIC",
+  "review": {
+    "status": "author-reviewed",
+    "note": "가상 요구사항 본문을 읽고 작성자가 직접 정리한 시안용 규칙이에요. 실제 스펙에는 전문가 검수가 필요해요."
+  },
+  "versionFactor": "version",
+  "factors": [
+    {
+      "id": "version",
+      "label": "스펙 버전",
+      "default": "V2",
+      "options": [
+        {
+          "value": "V1",
+          "label": "V1"
+        },
+        {
+          "value": "V2",
+          "label": "V2"
+        }
+      ]
+    },
+    {
+      "id": "uwb",
+      "label": "UWB 거리 측정",
+      "default": "fail",
+      "options": [
+        {
+          "value": "ok",
+          "label": "성공"
+        },
+        {
+          "value": "fail",
+          "label": "실패"
+        }
+      ]
+    },
+    {
+      "id": "nfc",
+      "label": "NFC 출입 허용",
+      "default": "y",
+      "options": [
+        {
+          "value": "y",
+          "label": "허용됨"
+        },
+        {
+          "value": "n",
+          "label": "허용 안 됨"
+        }
+      ]
+    },
+    {
+      "id": "credential",
+      "label": "크리덴셜 상태",
+      "default": "valid",
+      "options": [
+        {
+          "value": "valid",
+          "label": "유효"
+        },
+        {
+          "value": "suspended",
+          "label": "일시 정지"
+        }
+      ]
+    },
+    {
+      "id": "permission",
+      "label": "부여된 권한",
+      "default": "entry",
+      "options": [
+        {
+          "value": "entry",
+          "label": "출입만"
+        },
+        {
+          "value": "both",
+          "label": "출입 + 시동"
+        }
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "credential",
+      "rules": [
+        {
+          "when": {
+            "credential": "suspended"
+          },
+          "items": [
+            {
+              "kind": "no",
+              "text": "일시 정지된 크리덴셜은 접근을 승인하지 않아요.",
+              "requirements": [
+                "DEMO-REQ-006"
+              ]
+            }
+          ],
+          "stop": true
+        },
+        {
+          "when": {},
+          "items": [
+            {
+              "kind": "ok",
+              "text": "크리덴셜이 유효해요.",
+              "requirements": [
+                "DEMO-REQ-005",
+                "DEMO-REQ-006"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "entry",
+      "rules": [
+        {
+          "when": {
+            "uwb": "ok",
+            "version": "V2"
+          },
+          "items": [
+            {
+              "kind": "ok",
+              "text": "활성 크리덴셜, 요청 권한, 인증된 세션, UWB 거리를 모두 확인했어요.",
+              "requirements": [
+                "DEMO-REQ-009"
+              ]
+            }
+          ],
+          "set": {
+            "entry": true
+          }
+        },
+        {
+          "when": {
+            "uwb": "ok",
+            "version": "V1"
+          },
+          "items": [
+            {
+              "kind": "ok",
+              "text": "유효한 크리덴셜, 챌린지 응답, UWB 거리를 확인했어요.",
+              "requirements": [
+                "DEMO-REQ-009"
+              ]
+            }
+          ],
+          "set": {
+            "entry": true
+          }
+        },
+        {
+          "when": {
+            "uwb": "fail",
+            "nfc": "y",
+            "version": "V2"
+          },
+          "items": [
+            {
+              "kind": "no",
+              "text": "UWB 거리 측정에 실패해서 패시브 엔트리를 멈춰요.",
+              "requirements": [
+                "DEMO-REQ-010"
+              ]
+            },
+            {
+              "kind": "go",
+              "text": "크리덴셜이 NFC 출입을 허용하니 NFC 탭으로 시도할 수 있어요.",
+              "requirements": [
+                "DEMO-REQ-010"
+              ]
+            },
+            {
+              "kind": "ok",
+              "text": "탭 이벤트와 크리덴셜을 확인했어요. UWB 성공 여부는 필요 없어요.",
+              "requirements": [
+                "DEMO-REQ-011"
+              ]
+            }
+          ],
+          "set": {
+            "entry": true
+          }
+        },
+        {
+          "when": {
+            "uwb": "fail",
+            "nfc": "y",
+            "version": "V1"
+          },
+          "items": [
+            {
+              "kind": "no",
+              "text": "UWB 거리 측정에 실패해서 패시브 엔트리를 멈춰요.",
+              "requirements": [
+                "DEMO-REQ-010"
+              ]
+            },
+            {
+              "kind": "go",
+              "text": "NFC가 켜져 있어 NFC 탭으로 시도할 수 있어요.",
+              "requirements": [
+                "DEMO-REQ-010"
+              ]
+            },
+            {
+              "kind": "ok",
+              "text": "탭 이벤트와 크리덴셜을 확인했어요. UWB 성공 여부는 필요 없어요.",
+              "requirements": [
+                "DEMO-REQ-011"
+              ]
+            }
+          ],
+          "set": {
+            "entry": true
+          }
+        },
+        {
+          "when": {
+            "uwb": "fail",
+            "nfc": "n",
+            "version": "V2"
+          },
+          "items": [
+            {
+              "kind": "no",
+              "text": "UWB 거리 측정에 실패해서 패시브 엔트리를 멈춰요.",
+              "requirements": [
+                "DEMO-REQ-010"
+              ]
+            },
+            {
+              "kind": "no",
+              "text": "크리덴셜이 NFC 출입을 허용하지 않아 시도할 수 없어요.",
+              "requirements": [
+                "DEMO-REQ-010"
+              ]
+            }
+          ]
+        },
+        {
+          "when": {
+            "uwb": "fail",
+            "nfc": "n",
+            "version": "V1"
+          },
+          "items": [
+            {
+              "kind": "no",
+              "text": "UWB 거리 측정에 실패해서 패시브 엔트리를 멈춰요.",
+              "requirements": [
+                "DEMO-REQ-010"
+              ]
+            },
+            {
+              "kind": "no",
+              "text": "NFC가 꺼져 있어 시도할 수 없어요.",
+              "requirements": [
+                "DEMO-REQ-010"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "start",
+      "onlyIf": {
+        "entry": true
+      },
+      "rules": [
+        {
+          "when": {
+            "permission": "both"
+          },
+          "items": [
+            {
+              "kind": "ok",
+              "text": "시동 권한이 있어요.",
+              "requirements": [
+                "DEMO-REQ-012"
+              ]
+            }
+          ],
+          "set": {
+            "start": true
+          }
+        },
+        {
+          "when": {},
+          "items": [
+            {
+              "kind": "no",
+              "text": "출입 권한만으로는 시동 권한이 생기지 않아요.",
+              "requirements": [
+                "DEMO-REQ-012"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "verdicts": [
+    {
+      "flag": "entry",
+      "label": "출입",
+      "yes": "허용",
+      "no": "거부",
+      "yesNote": "조건을 모두 충족",
+      "noNote": "위 단계에서 중단"
+    },
+    {
+      "flag": "start",
+      "label": "시동",
+      "yes": "허용",
+      "no": "불가",
+      "yesNote": "권한 확인 통과",
+      "noNote": "시동 권한 없음",
+      "dependsOn": "entry",
+      "noNoteIfBlocked": "출입 단계에서 중단"
+    }
+  ]
+}
