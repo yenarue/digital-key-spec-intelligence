@@ -4,6 +4,7 @@ import type { AskResponse, SearchMode } from "../contracts/ask";
 import { splitAnswerCitations } from "../client/answer-citations";
 import { evidenceTargetId } from "./evidence-card";
 import { groupEvidence } from "../client/group-evidence";
+import { AnswerVerification } from "./answer-verification";
 import { fill, uiText } from "../content/ui-text";
 
 const text = uiText.answer;
@@ -37,6 +38,6 @@ export function AnswerPanel({ result, mode = "ai" }: { result: AskResponse; mode
     {result.status === "llm_unavailable" && <p className="fallback-copy">{text.llmUnavailable}</p>}
     {result.status === "insufficient_evidence" && <p className="fallback-copy">{text.insufficientEvidence}</p>}
     {result.warnings.length > 0 && <ul className="result-warnings">{result.warnings.map((warning, index) => <li key={index}>{warning}</li>)}</ul>}
-    <p className="evidence-caveat">{text.caveat}</p>
+    {result.status === "answered" && result.answer ? <AnswerVerification answer={result.answer} sources={result.sources} /> : <p className="evidence-caveat">{text.caveat}</p>}
   </section>;
 }

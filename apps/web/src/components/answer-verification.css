@@ -1,0 +1,12 @@
+.answer-verification{margin-top:20px;padding:14px 16px;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+.answer-verification h3{margin:0 0 8px;font-size:14px;font-weight:600;line-height:22px}
+.answer-verification ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.answer-verification>ul>li{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:22px;color:var(--secondary)}
+.answer-verification .pill{flex:none;font-size:12px;font-weight:600;line-height:20px;border-radius:999px;padding:0 10px;margin-top:1px;white-space:nowrap;min-width:92px;text-align:center}
+.answer-verification .pill.ok{background:#e3f5ec;color:#0b7a4b}
+.answer-verification .pill.warn{background:#fff5dd;color:#8a5a00}
+.answer-verification details{margin-top:4px}
+.answer-verification summary{color:var(--accent);cursor:pointer;font-size:13px;min-height:28px;align-content:center}
+.answer-verification details p{margin:4px 0;font-size:13px;color:var(--muted)}
+.answer-verification .uncited-list{gap:4px;padding-left:18px;list-style:disc;font-size:13px;color:var(--text)}
+.answer-verification .uncited-list li{display:list-item}

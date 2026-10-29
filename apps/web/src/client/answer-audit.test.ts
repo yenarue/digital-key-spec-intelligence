@@ -1,0 +1,23 @@
+import { describe, expect, it } from "vitest";
+import type { Evidence } from "@dksi/spec-core";
+import { auditAnswer } from "./answer-audit";
+
+const source = (id: string): Evidence => ({ citationId: id, documentId: "D", documentTitle: "t", version: "V2", sectionId: "1", requirementId: "R", quote: "q", fullText: "q" });
+const A = "SRC:D:V2:A", B = "SRC:D:V2:B";
+describe("auditAnswer", () => {
+  it("counts each known cited ID once and finds nothing uncited when every sentence is cited", () => {
+    const result = auditAnswer(`시동은 불가해요 [${A}]. 정지된 자격은 거부돼요 [${B}] 또한 [${A}]`, [source(A), source(B)]);
+    expect(result.citedIds).toEqual([A, B]);
+    expect(result.uncited).toEqual([]);
+  });
+  it("attaches a citation written after the full stop to the sentence before it", () => {
+    expect(auditAnswer(`시동은 불가해요. [${A}]`, [source(A)]).uncited).toEqual([]);
+  });
+  it("reports uncited sentences and bullet lines without the bullet marker", () => {
+    const answer = `직접 결론이에요 [${A}].\n\n- 근거 있는 항목 [${B}]\n- 해석이 섞인 항목\n이건 원문에 없는 해석이에요.`;
+    expect(auditAnswer(answer, [source(A), source(B)]).uncited).toEqual(["해석이 섞인 항목", "이건 원문에 없는 해석이에요."]);
+  });
+  it("ignores citation IDs that are not in the sources", () => {
+    expect(auditAnswer(`가짜예요 [SRC:X:V1:Z]`, [source(A)]).citedIds).toEqual([]);
+  });
+});

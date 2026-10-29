@@ -90,6 +90,10 @@ test('mocked answered UI safely links to an actual source and focuses its card',
   await page.getByRole('button',{name:/^근거 찾기/}).click();
   await expect(page.getByText('<b>권한</b>은 별도로 확인해야 합니다.',{exact:false})).toBeVisible();
   await expect(page.locator('.answer-prose b')).toHaveCount(0);
+  const verification=page.getByRole('region',{name:'답변 검증'});
+  await expect(verification.getByText('인용한 근거 1개가 모두 이번 검색 결과에 있어요.')).toBeVisible();
+  await expect(verification.getByText('사람 확인 필요',{exact:true})).toBeVisible();
+  await expect(verification.getByText('모든 문장에 인용이 붙어 있어요.')).toBeVisible();
   await page.getByRole('link',{name:`근거 1: ${source.version} ${source.requirementId}`,exact:true}).click();
   const card=page.locator('article.evidence-card').first();
   await expect(card).toBeFocused();
@@ -284,4 +288,19 @@ test('answer citation to a version in an inactive tab opens that tab and focuses
   const card=page.locator('article.evidence-tabs').filter({has:page.locator(`code.requirement-id:visible`,{hasText:v1.requirementId})});
   await expect(card).toBeFocused();
   await expect(card.getByRole('tab',{name:'V1'})).toHaveAttribute('aria-selected','true');
+});
+
+test('verification block lists sentences without a citation', async ({ page, request }) => {
+  const actual=await (await request.post('/api/ask',{data:{question:'NFC',versions:['V1'],mode:'keyword'}})).json();
+  const source=actual.sources[0];
+  await page.route('**/api/ask',route=>route.fulfill({json:{...actual,status:'answered',answer:`NFC는 탭 이벤트가 필요해요 [${source.citationId}].\n\n- 따라서 항상 안전하다고 볼 수 있어요.`,warnings:[]}}));
+  await page.goto('/');
+  await page.getByRole('radio',{name:'AI 검색',exact:true}).check();
+  await page.getByRole('textbox',{name:'질문',exact:true}).fill('NFC');
+  await page.getByRole('button',{name:/^근거 찾기/}).click();
+  const verification=page.getByRole('region',{name:'답변 검증'});
+  await expect(verification.getByText('인용이 붙지 않은 문장이 1개 있어요.')).toBeVisible();
+  await expect(verification.getByText('확인 필요',{exact:true})).toBeVisible();
+  await verification.getByText('어떤 문장인가요?').click();
+  await expect(verification.locator('.uncited-list li',{hasText:'따라서 항상 안전하다고 볼 수 있어요.'})).toBeVisible();
 });

@@ -105,6 +105,19 @@
     "citationAria": "근거 {n}: {version} {requirementId}",
     "caveat": "인용과 원문 일치 확인은 답변의 논리적 정확성을 보장하지 않습니다."
   },
+  "verification": {
+    "heading": "답변 검증",
+    "statusOk": "확인됨",
+    "statusCheck": "확인 필요",
+    "statusHuman": "사람 확인 필요",
+    "idsOk": "인용한 근거 {count}개가 모두 이번 검색 결과에 있어요.",
+    "quoteOk": "AI가 인용한 문구가 원문에 글자 그대로 있어요. 서버가 원문과 대조해 확인했어요.",
+    "uncited": "인용이 붙지 않은 문장이 {count}개 있어요.",
+    "uncitedNone": "모든 문장에 인용이 붙어 있어요.",
+    "uncitedDetails": "어떤 문장인가요?",
+    "uncitedHint": "AI가 정리하거나 해석해서 덧붙인 말일 수 있어요. 근거 카드의 원문과 직접 비교해 주세요.",
+    "human": "인용이 원문과 일치해도, 답변이 논리적으로 맞는지는 기계가 보증하지 못해요."
+  },
   "evidence": {
     "tabsLabel": "스펙 버전",
     "highlightChanges": "바뀐 부분 강조",
