@@ -39,23 +39,24 @@ export function EvidenceTabsCard({ items, index }: { items: Evidence[]; index: n
       <div className="version-tabs" role="tablist" aria-label={text.tabsLabel}>{items.map((item, position) => <button key={item.citationId} type="button" role="tab"
         ref={element => { tabs.current[position] = element; }} id={`${evidenceTargetId(item.citationId)}-tab`} aria-selected={position === active}
         aria-controls={evidenceTargetId(item.citationId)} tabIndex={position === active ? 0 : -1} onClick={() => setActive(position)} onKeyDown={move}>{item.version}</button>)}</div>
-      <span>§{current.sectionId}</span></div>
+      <span>§{current.sectionId}</span>
+      {diff && <label className="change-toggle"><input type="checkbox" checked={showChanges} onChange={event => setShowChanges(event.target.checked)} />
+        <span>{text.highlightChanges}</span><span className="change-count">{fill(text.changeCountShort, { count: diff.changes })}</span></label>}
+    </div>
     <h3 id={`${baseId}-heading`}>{current.heading ?? current.requirementId}</h3>
     <p className="document-title">{current.documentTitle}</p>
-    {diff && <label className="change-toggle"><input type="checkbox" checked={showChanges} onChange={event => setShowChanges(event.target.checked)} />
-      <span>{text.highlightChanges}</span><span className="change-count">{fill(text.changeCount, { count: diff.changes })}</span></label>}
     {items.map((item, position) => {
       const matches = (item.matches ?? []).filter(match => typeof match?.term === "string" && match.term.length > 0);
       const side = position === 0 ? diff?.from : diff?.to;
       return <div key={item.citationId} role="tabpanel" id={evidenceTargetId(item.citationId)} aria-labelledby={`${evidenceTargetId(item.citationId)}-tab`} hidden={position !== active}>
         <code className="requirement-id">{item.requirementId}</code>
-        {matches.length > 0 && !showChanges && <div className="matched-terms"><span>{text.matchedTerms}</span>
-          <ul aria-label={text.matchedTerms}>{matches.map(match => <li key={match.term} lang="en">{match.term}
-            {match.viaSynonym && <span className="synonym-tag" lang="ko">{text.synonymTag}</span>}</li>)}</ul></div>}
         {showChanges && side
           ? <blockquote lang="en" className="changes-view" aria-label={fill(text.changeLegend, { version: item.version, other: items[position === 0 ? items.length - 1 : 0].version })}>
             {side.map((part, partIndex) => part.changed ? (position === 0 ? <del key={partIndex}>{part.text}</del> : <ins key={partIndex}>{part.text}</ins>) : part.text)}</blockquote>
           : <blockquote lang="en"><Highlighted text={item.quote} evidence={item} /></blockquote>}
+        {matches.length > 0 && !showChanges && <div className="matched-terms"><span>{text.matchedTerms}</span>
+          <ul aria-label={text.matchedTerms}>{matches.map(match => <li key={match.term} lang="en">{match.term}
+            {match.viaSynonym && <span className="synonym-tag" lang="ko">{text.synonymTag}</span>}</li>)}</ul></div>}
         <details onToggle={event => setExpanded(event.currentTarget.open)}>
           <summary>{expanded ? text.collapse : text.expand}</summary>
           <div className="source-full"><p lang="en"><Highlighted text={item.fullText} evidence={item} /></p>

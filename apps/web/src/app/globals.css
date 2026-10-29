@@ -64,3 +64,4 @@
 @keyframes scan-hit{0%,30%{background:none;color:inherit}55%,85%{background:#ffe27a;color:var(--text)}100%{background:none;color:inherit}}
 @media(max-width:767px){.search-progress{grid-template-columns:1fr;gap:16px;padding-bottom:32px}}
 @media(prefers-reduced-motion:reduce){.scan-bar,.scan-hit,.progress-steps li.on .progress-dot{animation:none}.scan-bar{display:none}}
+.evidence-card blockquote+.matched-terms{margin:-4px 0 12px}

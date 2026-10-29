@@ -20,10 +20,10 @@ export function EvidenceCard({ evidence, index }: { evidence: Evidence; index: n
     <h3 id={`${id}-heading`}>{evidence.heading ?? evidence.requirementId}</h3>
     <p className="document-title">{evidence.documentTitle}</p>
     <code className="requirement-id">{evidence.requirementId}</code>
+    <blockquote lang="en"><Highlighted text={evidence.quote} evidence={evidence} /></blockquote>
     {matches.length > 0 && <div className="matched-terms"><span>{text.matchedTerms}</span>
       <ul aria-label={text.matchedTerms}>{matches.map(match => <li key={match.term} lang="en">{match.term}
         {match.viaSynonym && <span className="synonym-tag" lang="ko">{text.synonymTag}</span>}</li>)}</ul></div>}
-    <blockquote lang="en"><Highlighted text={evidence.quote} evidence={evidence} /></blockquote>
     <details onToggle={event => setExpanded(event.currentTarget.open)}>
       <summary>{expanded ? text.collapse : text.expand}</summary>
       <div className="source-full"><p lang="en"><Highlighted text={evidence.fullText} evidence={evidence} /></p>

@@ -108,7 +108,7 @@
   "evidence": {
     "tabsLabel": "스펙 버전",
     "highlightChanges": "바뀐 부분 강조",
-    "changeCount": "V1→V2 변경 {count}곳",
+    "changeCountShort": "{count}곳",
     "changeLegend": "{version}에서 {other}와 달라진 말",
     "changeSource": "원문 전체 기준",
     "collapse": "원문 접기",
