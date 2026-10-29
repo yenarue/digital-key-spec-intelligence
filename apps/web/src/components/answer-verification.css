@@ -9,4 +9,7 @@
 .answer-verification summary{color:var(--accent);cursor:pointer;font-size:13px;min-height:28px;align-content:center}
 .answer-verification details p{margin:4px 0;font-size:13px;color:var(--muted)}
 .answer-verification .uncited-list{gap:4px;padding-left:18px;list-style:disc;font-size:13px;color:var(--text)}
-.answer-verification .uncited-list li{display:list-item}
+.answer-verification .uncited-list li{display:list-item;border-radius:4px;cursor:default}
+.answer-verification .uncited-list li:hover,.answer-verification .uncited-list li:focus-visible{background:#ffe9a8}
+.answer-verification .uncited-list li:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.answer-text mark.answer-hover{background:#ffe9a8;color:inherit;border-radius:3px;padding:0 1px}

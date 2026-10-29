@@ -5,7 +5,7 @@ import { fill, uiText } from "../content/ui-text";
 
 const text = uiText.verification;
 /** What was checked by machine (server validation, citation markers) and what only a person can judge. Shown only for answers the server accepted. */
-export function AnswerVerification({ answer, sources }: { answer: string; sources: readonly Evidence[] }) {
+export function AnswerVerification({ answer, sources, onHighlight }: { answer: string; sources: readonly Evidence[]; onHighlight?: (span: [number, number] | null) => void }) {
   const audit = auditAnswer(answer, sources);
   const gaps = audit.uncited.length;
   return <section className="answer-verification" aria-labelledby="verification-heading">
@@ -15,8 +15,10 @@ export function AnswerVerification({ answer, sources }: { answer: string; source
       <li><span className="pill ok">{text.statusOk}</span><span>{text.quoteOk}</span></li>
       <li><span className={`pill ${gaps ? "warn" : "ok"}`}>{gaps ? text.statusCheck : text.statusOk}</span>
         <span>{gaps ? fill(text.uncited, { count: gaps }) : text.uncitedNone}
-          {gaps > 0 && <details><summary>{text.uncitedDetails}</summary><p>{text.uncitedHint}</p>
-            <ul className="uncited-list">{audit.uncited.map((sentence, index) => <li key={index}>{sentence}</li>)}</ul></details>}</span></li>
+          {gaps > 0 && <details><summary>{text.uncitedDetails}</summary><p>{text.uncitedHint} {text.uncitedHover}</p>
+            <ul className="uncited-list">{audit.uncited.map((sentence, index) => <li key={index} tabIndex={0}
+              onMouseEnter={() => onHighlight?.([sentence.start, sentence.end])} onMouseLeave={() => onHighlight?.(null)}
+              onFocus={() => onHighlight?.([sentence.start, sentence.end])} onBlur={() => onHighlight?.(null)}>{sentence.text}</li>)}</ul></details>}</span></li>
       <li><span className="pill warn">{text.statusHuman}</span><span>{text.human}</span></li>
     </ul>
   </section>;

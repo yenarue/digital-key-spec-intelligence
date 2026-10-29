@@ -303,4 +303,13 @@ test('verification block lists sentences without a citation', async ({ page, req
   await expect(verification.getByText('확인 필요',{exact:true})).toBeVisible();
   await verification.getByText('어떤 문장인가요?').click();
   await expect(verification.locator('.uncited-list li',{hasText:'따라서 항상 안전하다고 볼 수 있어요.'})).toBeVisible();
+  const item=verification.locator('.uncited-list li',{hasText:'따라서 항상 안전하다고 볼 수 있어요.'});
+  await expect(page.locator('.answer-text mark.answer-hover')).toHaveCount(0);
+  await item.hover();
+  await expect(page.locator('.answer-text mark.answer-hover')).toHaveText('따라서 항상 안전하다고 볼 수 있어요.');
+  await expect(page.locator('.answer-text').first()).toHaveText(/NFC는 탭 이벤트가 필요해요/);
+  await page.mouse.move(0,0);
+  await expect(page.locator('.answer-text mark.answer-hover')).toHaveCount(0);
+  await item.focus();
+  await expect(page.locator('.answer-text mark.answer-hover')).toHaveCount(1);
 });

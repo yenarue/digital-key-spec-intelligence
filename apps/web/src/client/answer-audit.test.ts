@@ -15,7 +15,12 @@ describe("auditAnswer", () => {
   });
   it("reports uncited sentences and bullet lines without the bullet marker", () => {
     const answer = `직접 결론이에요 [${A}].\n\n- 근거 있는 항목 [${B}]\n- 해석이 섞인 항목\n이건 원문에 없는 해석이에요.`;
-    expect(auditAnswer(answer, [source(A), source(B)]).uncited).toEqual(["해석이 섞인 항목", "이건 원문에 없는 해석이에요."]);
+    expect(auditAnswer(answer, [source(A), source(B)]).uncited.map(sentence => sentence.text)).toEqual(["해석이 섞인 항목", "이건 원문에 없는 해석이에요."]);
+  });
+  it("returns the exact range of each uncited sentence inside the original answer", () => {
+    const answer = `직접 결론이에요 [${A}].\n\n- 해석이 섞인 항목\n이건 원문에 없는 해석이에요.`;
+    const ranges = auditAnswer(answer, [source(A)]).uncited.map(({ start, end }) => answer.slice(start, end));
+    expect(ranges).toEqual(["해석이 섞인 항목", "이건 원문에 없는 해석이에요."]);
   });
   it("ignores citation IDs that are not in the sources", () => {
     expect(auditAnswer(`가짜예요 [SRC:X:V1:Z]`, [source(A)]).citedIds).toEqual([]);
