@@ -113,10 +113,13 @@ test('pending request prevents duplicate sends and preserves input on fallback',
   await expect(page.getByRole('radio',{name:'키워드 검색',exact:true})).toBeDisabled();
   await expect(page.getByRole('radio',{name:'AI 검색',exact:true})).toBeDisabled();
   await expect(page.getByRole('button',{name:/^찾는 중/})).toBeDisabled();
+  await expect(page.locator('.search-progress .progress-steps li')).toHaveCount(4);
+  await expect(page.locator('.search-progress .progress-steps li.on')).toHaveCount(1);
   await page.locator('form').evaluate(form=>{(form as HTMLFormElement).requestSubmit();});
   release();
   await expect(page.getByText('검색 결과를 확인하세요',{exact:true})).toBeVisible();
   expect(calls).toBe(1);
+  await expect(page.locator('.search-progress')).toHaveCount(0);
   await expect(input).toHaveValue('NFC');
 });
 

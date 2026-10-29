@@ -6,6 +6,7 @@ import { askQuestion, questionError, questionLength } from "../client/ask-client
 import { addHistory, clearHistory, historyStore, removeHistory, type HistoryEntry } from "../client/history";
 import { EvidenceCard } from "./evidence-card";
 import { AnswerPanel } from "./answer-panel";
+import { SearchProgress } from "./search-progress";
 import { QuestionHistory, savedTime, scopeLabel } from "./question-history";
 import { fill, uiText } from "../content/ui-text";
 import webPackage from "../../package.json";
@@ -117,7 +118,7 @@ export function AskPanel() {
     <QuestionHistory entries={history} disabled={pending} currentId={submitted?.saved?.id} onOpen={openHistory}
       onRemove={id => historyStore.set(removeHistory(id))} onClear={() => historyStore.set(clearHistory())} />
     <p className="search-status" role="status" aria-live="polite">{pending ? (mode === "keyword" ? text.statusPendingKeyword : text.statusPendingAi) : result ? `${submitted?.saved ? historyText.statusSaved : reused ? text.statusReused : text.statusDone} ${fill(submitted?.mode === "keyword" ? text.statusCountKeyword : text.statusCount, { count: result.sources.length })}` : ""}</p>
-    {pending && <div className="loading-skeleton" aria-hidden="true"><div /><div /><div /></div>}
+    {pending && <SearchProgress mode={mode} />}
     {!pending && result && <div className="result-block">
       {submitted?.saved && <div className="saved-banner"><strong>{historyText.savedLabel}</strong>
         <span>{savedTime(submitted.saved.at)} · {modeLabels[submitted.mode]} · {scopeLabel(submitted.scope === "all" ? ["V1", "V2"] : [submitted.scope])}</span>
