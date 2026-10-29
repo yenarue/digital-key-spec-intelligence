@@ -348,8 +348,13 @@
           "title": "공통 코어",
           "boxes": [
             {
-              "name": "검색·근거 검증 코어",
-              "detail": "spec-core · Query · 인용은 항상 원문",
+              "name": "검색",
+              "detail": "MiniSearch · 버전 필터 · Query",
+              "planned": false
+            },
+            {
+              "name": "근거 검증",
+              "detail": "인용 ID·원문 대조 · 인용은 항상 원문",
               "planned": false
             }
           ]
