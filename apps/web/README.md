@@ -12,8 +12,10 @@ Next.js App Router + TypeScript + Tailwind. A안 Clear Desk, local Pretendard WO
 
 무근거는 insufficient_evidence, 키 없음은 search_only, 모델 오류/인용 검증 실패는 llm_unavailable과 검색 sources를 반환한다. same-origin 검사는 인증이나 전역 rate limit이 아니다. Local MCP는 disabled/aria-disabled이고 별도 서버/페이지는 없다.
 
-첫 Vercel Production v0.1.1과 실제 AI 응답을 확인했다. 검색 모드 후속 릴리스 v0.2.0의 배포 결과와 실모델 결과는 PLAN 실행 로그를 확인한다. [배포 가이드](../../docs/deployment.md)와 [PLAN](../../PLAN.md)을 확인한다. Skill 파일은 Web에서 실행하지 않는다.
+최신 Vercel Production v0.3.3에서 검색 모드 전환·무호출 결과 재사용·실제 AI 응답·모바일 화면을 확인했다. 검증 범위와 한계는 PLAN 실행 로그를 확인한다. [배포 가이드](../../docs/deployment.md)와 [PLAN](../../PLAN.md)을 확인한다. Skill 파일은 Web에서 실행하지 않는다.
 
 Vercel의 120초 함수 예산은 Fluid Compute 환경을 기준으로 한다. [공식 duration 문서](https://vercel.com/docs/functions/configuring-functions/duration)의 현재 Hobby 한도 내이며 실제 프로젝트 설정과 배포 URL에서 확인해야 한다.
 
 검색 방식 API는 `mode?: "keyword" | "ai"`를 받는다. 생략은 기존 AI 동작을 유지하고 잘못된 값은400이다. 키워드 결과는 `search_only`, null answer, empty warnings다. UI 전환만으로 호출하지 않으며 현재 질문·버전·topK의 모드별 최신 결과 하나씩을 메모리에 보관한다. 질문/버전이 달라지면 비우고, 명시적 재제출은 새 요청을 보낸다.
+
+발표 시연 순서: 키워드 기본 모드에서 `시동 권한` 예시를 선택해 제출 → 검색 결과·V2·원문 펼치기 확인 → AI 모드 선택 후 직접 제출 → 검증된 인용으로 카드 이동 → 키워드로 돌아가 `이전 실행 결과`와 추가 요청 없음을 비교한다. 무료 모델이 실패하면 검색 결과가 유지되는 fallback을 설명한다. Agent Skills 페이지는 별도의 에이전트 워크플로 소개이며 웹에서 실행하지 않는다.

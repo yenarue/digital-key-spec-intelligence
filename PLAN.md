@@ -8,7 +8,7 @@
 
 ### 현재 실행 결과
 
-로컬 Core/API/UI 구현과 독립 리뷰를 마쳤다. 단위·통합168개, 검색 평가18개, 브라우저7개, lint/typecheck/build를 실제 실행해 통과했다. dev는 http://localhost:3000 에서 계속 실행 중이다. 전체 제품명과 manifest 기반 버전 표시도 추가했다. 현재 배포 버전은 v0.1.1이다. 루트 .env 로딩을 연결해 실제 무료 모델의 answered 응답과 원문 인용을 확인했다. 병행 세션의 첫 Production 배포 기록이 docs/deployment.md에 추가됐다. 이번 수정은 실제 URL의 버전과 AI answered 응답까지 확인했다. 전체 G4 브라우저 검증과 A–E 완료 판정은 아직 남아 있다.
+A–E Web MVP와 키워드/AI 검색 전환(FR-18/19)을 구현·통합하고 실제 Production에서 검증했다. 현재 공유 저장소와 배포 버전은 병행 세션의 후속 기능을 포함한 v0.3.3(0261d61)이다. 최신 검증은 단위·통합215/215, 검색 평가21/21(기대 ID21/21@5), 브라우저16/16, lint·build 통과다. 실제 화면에서 기본 keyword → AI 전환 무호출 → 명시적 AI 제출 answered → keyword 이전 결과 재사용 무호출을 확인했다. 모바일375/데스크톱1280, 정확한 인용 이동, 브라우저 오류0건을 확인했다. dev는 http://localhost:3000 에서 계속 실행 중이다. A–E P0 배포 Gate는 통과했으며, 심화 접근성·전체 Skill activation 회귀·추가 CI는 미완료/후속으로 유지한다. 배포별 증거와 무료 모델 한계는 docs/deployment.md 및 하단 로그를 따른다.
 
 ### 착수 시점의 자산과 부족한 부분 (기준 기록)
 
@@ -116,7 +116,7 @@ type ApiError = { error: { code: "invalid_request" | "payload_too_large" | "inte
 - [x] **R1 · API · G0 후:** `src/server/{ask-service,request-validation}.ts`와 단위 테스트에 입력 검증·주입형 Retriever·무근거 무호출·검색 전용 응답을 구현한다. Core 구현 완료를 기다리지 않고 계약을 만족하는 fake retriever로 검사한다.
 - [x] **R2 · API · R1 후:** `src/app/api/ask/route.ts`, `route.test.ts`에 Node runtime·본문 제한·400/413·no-store·서버 오류 비노출을 구현한다. Main의 `src/server/ask-runtime.ts` 조립 함수를 호출하도록 어댑터를 만든다. 이 조립 파일의 타입·export 경계는 B2에 존재하고 실물 조립은 Main이 M1에서 완성한다. 개별 검증은 주입형 service/route mock으로 하고 전체 빌드는 M1에서 수행한다.
 - [x] **M1 · Main · C2+U2+R2 후:** 모든 writer를 잠시 멈추고 `spec-core/src/index.ts` exports, `web/src/server/corpus.ts`, `ask-runtime.ts`를 연결하고 `web/src/integration/**`에 실물 연결 테스트를 둔다. 정적 demo import → 실제 코어 → 실제 API → 실제 UI로 동작시키고 고정 응답·fake provider가 production 경로에 없는지 확인한다. 검색/버전/원문/API 통합 테스트·lint·build를 실행해 G1-local을 통과한다.
-- [ ] **M2 · Main · M1 후:** 키 없는 Vercel Preview를 배포하고 실제 검색·버전·근거 카드·모바일 화면·정적 JSON 번들링을 확인한다(G1-preview). 이 작업 중 PG2는 G1-local 기준으로 시작할 수 있다. 배포 대상 커밋을 먼저 고정하고, 해당 커밋의 Git 연동 배포 또는 별도 임시 checkout에서 배포한다. PG2가 편집 중인 공유 worktree를 CLI로 직접 업로드하지 않는다.
+- [x] **M2 · Main · M1 후:** 키 없는 Vercel Preview를 배포하고 실제 검색·버전·근거 카드·모바일 화면·정적 JSON 번들링을 확인한다(G1-preview). 이 작업 중 PG2는 G1-local 기준으로 시작할 수 있다. 배포 대상 커밋을 먼저 고정하고, 해당 커밋의 Git 연동 배포 또는 별도 임시 checkout에서 배포한다. PG2가 편집 중인 공유 worktree를 CLI로 직접 업로드하지 않는다.
 
 **G1 완료:** 키 없이 브라우저 → 실제 API → 실제 검색 → 근거/원문이 동작한다. G1-preview까지 확인된 URL을 중간 배포 성과로 기록한다. AI 답변 없는 Vertical Slice를 최종 A–E 완료로 표시하지 않는다.
 
@@ -147,9 +147,9 @@ type ApiError = { error: { code: "invalid_request" | "payload_too_large" | "inte
 
 ### Phase 5 — 최종 배포·실측·인수인계 (Main 순차, P0)
 
-- [ ] **M5 · Main · M2+M4 후:** 모든 writer를 멈추고 P1 반영 여부를 확정한다. 깨끗한 설치 기준 `npm ci`, `npm run test`, `npm run eval`, `npm run lint`, `npm run build`, `npm run test:e2e`를 실행하고 실패를 수정한다. 최종 검사 중에는 코드·lockfile·설정을 동시에 바꾸지 않는다.
-- [ ] **M6 · Main · M5 후:** 최종 production 커밋/배포를 고정하고 Vercel 환경변수·Root Directory·정적 번들을 점검한다. §9의 배포 검증 체크리스트를 실제 URL에서 수행한다(G4). 실제 UI가 preview와 다른 커밋이면 최종 URL에서 다시 확인한다.
-- [ ] **M7 · Main · M6 후:** README, workspace README, `docs/decisions.md`에 실제 설치/실행법·URL·커밋·결과·P1 보류·제공자 한계와 발표 순서를 기록한다. 전체 A–E 필수 수용 기준 충족 여부를 판정한다. 구현 단계마다 변경 파일/실행 명령과 결과/한계/다음 단계 보고를 남긴다.
+- [x] **M5 · Main · M2+M4 후:** 모든 writer를 멈추고 P1 반영 여부를 확정한다. 깨끗한 설치 기준 `npm ci`, `npm run test`, `npm run eval`, `npm run lint`, `npm run build`, `npm run test:e2e`를 실행하고 실패를 수정한다. 최종 검사 중에는 코드·lockfile·설정을 동시에 바꾸지 않는다.
+- [x] **M6 · Main · M5 후:** 최종 production 커밋/배포를 고정하고 Vercel 환경변수·Root Directory·정적 번들을 점검한다. §9의 배포 검증 체크리스트를 실제 URL에서 수행한다(G4). 실제 UI가 preview와 다른 커밋이면 최종 URL에서 다시 확인한다.
+- [x] **M7 · Main · M6 후:** README, workspace README, `docs/decisions.md`에 실제 설치/실행법·URL·커밋·결과·P1 보류·제공자 한계와 발표 순서를 기록한다. 전체 A–E 필수 수용 기준 충족 여부를 판정한다. 구현 단계마다 변경 파일/실행 명령과 결과/한계/다음 단계 보고를 남긴다.
 - [ ] **O1 · Main · M7 후, P1:** 여유 시 `.github/workflows/ci.yml`에 비밀 없는 install/test/eval/lint/build를 추가한다. 배포를 기다리게 하지 않으며 추가 후 실제 workflow 결과는 별도 확인한다.
 
 ## 4. Dependency Graph
@@ -284,13 +284,13 @@ Phase 번호는 기능별 매핑이며 병렬 시작 시점은 §5를 따른다.
 5. 기본 무료 라우터와 무료 모델 allowlist 외 유료 호출을 거부한다. 제공자 정책이나 privacy 옵션이 무료 라우팅과 충돌하면 실패를 fallback으로 처리한다. 실자료 전송 옵션·source/provider selector는 공개 MVP에 만들지 않는다.
 6. **아래 checklist는 모두 M6 / Main / M5 완료 및 production 배포 후 수행**한다. production 배포 후 아래를 실제 URL에서 검사하고 URL·배포 시각·커밋·검사 결과를 README 또는 결정 기록에 남긴다.
 
-- [ ] **D1 · M6 하위 검사 / Main / P0:** 합성 경고와 disabled MCP, 모바일/데스크톱 화면 확인.
-- [ ] **D2 · M6 하위 검사 / Main / P0:** Q1(V1), Q3(V2), Q5(all)의 top-5와 원문 확장 확인.
-- [ ] **D3 · M6 하위 검사 / Main / P0:** Q8 무근거와 invalid POST 검증; 모델 호출 없음 확인.
-- [ ] **D4 · M6 하위 검사 / Main / P0:** 실제 AI 응답과 인용·조건을 수동 대조. 일시적 제공자 장애는 실제 발생 상태로 기록.
-- [ ] **D5 · M6 하위 검사 / Main / P0:** 키 없는 Preview에서 검색 전용 확인; timeout/429는 자동 통합 테스트 또는 별도 통제된 환경에서 재현. 실제 장애가 없었다면 live 재현 완료라고 쓰지 않는다.
-- [ ] **D6 · M6 하위 검사 / Main / P0:** 브라우저 네트워크/클라이언트 산출물에서 키·서버 설정 비노출, 콘솔 오류와 API 응답 확인.
-- [ ] **D7 · M6 하위 검사 / Main / P0:** Vercel 배포 로그·함수에 루트 JSON 누락이나 런타임 쓰기 의존성이 없는지 확인.
+- [x] **D1 · M6 하위 검사 / Main / P0:** 합성 경고와 disabled MCP, 모바일/데스크톱 화면 확인.
+- [x] **D2 · M6 하위 검사 / Main / P0:** Q1(V1), Q3(V2), Q5(all)의 top-5와 원문 확장 확인.
+- [x] **D3 · M6 하위 검사 / Main / P0:** Q8 무근거와 invalid POST 검증; 모델 호출 없음 확인.
+- [x] **D4 · M6 하위 검사 / Main / P0:** 실제 AI 응답과 인용·조건을 수동 대조. 일시적 제공자 장애는 실제 발생 상태로 기록.
+- [x] **D5 · M6 하위 검사 / Main / P0:** 키 없는 Preview에서 검색 전용 확인; timeout/429는 자동 통합 테스트 또는 별도 통제된 환경에서 재현. 실제 장애가 없었다면 live 재현 완료라고 쓰지 않는다.
+- [x] **D6 · M6 하위 검사 / Main / P0:** 브라우저 네트워크/클라이언트 산출물에서 키·서버 설정 비노출, 콘솔 오류와 API 응답 확인.
+- [x] **D7 · M6 하위 검사 / Main / P0:** Vercel 배포 로그·함수에 루트 JSON 누락이나 런타임 쓰기 의존성이 없는지 확인.
 
 Vercel 계정 접근/프로젝트 연결/secret 설정 권한이 없다면 필요한 외부 조치만 요청한다. 공개 MVP는 개인 비상업적 학술 시연용이며 회사 운영으로 전환하지 않는다.
 
@@ -377,7 +377,7 @@ Vercel 계정 접근/프로젝트 연결/secret 설정 권한이 없다면 필�
 
 ## 13. Post-Deployment Follow-up — 키워드 / AI 검색 전환
 
-**상태: v0.1.1 첫 배포 및 핵심 live 검증 후 구현 진행 중.** 사용자 후속 승인에 따라 키워드/AI 검색 전환을 구현한다. 기존 PRD의 A–E 필수 수용 기준을 대체하거나 이번 배포를 지연시키지 않는다. 구현 시 PRD/DESIGN/결정 기록에 후속 요구사항을 반영한다.
+**상태: S0–S4 구현·통합·배포 검증 완료.** 사용자 후속 승인에 따라 키워드/AI 검색 전환을 구현한다. 기존 PRD의 A–E 필수 수용 기준을 대체하거나 이번 배포를 지연시키지 않는다. 구현 시 PRD/DESIGN/결정 기록에 후속 요구사항을 반영한다.
 
 ### 목적과 동작 제안
 
@@ -428,7 +428,7 @@ UI는 `mode`를 항상 명시한다. **API에서 mode를 생략한 기존 클라
 - [x] **S1 · API Agent · S0 후 / S2와 병렬:** mode 검증과 서버 생성 분기를 구현한다. keyword는 항상 retriever까지만 실행하고 모델 호출을 건너뛴다. ai의 인용 검증·실패 fallback·1회 상한은 유지한다. 설정된 fake 키/금지 모델에서도 keyword 결과가 정상이고 provider가 호출되지 않는 targeted 테스트를 제출한다.
 - [x] **S2 · UI Agent · S0 후 / S1과 병렬:** 검색 방식 선택, 요청 mode 전달, 제출 당시 모드 표기, 의도된 keyword와 AI fallback 안내 구분을 구현한다. 전환만으로 호출하지 않고 동일 입력의 모드별 최신 결과를 재사용해 비교한다. 입력 변경·pending·재제출·모바일·keyboard 상태를 검사한다.
 - [x] **S3 · Main · S1+S2 후 / Integration Gate G5:** 실제 UI→API→코어를 통합하고 아래 수용 기준과 test/eval/lint/build·관련 E2E를 실행한다. 단순 화면 상태가 아니라 서버 provider 호출 횟수를 검사한다. 기존 무근거·버전 격리·인용 거부·AI 장애 회귀가 통과해야 한다.
-- [ ] **S4 · Main · S3/G5 후 / 다음 릴리스:** 호환 기능 추가로 Minor를 증가시킨다. 첫 배포가0.1.0이면 다음 목표는0.2.0이며, 실제 배포 기준이 다르면 그 버전에서 계산한다. 지금 버전을 올리거나 태그를 만들지 않는다. Preview→Production 배포 후 실제 URL에서 두 모드·표시 버전·키워드 무호출을 확인하고 결과를 기록한다.
+- [x] **S4 · Main · S3/G5 후 / 다음 릴리스:** 호환 기능 추가로 Minor를 증가시킨다. 첫 배포가0.1.0이면 다음 목표는0.2.0이며, 실제 배포 기준이 다르면 그 버전에서 계산한다. 지금 버전을 올리거나 태그를 만들지 않는다. Preview→Production 배포 후 실제 URL에서 두 모드·표시 버전·키워드 무호출을 확인하고 결과를 기록한다.
 
 ### 수용 기준과 검증
 
@@ -647,3 +647,14 @@ Skill 목록 페이지가 아니라 **프로젝트와 Skill을 소개하는 랜�
 - 두 Skill의 README/SKILL.md 링크가 저장소의 실제 경로를 가리킨다.
 - Roadmap에서 현재 상태(Live / 정의·수동 검증)와 계획(Planned)이 구분된다.
 - 기존 test/E2E/eval 통과, 375px 가로 스크롤 없음.
+
+
+## Release and live integration closure — 2026-10-29
+
+- S4 fixed source9abe8e6 (v0.2.0) was checked out cleanly in /private/tmp/dksi-release-020. Actual npm ci succeeded; test198/198, eval18/18, lint/build and E2E9/9 all passed there. No root .env was copied; only Vercel project-link metadata was copied. Preview dpl_FaVNLFxup3YM8jMV39wz2q7vbVS4 Ready: actual keyword Q5 returned search_only, null answer, empty warnings and V1/V2 REQ008 in top2.
+- During continuation, shared main had already advanced to0261d61/v0.3.3 via concurrent UI-copy/overview/matched-terms/history/Skills/design work. All was preserved; no older Production redeploy or config rollback was performed. Main was already pushed. Current Production dpl_7EYUAknDCDWPm4LC7VcajZAVvtgT is Ready at https://digital-key-spec-intelligence.vercel.app.
+- Latest0261d61 verification executed again: npm run test215/215, npm run eval21/21 (expectedIDs21/21@5), npm run lint, npm run build, npm run test:e2e16/16 passed. The model UI in automated regression remains stubbed; actual model proof is separate below. Local credential scan found no key in23 current production client files.
+- Independent real-browser QA on v0.3.3: initial0POSTs, keywordsubmit1POST/search_only/null/emptywarnings, switchtoAI still1POST, explicitAIsubmit2POST/answered, switchbackkeyword still2POST and previous-result label. V2 entry-only/start AI response matched exact REQ012 citation; two modes returned identical5sources. Citation focus, mobile375/desktop1280 no overflow, icon200, console0errors/0warnings, Skills navigation/version and isolated local history2entries verified. Artifacts: output/playwright/live-033-mobile-ai.png and live-033-desktop-keyword.png. User browser data untouched.
+- Actual Production keyword API checks: Q1V1/Q3V2/Q5all expected IDs@5, version exclusion and every quote/fullText against current corpus passed; unsupported spaceship returned insufficient_evidence/null/empty sources; invalid mode and empty question returned400. No model invocation on keyword/invalid/no-evidence is also proven by service/runtime spies; HTTP responses alone are not claimed as upstream-call telemetry.
+- G4/M6/M7 and A–E P0 accepted using accumulated actual checks: initial no-key Preview record (docs/deployment.md), live AI and mobile/source checks, current validation above. No-key Preview mobile was not independently rerun: blank-key E2E plus Production mobile covered the same UI. 429/timeout are automated controlled cases, not a claim of forced live faults. Latest source serves bundled synthetic JSON; actual response/source checks and deployment logs showed no missing-corpus/runtime-write failure.
+- P1 limitations retained: U4 full assistive-tech/320px/200% audit, O1 CI, full Skill activation/negative/adversarial session suite. Free-model occasional failure and domain interpretation remain limitations; no measured quota-saving percentage or semantic correctness guarantee. Latest browser success does not imply provider reliability.

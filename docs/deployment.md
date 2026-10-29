@@ -74,7 +74,7 @@ Not yet verified: a grounded `answered` response on Production (free-model timeo
 ### 2026-10-29 — v0.1.1 timeout patch
 
 - Source: `0eb5af2` (fix `617fc2e`), pushed to `main`; Git-triggered Production deployment `dpl_Dap8KZSSqmKSMT1HcDQX2VS1M48H` verified Ready using `vercel inspect`.
-- Model deadline is 90 seconds including response body; Route Handler `maxDuration=120` gives retrieval/validation overhead room. Total generation budget is 8,000 tokens including reasoning; still one free-model call, no automatic retries or paid fallback.
+- At this v0.1.1 revision, model deadline was60 seconds including response body, Route Handler maxDuration90, and total generation budget2,400 tokens including reasoning. Later commit34fb076 increased these to90/120 seconds and8,000 tokens; that later change is not part of the original v0.1.1 verification. Still one free-model call, no automatic retries or paid fallback.
 - Local verification: unit/integration168/168, browser7/7, lint/build passed. All three UI sample questions returned actual AI answers locally with validated exact citations.
 - Production homepage returned HTTP200, full product title, synthetic notice and `v0.1.1`. Actual POST asking whether V2 entry-only permits starting returned HTTP200 / `answered`, no warnings, V2-only evidence and the correct `DEMO-V2-REQ-012` citation; answer was manually checked against its source.
 - This supersedes the earlier missing Production-answer/version checks. Q5 and the remaining live browser/mobile/console/function-log checks are still pending. Free-model availability and answer quality are not guaranteed by one successful request.
@@ -85,3 +85,14 @@ Not yet verified: a grounded `answered` response on Production (free-model timeo
 - Local before push: `npm run test` 215/215, lint, typecheck, build passed; `npm run test:e2e` 16/16 (incl. FR-21 history and `/skills`).
 - Production: `/skills` returned HTTP 200 about a minute after the push; page HTML showed `v0.3.0`, the not-executed notice, the Skill plan section and `Local MCP · Coming soon`. HTML check only — no live browser/mobile run, and FR-21 history not exercised on Production.
 
+
+### 2026-10-29 — search modes release and latest v0.3.3 closure
+
+- Search modes commits: becaa91 contract,922b408 API,8b8820d UI,fd0ec72 integration/icon,9abe8e6 v0.2.0 release. Two agents had disjoint API/UI ownership; Main integrated; agents cross-reviewed read-only with no material defect.
+- Clean v0.2.0 checkout: npm ci, test198/198, eval18/18, lint/build, E2E9/9 passed. Preview https://digital-key-spec-intelligence-l4i4zr8co-yena-kim1.vercel.app (dpl_FaVNLFxup3YM8jMV39wz2q7vbVS4) Ready; actual keyword Q5 returned search_only/null/empty warnings and both expected008 sources.
+- Concurrent work advanced main to0261d61/v0.3.3 before final Production verification. Preserved it; no obsolete v0.2.0 Production upload. Latest public deployment dpl_7EYUAknDCDWPm4LC7VcajZAVvtgT, https://digital-key-spec-intelligence.vercel.app, verified Ready and actual version v0.3.3.
+- Re-executed latest local test215/215, eval21/21 (all21 expected IDs@5), lint/build, E2E16/16. Credential scan of23 current client build files passed without printing the key. Dev remains localhost:3000.
+- Actual Production API keyword checks Q1V1/Q3V2/Q5all passed expected IDs@5, exact original quotes/fullText and version isolation; unknown question returned insufficient_evidence; invalid mode/empty question400.
+- Actual isolated-browser QA: initial0POSTs; keyword submit1POST gives search_only/null/no warnings; AI switch no request; explicit AI submit gives secondPOST/answered with correct V2 entry-only/start REQ012 citation; switching back keyword reuses previous result with no third request. Same5 sources in both modes. One actual AI call for this final QA.
+- Mobile375/desktop1280 no horizontal overflow; source citation focus, icon200, browser0errors/0warnings, Skills navigation, version and isolated history records verified. Screenshots: output/playwright/live-033-mobile-ai.png and live-033-desktop-keyword.png.
+- A–E core live Gate and FR-18/19 accepted. Keyword zero-provider calls are proven by server/runtime spy tests; live response status alone is not used as model-call telemetry. Retain free-model nondeterminism, full assistive-tech/Skill activation/CI limitations; no reliability or quota-savings percentage claimed. No new secrets/environment/model settings were changed in this closure.

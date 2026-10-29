@@ -113,3 +113,9 @@
 ## 2026-10-29 — Search area and history list follow the C design preview
 - The search form is now one white card (toggles, question box, example chips), as in `docs/design-previews/question-history.html` C. Kept the existing segmented toggles at the owner's request, only shortened to 32px. Kept two small notes the preview omits on purpose: the mode hint (keyword makes no AI call) and the "demo fictional documents only" input hint. The `질문` label is visually hidden but still names the textarea.
 - History rows are single lines: question (ellipsis) then short tags (`AI`/`키워드`, `전체`/`V2`, result) and time (HH:mm today, M/D otherwise). Per-row delete stays (DESIGN rule) but shows on hover/focus, always on touch. Opening an entry collapses the list and marks that row current; the saved banner gains a border, `↻ 다시 실행` and the old-version note.
+
+
+## 2026-10-29 — Search modes integration and concurrent release closure
+- Keyword/AI modes were implemented by two disjoint API/UI agents and integrated by Main with real core/provider/validator tests. A third read-only agent checked Production; API/UI agents independently cross-reviewed each other. Zero keyword provider calls and omitted-mode compatibility are asserted server-side.
+- Clean v0.2.0 checkout and Preview passed. During continuation, main had advanced to v0.3.3; preserve all concurrent authorized work and verify the latest Production rather than uploading an obsolete checkout. Latest215 unit/integration,21 evaluation,16 browser tests, lint/build and actual live mode/citation/mobile checks passed; see deployment.md.
+- Initial no-key Preview proof and final blank-key E2E/Production mobile checks jointly cover the initial vertical slice; no separate rerun of no-key Preview mobile was claimed. Provider fault cases are controlled tests; actual successful model answers are recorded separately. Full assistive-tech/Skill activation/CI work stays deferred.
